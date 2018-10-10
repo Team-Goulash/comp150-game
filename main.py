@@ -1,6 +1,7 @@
 # DON'T FORGET TO COMMENT YOUR CODE PLEASE!!!
-import pygame, sys, random
+import pygame, sys, random, inputs
 from pygame.locals import *
+
 # Set the window size
 WINDOW_HEIGHT = 750
 WINDOW_WIDTH = 1334
@@ -41,11 +42,12 @@ i = 0                   # ???
 
 
 def gen_rand_map_tiles():
-    # use ''' ''' to add a description to your functions
-    '''
-    Generates the randome map tiles
+    # use """ """ to add a description to your functions
+    """
+    Generates the random map tiles
     :return: tile type ID [x][y]
-    '''
+    """
+
     tiles = []                  # [] = list
     for y in range(MAP_HEIGHT):
         tile = []
@@ -54,6 +56,36 @@ def gen_rand_map_tiles():
             tile.append(item)
         tiles.append(tile)
     return tiles
+
+
+def event_inputs():
+    """Gets the inputs and sets the key presses."""
+    for event in pygame.event.get():
+        # event: exit game! (via window X or alt-F4)
+        if event.type == QUIT:
+            exit_game()
+        # change the key pressed state
+        elif event.type == KEYDOWN or event.type == KEYUP:
+            if event.key == inputs.MOVE["left"]:                # set left key pressed (A)
+                inputs.KEY_PRESSED["left"] = event.type == KEYDOWN
+            elif event.key == inputs.MOVE["right"]:             # set right key pressed (D)
+                inputs.KEY_PRESSED["right"] = event.type == KEYDOWN
+            elif event.key == inputs.MOVE["forwards"]:          # set forwards key pressed (W)
+                inputs.KEY_PRESSED["forwards"] = event.type == KEYDOWN
+            elif event.key == inputs.MOVE["backwards"]:         # set backwards key pressed (S)
+                inputs.KEY_PRESSED["backwards"] = event.type == KEYDOWN
+            elif event.key == inputs.PAUSE:                     # get paused key down.
+                pass    # replace pass with pause action/function.
+        elif event.type == MOUSEBUTTONDOWN:                     # has a mouse button just been pressed?
+            pass        # replace pass with mouse button down action/function.
+        elif event.type == MOUSEBUTTONUP:                       # has a mouse button just been released?
+            pass        # replace pass with mouse button up action/function.
+
+
+def exit_game():
+    """Exits the game to desktop"""
+    pygame.quit()
+    sys.exit()
 
 
 def main():
@@ -75,11 +107,26 @@ def main():
 
     # main game loop
     while True:
-        # inputs
-        for event in pygame.event.get():
-            if event.type == QUIT:
-                pygame.quit()
-                sys.exit()
+
+        # Get inputs
+        event_inputs()
+
+        # Key press actions
+        if inputs.KEY_PRESSED["forwards"]:
+            # forwards key action
+            print("Forwards key is pressed")
+
+        if inputs.KEY_PRESSED["backwards"]:
+            # backwards key action
+            print("Backwards key is pressed")
+
+        if inputs.KEY_PRESSED["left"]:
+            # left key action
+            print("Left key is pressed")
+
+        if inputs.KEY_PRESSED["right"]:
+            # right key action
+            print("Right key is pressed")
 
         # wait for the frame to end
         fps_clock.tick(FPS)
