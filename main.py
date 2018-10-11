@@ -20,9 +20,11 @@ fps_clock = pygame.time.Clock()
 
 # Tile Size
 TILE_SIZE = library.floorImg.get_rect().width
-MAP_WIDTH = 25
-MAP_HEIGHT = 15
+MAP_WIDTH = 250
+MAP_HEIGHT = 150
 print(TILE_SIZE * MAP_WIDTH)
+
+level = pygame.Surface((TILE_SIZE * MAP_WIDTH, TILE_SIZE * MAP_HEIGHT))
 
 
 def gen_rand_map_tiles():
@@ -46,9 +48,6 @@ def gen_rand_map_tiles():
 
 def initialize_level():
     """Draws the tiles with according images on a blank surface"""
-    global level
-    level = pygame.Surface((TILE_SIZE * MAP_WIDTH, TILE_SIZE * MAP_HEIGHT))
-
     # stores the tile map
     tile_map = gen_rand_map_tiles()
 
