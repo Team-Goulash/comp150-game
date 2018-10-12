@@ -1,5 +1,5 @@
 # DON'T FORGET TO COMMENT YOUR CODE PLEASE!!!
-import pygame, sys, library
+import pygame, sys, library, random
 from pygame.locals import *
 from random import choices
 
@@ -20,11 +20,18 @@ fps_clock = pygame.time.Clock()
 
 # Tile Size
 TILE_SIZE = library.floorImg.get_rect().width
-MAP_WIDTH = 250
-MAP_HEIGHT = 150
+MAP_WIDTH = 50
+MAP_HEIGHT = 25
 print(TILE_SIZE * MAP_WIDTH)
 
 level = pygame.Surface((TILE_SIZE * MAP_WIDTH, TILE_SIZE * MAP_HEIGHT))
+# [] = array
+tiles = []
+floorTiles = []
+wallTiles = []
+doorTiles = []
+
+player = library.playerImg
 
 
 def gen_rand_map_tiles():
@@ -33,8 +40,6 @@ def gen_rand_map_tiles():
     Generates the random map tiles with different probabilities
     :return: tile type ID [x][y]
     """
-
-    tiles = []                  # [] = array
     population = [0, 1, 2]
     weights = [0.75, 0.3, 0.075]
     for y in range(MAP_HEIGHT):
@@ -56,6 +61,13 @@ def initialize_level():
         for column in range(MAP_WIDTH):
             level.blit(library.materials[tile_map[row][column]],
                        (column * TILE_SIZE, row * TILE_SIZE, TILE_SIZE, TILE_SIZE))
+
+            if tile_map[row][column] == 0:
+                floorTiles.append([column * TILE_SIZE, row * TILE_SIZE, TILE_SIZE, TILE_SIZE])
+            elif tile_map[row][column] == 1:
+                wallTiles.append([column * TILE_SIZE, row * TILE_SIZE, TILE_SIZE, TILE_SIZE])
+            elif tile_map[row][column] == 2:
+                doorTiles.append([column * TILE_SIZE, row * TILE_SIZE, TILE_SIZE, TILE_SIZE])
 
 
 def event_inputs():
@@ -94,10 +106,25 @@ def exit_game():
 def main():
     # create the level
     initialize_level()
+
     # create movement variables
     ticks_since_last_frame = 0
-    x = 0
-    y = 0
+    screen_rect = screen.get_rect()
+    level_rect = level.get_rect()
+
+    # find a random floor tile and get it's position coordinates
+    playerSpawnPoint = floorTiles[random.randint(0, len(floorTiles))]
+    playerX = playerSpawnPoint[0]
+    playerY = playerSpawnPoint[1]
+
+    # variables for centering the level
+    x = screen_rect.centerx - level_rect.centerx
+    y = screen_rect.centery - level_rect.centery
+
+    # variables for offsetting everything so the starting tile is always at the center
+    offsetX = -level_rect.centerx + Rect(playerSpawnPoint).centerx
+    offsetY = -level_rect.centery + Rect(playerSpawnPoint).centery
+
     # main game loop
     while True:
         t = pygame.time.get_ticks()
@@ -107,23 +134,27 @@ def main():
         event_inputs()
 
         # multiply the movement by delta_time to ensure constant speed no matter the FPS
-        movement_speed = 500 * delta_time
+        movement_speed = 75 * delta_time
 
         # Key press actions
         if library.KEY_PRESSED["forwards"]:
             # forwards key action
+            playerY -= movement_speed
             y += movement_speed
 
         if library.KEY_PRESSED["backwards"]:
             # backwards key action
+            playerY += movement_speed
             y -= movement_speed
 
         if library.KEY_PRESSED["left"]:
             # left key action
+            playerX -= movement_speed
             x += movement_speed
 
         if library.KEY_PRESSED["right"]:
             # right key action
+            playerX += movement_speed
             x -= movement_speed
 
         # wait for the frame to end
@@ -131,7 +162,13 @@ def main():
         # fill the background
         screen.fill(library.BLACK)
         # render the level on screen
-        screen.blit(level, (x, y))
+        screen.blit(level, (x - offsetX, y - offsetY))
+        # draw starting point rect (testing)
+        pygame.draw.rect(screen, library.BLUE,
+                         [x + playerSpawnPoint[0] - offsetX, y + playerSpawnPoint[1] - offsetY, playerSpawnPoint[2],
+                          playerSpawnPoint[3]])
+        # draw the player
+        screen.blit(player, (x + playerX - offsetX, y + playerY - offsetY))
         # update the display.
         pygame.display.flip()
         ticks_since_last_frame = t

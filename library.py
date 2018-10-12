@@ -16,11 +16,13 @@ WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 
 # set images
-scaleNum = 10
+scaleNum = 90
 
 doorImg = pygame.transform.scale(pygame.image.load("Well Escape tiles/DoorTile.png"), (scaleNum, scaleNum))
 floorImg = pygame.transform.scale(pygame.image.load("Well Escape tiles/FloorTile.png"), (scaleNum, scaleNum))
 wallImg = pygame.transform.scale(pygame.image.load("Well Escape tiles/WallTile.png"), (scaleNum, scaleNum))
+
+playerImg = pygame.transform.scale(pygame.image.load("Characters/Player.png"), (int(scaleNum), int(scaleNum)))
 
 # set materials
 FLOOR = 0
