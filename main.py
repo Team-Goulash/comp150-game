@@ -89,8 +89,10 @@ def event_inputs():
 
         if event.type == KEYUP:
             if event.key == library.PAUSE:                     # get paused key down.
-                main()  # generate a new level in-game(testing)
+                main()  # reset the game
                 floorTiles.clear()
+                wallTiles.clear()
+                doorTiles.clear()
         elif event.type == MOUSEBUTTONDOWN:                     # has a mouse button just been pressed?
             pass      # replace pass with mouse button up action/function.
         elif event.type == MOUSEBUTTONUP:                       # has a mouse button just been released?
