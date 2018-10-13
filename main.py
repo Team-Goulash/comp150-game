@@ -33,13 +33,16 @@ doorTiles = []
 
 player = library.playerImg
 
-playerX = 0
-playerY = 0
-offsetX = 0
-offsetY = 0
-x = 0
-y = 0
-playerSpawnPoint = []
+
+class GameStore:
+    playerX = 0
+    playerY = 0
+    offsetX = 0
+    offsetY = 0
+    x = 0
+    y = 0
+    playerSpawnPoint = []
+
 
 def gen_rand_map_tiles():
     # use """ """ to add a description to your functions
@@ -111,7 +114,6 @@ def exit_game():
 
 # creates a new level and positions everything accordingly in that level
 def start():
-    global x, y, playerX, playerY, offsetX, offsetY, playerSpawnPoint
     # create the level
     initialize_level()
 
@@ -121,22 +123,21 @@ def start():
     level_rect = level.get_rect()
 
     # find a random floor tile and get it's position coordinates
-    playerSpawnPoint = floorTiles[random.randint(0, len(floorTiles))]
-    playerX = playerSpawnPoint[0]
-    playerY = playerSpawnPoint[1]
+    GameStore.playerSpawnPoint = floorTiles[random.randint(0, len(floorTiles))]
+    GameStore.playerX = GameStore.playerSpawnPoint[0]
+    GameStore.playerY = GameStore.playerSpawnPoint[1]
 
     # variables for centering the level
-    x = screen_rect.centerx - level_rect.centerx
-    y = screen_rect.centery - level_rect.centery
+    GameStore.x = screen_rect.centerx - level_rect.centerx
+    GameStore.y = screen_rect.centery - level_rect.centery
 
     # variables for offsetting everything so the starting tile is always at the center
-    offsetX = -level_rect.centerx + Rect(playerSpawnPoint).centerx
-    offsetY = -level_rect.centery + Rect(playerSpawnPoint).centery
+    GameStore.offsetX = -level_rect.centerx + Rect(GameStore.playerSpawnPoint).centerx
+    GameStore.offsetY = -level_rect.centery + Rect(GameStore.playerSpawnPoint).centery
 
 
 def main():
     start()
-    global x, y, playerX, playerY, offsetX, offsetY, playerSpawnPoint
     ticks_since_last_frame = 0
     # main game loop
     while True:
@@ -152,36 +153,39 @@ def main():
         # Key press actions
         if library.KEY_PRESSED["forwards"]:
             # forwards key action
-            playerY -= movement_speed
-            y += movement_speed
+            GameStore.playerY -= movement_speed
+            GameStore.y += movement_speed
 
         if library.KEY_PRESSED["backwards"]:
             # backwards key action
-            playerY += movement_speed
-            y -= movement_speed
+            GameStore.playerY += movement_speed
+            GameStore.y -= movement_speed
 
         if library.KEY_PRESSED["left"]:
             # left key action
-            playerX -= movement_speed
-            x += movement_speed
+            GameStore.playerX -= movement_speed
+            GameStore.x += movement_speed
 
         if library.KEY_PRESSED["right"]:
             # right key action
-            playerX += movement_speed
-            x -= movement_speed
+            GameStore.playerX += movement_speed
+            GameStore.x -= movement_speed
 
         # wait for the frame to end
         fps_clock.tick(FPS)
         # fill the background
         screen.fill(library.BLACK)
         # render the level on screen
-        screen.blit(level, (x - offsetX, y - offsetY))
+        screen.blit(level, (GameStore.x - GameStore.offsetX, GameStore.y - GameStore.offsetY))
         # draw starting point rect (testing)
         pygame.draw.rect(screen, library.BLUE,
-                         [x + playerSpawnPoint[0] - offsetX, y + playerSpawnPoint[1] - offsetY, playerSpawnPoint[2],
-                          playerSpawnPoint[3]])
+                         [GameStore.x + GameStore.playerSpawnPoint[0] - GameStore.offsetX,
+                          GameStore.y + GameStore.playerSpawnPoint[1] - GameStore.offsetY,
+                          GameStore.playerSpawnPoint[2],
+                          GameStore.playerSpawnPoint[3]])
         # draw the player
-        screen.blit(player, (x + playerX - offsetX, y + playerY - offsetY))
+        screen.blit(player, (GameStore.x + GameStore.playerX - GameStore.offsetX,
+                             GameStore.y + GameStore.playerY - GameStore.offsetY))
         # update the display.
         pygame.display.flip()
         ticks_since_last_frame = t
