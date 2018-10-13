@@ -20,8 +20,8 @@ fps_clock = pygame.time.Clock()
 
 # Tile Size
 TILE_SIZE = library.floorImg.get_rect().width
-MAP_WIDTH = 50
-MAP_HEIGHT = 25
+MAP_WIDTH = 10
+MAP_HEIGHT = 5
 print(TILE_SIZE * MAP_WIDTH)
 
 level = pygame.Surface((TILE_SIZE * MAP_WIDTH, TILE_SIZE * MAP_HEIGHT))
@@ -33,6 +33,13 @@ doorTiles = []
 
 player = library.playerImg
 
+playerX = 0
+playerY = 0
+offsetX = 0
+offsetY = 0
+x = 0
+y = 0
+playerSpawnPoint = []
 
 def gen_rand_map_tiles():
     # use """ """ to add a description to your functions
@@ -40,6 +47,7 @@ def gen_rand_map_tiles():
     Generates the random map tiles with different probabilities
     :return: tile type ID [x][y]
     """
+    tiles.clear()
     population = [0, 1, 2]
     weights = [0.75, 0.3, 0.075]
     for y in range(MAP_HEIGHT):
@@ -53,20 +61,19 @@ def gen_rand_map_tiles():
 
 def initialize_level():
     """Draws the tiles with according images on a blank surface"""
-    # stores the tile map
-    tile_map = gen_rand_map_tiles()
-
+    # generate the map
+    gen_rand_map_tiles()
     # draw the tiles to the level surface
     for row in range(MAP_HEIGHT):
         for column in range(MAP_WIDTH):
-            level.blit(library.materials[tile_map[row][column]],
+            level.blit(library.materials[tiles[row][column]],
                        (column * TILE_SIZE, row * TILE_SIZE, TILE_SIZE, TILE_SIZE))
 
-            if tile_map[row][column] == 0:
+            if tiles[row][column] == 0:
                 floorTiles.append([column * TILE_SIZE, row * TILE_SIZE, TILE_SIZE, TILE_SIZE])
-            elif tile_map[row][column] == 1:
+            elif tiles[row][column] == 1:
                 wallTiles.append([column * TILE_SIZE, row * TILE_SIZE, TILE_SIZE, TILE_SIZE])
-            elif tile_map[row][column] == 2:
+            elif tiles[row][column] == 2:
                 doorTiles.append([column * TILE_SIZE, row * TILE_SIZE, TILE_SIZE, TILE_SIZE])
 
 
@@ -89,8 +96,7 @@ def event_inputs():
 
         if event.type == KEYUP:
             if event.key == library.PAUSE:                     # get paused key down.
-                initialize_level()  # generate a new level in-game(testing)
-
+                start()     # resets the level
         elif event.type == MOUSEBUTTONDOWN:                     # has a mouse button just been pressed?
             pass      # replace pass with mouse button up action/function.
         elif event.type == MOUSEBUTTONUP:                       # has a mouse button just been released?
@@ -103,12 +109,14 @@ def exit_game():
     sys.exit()
 
 
-def main():
+# creates a new level and positions everything accordingly in that level
+def start():
+    global x, y, playerX, playerY, offsetX, offsetY, playerSpawnPoint
     # create the level
     initialize_level()
 
     # create movement variables
-    ticks_since_last_frame = 0
+
     screen_rect = screen.get_rect()
     level_rect = level.get_rect()
 
@@ -125,6 +133,11 @@ def main():
     offsetX = -level_rect.centerx + Rect(playerSpawnPoint).centerx
     offsetY = -level_rect.centery + Rect(playerSpawnPoint).centery
 
+
+def main():
+    start()
+    global x, y, playerX, playerY, offsetX, offsetY, playerSpawnPoint
+    ticks_since_last_frame = 0
     # main game loop
     while True:
         t = pygame.time.get_ticks()
