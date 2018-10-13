@@ -33,6 +33,13 @@ doorTiles = []
 
 player = library.playerImg
 
+playerX = 0
+playerY = 0
+offsetX = 0
+offsetY = 0
+x = 0
+y = 0
+playerSpawnPoint = []
 
 def gen_rand_map_tiles():
     # use """ """ to add a description to your functions
@@ -89,10 +96,7 @@ def event_inputs():
 
         if event.type == KEYUP:
             if event.key == library.PAUSE:                     # get paused key down.
-                main()  # reset the game
-                floorTiles.clear()
-                wallTiles.clear()
-                doorTiles.clear()
+                start()     # resets the level
         elif event.type == MOUSEBUTTONDOWN:                     # has a mouse button just been pressed?
             pass      # replace pass with mouse button up action/function.
         elif event.type == MOUSEBUTTONUP:                       # has a mouse button just been released?
@@ -105,12 +109,14 @@ def exit_game():
     sys.exit()
 
 
-def main():
+# creates a new level and positions everything accordingly in that level
+def start():
+    global x, y, playerX, playerY, offsetX, offsetY, playerSpawnPoint
     # create the level
     initialize_level()
 
     # create movement variables
-    ticks_since_last_frame = 0
+
     screen_rect = screen.get_rect()
     level_rect = level.get_rect()
 
@@ -127,6 +133,11 @@ def main():
     offsetX = -level_rect.centerx + Rect(playerSpawnPoint).centerx
     offsetY = -level_rect.centery + Rect(playerSpawnPoint).centery
 
+
+def main():
+    start()
+    global x, y, playerX, playerY, offsetX, offsetY, playerSpawnPoint
+    ticks_since_last_frame = 0
     # main game loop
     while True:
         t = pygame.time.get_ticks()
