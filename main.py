@@ -2,6 +2,8 @@
 import pygame, sys, library, random
 from pygame.locals import *
 from random import choices
+# import the Animator class
+from animator import Animator
 
 # initialize py game
 pygame.init()
@@ -31,7 +33,7 @@ floorTiles = []
 wallTiles = []
 doorTiles = []
 
-player = library.playerImg
+player = Animator("Characters/girl_front_spriteSheet.png", library.scaleNum, 3, 7, 0.75)  # library.playerImg
 
 
 class GameStore:
@@ -183,9 +185,11 @@ def main():
                           GameStore.y + GameStore.playerSpawnPoint[1] - GameStore.offsetY,
                           GameStore.playerSpawnPoint[2],
                           GameStore.playerSpawnPoint[3]])
+        # update the player (testing)
+        player.update_time(delta_time)
         # draw the player
-        screen.blit(player, (GameStore.x + GameStore.playerX - GameStore.offsetX,
-                             GameStore.y + GameStore.playerY - GameStore.offsetY))
+        screen.blit(player.get_current_sprite(), (GameStore.x + GameStore.playerX - GameStore.offsetX,
+                                                  GameStore.y + GameStore.playerY - GameStore.offsetY))
         # update the display.
         pygame.display.flip()
         ticks_since_last_frame = t
