@@ -22,7 +22,8 @@ doorImg = pygame.transform.scale(pygame.image.load("Well Escape tiles/DoorTile.p
 floorImg = pygame.transform.scale(pygame.image.load("Well Escape tiles/FloorTile.png"), (scaleNum, scaleNum))
 wallImg = pygame.transform.scale(pygame.image.load("Well Escape tiles/WallTile.png"), (scaleNum, scaleNum))
 
-playerImg = pygame.transform.scale(pygame.image.load("Characters/Player.png"), (int(scaleNum), int(scaleNum)))
+playerImg = pygame.transform.scale(pygame.image.load("Characters/Player.png"),
+                                   (int(scaleNum * 0.75), int(scaleNum * 0.75)))
 
 # set materials
 FLOOR = 0
