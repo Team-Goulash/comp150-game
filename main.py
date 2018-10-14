@@ -33,7 +33,27 @@ floorTiles = []
 wallTiles = []
 doorTiles = []
 
-player = Animator("Characters/girl_front_spriteSheet.png", library.scaleNum, 3, 7, 0.75)  # library.playerImg
+# set player animations
+player_animation = ["", "", "", ""]
+# set left animation
+player_animation[library.LEFT] = Animator("Characters/girl_front_spriteSheet.png", library.scaleNum, 3, 7, 0.75)
+# set right animation
+player_animation[library.RIGHT] = Animator("Characters/girl_front_spriteSheet.png", library.scaleNum, 3, 7, 0.75)
+# set forwards animation
+player_animation[library.FORWARDS] = Animator("Characters/girl_back_spriteSheet.png", library.scaleNum, 3, 7, 0.75)
+# set backwards animation
+player_animation[library.BACKWARDS] = Animator("Characters/girl_front_spriteSheet.png", library.scaleNum, 3, 7, 0.75)
+
+# set player idle animations
+player_idle_animation = ["", "", "", ""]
+# set left idle animation
+player_idle_animation[library.LEFT] = Animator("Characters/girl_frontIdle_spriteSheet.png", library.scaleNum, 3, 7, 0.75)
+# set right idle animation
+player_idle_animation[library.RIGHT] = Animator("Characters/girl_frontIdle_spriteSheet.png", library.scaleNum, 3, 7, 0.75)
+# set forwards idle animation
+player_idle_animation[library.FORWARDS] = Animator("Characters/girl_frontIdle_spriteSheet.png", library.scaleNum, 3, 7, 0.75)
+# set backwards idle animation
+player_idle_animation[library.BACKWARDS] = Animator("Characters/girl_frontIdle_spriteSheet.png", library.scaleNum, 3, 7, 0.75)
 
 
 class GameStore:
@@ -138,9 +158,26 @@ def start():
     GameStore.offsetY = -level_rect.centery + Rect(GameStore.playerSpawnPoint).centery
 
 
+def change_direction(last_dir, current_dir):
+    """
+    Reset the players animator if the direction changes
+    :param last_dir:        players direction from last frame
+    :param current_dir:     players direction this frame
+    :return:                current direction
+    """
+    if last_dir != current_dir:
+        player_animation[last_dir].reset()
+    return current_dir
+
+
 def main():
+
     start()
     ticks_since_last_frame = 0
+
+    # players current direction
+    current_direction = library.LEFT
+
     # main game loop
     while True:
         t = pygame.time.get_ticks()
@@ -149,29 +186,54 @@ def main():
         # Get inputs
         event_inputs()
 
+        # set the player idle
+        player_idle = True
+
         # multiply the movement by delta_time to ensure constant speed no matter the FPS
         movement_speed = 75 * delta_time
 
         # Key press actions
-        if library.KEY_PRESSED["forwards"]:
-            # forwards key action
-            GameStore.playerY -= movement_speed
-            GameStore.y += movement_speed
-
-        if library.KEY_PRESSED["backwards"]:
-            # backwards key action
-            GameStore.playerY += movement_speed
-            GameStore.y -= movement_speed
-
         if library.KEY_PRESSED["left"]:
             # left key action
             GameStore.playerX -= movement_speed
             GameStore.x += movement_speed
+            # set the current direction
+            current_direction = change_direction(current_direction, library.LEFT)
+            player_idle = False
 
         if library.KEY_PRESSED["right"]:
             # right key action
             GameStore.playerX += movement_speed
             GameStore.x -= movement_speed
+            # set the current direction
+            current_direction = change_direction(current_direction, library.RIGHT)
+            player_idle = False
+
+        if library.KEY_PRESSED["forwards"]:
+            # forwards key action
+            GameStore.playerY -= movement_speed
+            GameStore.y += movement_speed
+            # set the current direction
+            current_direction = change_direction(current_direction, library.FORWARDS)
+            player_idle = False
+
+        if library.KEY_PRESSED["backwards"]:
+            # backwards key action
+            GameStore.playerY += movement_speed
+            GameStore.y -= movement_speed
+            # set the current direction
+            current_direction = change_direction(current_direction, library.BACKWARDS)
+            player_idle = False
+
+
+        # switch between active and idle
+        if not player_idle:
+            player = player_animation[current_direction]
+        else:
+            player = player_idle_animation[current_direction]
+
+        # update the avatars animation time
+        player.update_time(delta_time)
 
         # wait for the frame to end
         fps_clock.tick(FPS)
@@ -185,8 +247,7 @@ def main():
                           GameStore.y + GameStore.playerSpawnPoint[1] - GameStore.offsetY,
                           GameStore.playerSpawnPoint[2],
                           GameStore.playerSpawnPoint[3]])
-        # update the player (testing)
-        player.update_time(delta_time)
+
         # draw the player
         screen.blit(player.get_current_sprite(), (GameStore.x + GameStore.playerX - GameStore.offsetX,
                                                   GameStore.y + GameStore.playerY - GameStore.offsetY))
