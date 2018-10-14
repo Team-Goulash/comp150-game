@@ -47,13 +47,17 @@ player_animation[library.BACKWARDS] = Animator("Characters/girl_front_spriteShee
 # set player idle animations
 player_idle_animation = ["", "", "", ""]
 # set left idle animation
-player_idle_animation[library.LEFT] = Animator("Characters/girl_frontIdle_spriteSheet.png", library.scaleNum, 3, 7, 0.75)
+player_idle_animation[library.LEFT] = Animator("Characters/girl_frontIdle_spriteSheet.png",
+                                               library.scaleNum, 3, 7, 1.5)
 # set right idle animation
-player_idle_animation[library.RIGHT] = Animator("Characters/girl_frontIdle_spriteSheet.png", library.scaleNum, 3, 7, 0.75)
+player_idle_animation[library.RIGHT] = Animator("Characters/girl_frontIdle_spriteSheet.png",
+                                                library.scaleNum, 3, 7, 1.5)
 # set forwards idle animation
-player_idle_animation[library.FORWARDS] = Animator("Characters/girl_frontIdle_spriteSheet.png", library.scaleNum, 3, 7, 0.75)
+player_idle_animation[library.FORWARDS] = Animator("Characters/girl_backIdle_spriteSheet.png",
+                                                   library.scaleNum, 3, 7, 1.5)
 # set backwards idle animation
-player_idle_animation[library.BACKWARDS] = Animator("Characters/girl_frontIdle_spriteSheet.png", library.scaleNum, 3, 7, 0.75)
+player_idle_animation[library.BACKWARDS] = Animator("Characters/girl_frontIdle_spriteSheet.png",
+                                                    library.scaleNum, 3, 7, 1.5)
 
 
 class GameStore:
@@ -225,7 +229,6 @@ def main():
             current_direction = change_direction(current_direction, library.BACKWARDS)
             player_idle = False
 
-
         # switch between active and idle
         if not player_idle:
             player = player_animation[current_direction]
@@ -249,8 +252,11 @@ def main():
                           GameStore.playerSpawnPoint[3]])
 
         # draw the player
-        screen.blit(player.get_current_sprite(), (GameStore.x + GameStore.playerX - GameStore.offsetX,
-                                                  GameStore.y + GameStore.playerY - GameStore.offsetY))
+        screen.blit(pygame.transform.scale(player.get_current_sprite(),
+                    (int(library.scaleNum * 0.9), int(library.scaleNum * 0.9))),
+                    (GameStore.x + GameStore.playerX - GameStore.offsetX,
+                     GameStore.y + GameStore.playerY - GameStore.offsetY))
+
         # update the display.
         pygame.display.flip()
         ticks_since_last_frame = t
