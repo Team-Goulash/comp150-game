@@ -174,6 +174,46 @@ def change_direction(last_dir, current_dir):
     return current_dir
 
 
+def animation_direction(last_direction):
+    """
+    Gets the next animation direction.
+    this prevents it from resetting if two keys are pressed at the same time!
+    :return: (Direction, idle)
+    """
+    # find if any keys are pressed and set it to idle
+    idle = not library.KEY_PRESSED["left"] and not library.KEY_PRESSED["right"] \
+        and not library.KEY_PRESSED["forwards"] and not library.KEY_PRESSED["backwards"]
+
+    # if theres no keys pressed return early as theres nothing to test
+    if idle:
+        return (last_direction, idle)
+
+    # set direction to last direction encase there is opposite keys being pressed
+    direction = last_direction
+
+    # set to idle if both left and right keys are pressed
+    if library.KEY_PRESSED["left"] and library.KEY_PRESSED["right"]:
+        idle = True
+    elif library.KEY_PRESSED["left"]:       # set left direction
+        direction = library.LEFT
+    elif library.KEY_PRESSED["right"]:      # set right direction
+        direction = library.RIGHT
+
+    # do forwards and backwards in separate if as the animation trumps left and right
+    # set to idle if both forwards and backwards keys are pressed
+    if library.KEY_PRESSED["forwards"] and library.KEY_PRESSED["backwards"]:
+        # set to idle if neither left or right is pressed
+        idle = not library.KEY_PRESSED["left"] and not library.KEY_PRESSED["right"]
+    elif library.KEY_PRESSED["forwards"]:
+        direction = library.FORWARDS        # set forwards direction
+        idle = False
+    elif library.KEY_PRESSED["backwards"]:
+        direction = library.BACKWARDS       # set backwards direction
+        idle = False
+
+    return (direction, idle)
+
+
 def main():
 
     start()
@@ -190,8 +230,10 @@ def main():
         # Get inputs
         event_inputs()
 
-        # set the player idle
-        player_idle = True
+        # set the players animation direction and idle for the animation
+        next_animation_direction, player_idle = animation_direction(current_direction)
+        # set the current direction
+        current_direction = change_direction(current_direction, next_animation_direction)
 
         # multiply the movement by delta_time to ensure constant speed no matter the FPS
         movement_speed = 75 * delta_time
@@ -202,32 +244,34 @@ def main():
             GameStore.playerX -= movement_speed
             GameStore.x += movement_speed
             # set the current direction
-            current_direction = change_direction(current_direction, library.LEFT)
-            player_idle = False
+            # current_direction = change_direction(current_direction, library.LEFT)
+            # player_idle = False
 
         if library.KEY_PRESSED["right"]:
             # right key action
             GameStore.playerX += movement_speed
             GameStore.x -= movement_speed
             # set the current direction
-            current_direction = change_direction(current_direction, library.RIGHT)
-            player_idle = False
+            # current_direction = change_direction(current_direction, library.RIGHT)
+            # player_idle = False
 
         if library.KEY_PRESSED["forwards"]:
             # forwards key action
             GameStore.playerY -= movement_speed
             GameStore.y += movement_speed
             # set the current direction
-            current_direction = change_direction(current_direction, library.FORWARDS)
-            player_idle = False
+            # current_direction = change_direction(current_direction, library.FORWARDS)
+            # player_idle = False
 
         if library.KEY_PRESSED["backwards"]:
             # backwards key action
             GameStore.playerY += movement_speed
             GameStore.y -= movement_speed
             # set the current direction
-            current_direction = change_direction(current_direction, library.BACKWARDS)
-            player_idle = False
+            # current_direction = change_direction(current_direction, library.BACKWARDS)
+            # player_idle = False
+
+
 
         # switch between active and idle
         if not player_idle:
