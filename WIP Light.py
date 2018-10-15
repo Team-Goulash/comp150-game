@@ -1,22 +1,41 @@
-import pygame
-
-x = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]  #representation of tile mep
-y = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
-
-print ("Input X 0-9")               #3 debug lines
-xtile = input(int)
-ytile = input(int)
+import pygame, main
 
 change = False                      # variable that activates lightning sequence
 
-currentTile = [xtile, ytile]        #tile that character is on
-previousTile = [xtile + 1, ytile]   #tile that character was last frame
+currentposx = main.GameStore.playerX
+currentposy = main.GameStore.playerY
+currentTilex = 0
+currentTiley = 0
+currentTile = (currentTilex, currentTiley)        #tile that character is on
+previousTile = (currentTilex + 1 , currentTiley + 1)   #tile that character was last frame
 
-if currentTile != previousTile:     #checks whether you have moved onto another tile
-    change = True
-    print("happened 1")
+xtilelength = 10
+ytilelength = 3
 
-if change:                          #start the lightning sequence
+def check:
+    while True:
+        for i in main.MAP_WIDTH:
+            r = i * 90
+            t = currentposx - r
+            if t < 0:
+                currentTilex = i
+                break
+
+        for i in main.MAP_HEIGHT:
+            r = i * 90
+            t = currentposx - r
+            if t < 0:
+                currentTiley = i
+                break
+    if currentTile != previousTile:
+        change = True
+        previousTile = currentTile
+
+
+
+
+
+"""if change:                          #start the lightning sequence
     xarray = [xtile - 3, xtile - 2, xtile + 2, xtile + 3]
     yarray = [ytile - 3, ytile - 2, ytile + 2, ytile + 3]
     for x in xarray:
@@ -25,3 +44,4 @@ if change:                          #start the lightning sequence
             line = pygame.draw.line(DISPLAYSURF, (255,0,0), (playersPosition), tilesPoisition)
             if line.collidelist #if there is wall value
                 tile #texture change to black
+                """
