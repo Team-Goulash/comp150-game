@@ -5,6 +5,12 @@ from pygame.locals import *
 PAUSE = K_ESCAPE
 MOVE = {"left": K_a, "right": K_d, "forwards": K_w, "backwards": K_s}
 
+# directions
+LEFT = 0
+RIGHT = 1
+FORWARDS = 2
+BACKWARDS = 3
+
 # boolean values for key pressed states
 KEY_PRESSED = {"left": False, "right": False, "forwards": False, "backwards": False}
 
