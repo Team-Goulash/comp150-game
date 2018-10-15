@@ -1,6 +1,6 @@
 import pygame
 
-x = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]  #tile mep
+x = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]  #representation of tile mep
 y = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
 
 print ("Input X 0-9")               #3 debug lines
