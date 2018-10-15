@@ -36,9 +36,9 @@ doorTiles = []
 # set player animations
 player_animation = ["", "", "", ""]
 # set left animation
-player_animation[library.LEFT] = Animator("Characters/girl_front_spriteSheet.png", library.scaleNum, 3, 7, 0.75)
+player_animation[library.LEFT] = Animator("Characters/girl_sideLeft_spriteSheet.png", library.scaleNum, 3, 7, 0.75)
 # set right animation
-player_animation[library.RIGHT] = Animator("Characters/girl_front_spriteSheet.png", library.scaleNum, 3, 7, 0.75)
+player_animation[library.RIGHT] = Animator("Characters/girl_sideRight_spriteSheet.png", library.scaleNum, 3, 7, 0.75)
 # set forwards animation
 player_animation[library.FORWARDS] = Animator("Characters/girl_back_spriteSheet.png", library.scaleNum, 3, 7, 0.75)
 # set backwards animation
@@ -47,10 +47,10 @@ player_animation[library.BACKWARDS] = Animator("Characters/girl_front_spriteShee
 # set player idle animations
 player_idle_animation = ["", "", "", ""]
 # set left idle animation
-player_idle_animation[library.LEFT] = Animator("Characters/girl_frontIdle_spriteSheet.png",
+player_idle_animation[library.LEFT] = Animator("Characters/girl_sideLeftIdle_spriteSheet.png",
                                                library.scaleNum, 3, 7, 1.5)
 # set right idle animation
-player_idle_animation[library.RIGHT] = Animator("Characters/girl_frontIdle_spriteSheet.png",
+player_idle_animation[library.RIGHT] = Animator("Characters/girl_sideRightIdle_spriteSheet.png",
                                                 library.scaleNum, 3, 7, 1.5)
 # set forwards idle animation
 player_idle_animation[library.FORWARDS] = Animator("Characters/girl_backIdle_spriteSheet.png",
@@ -180,7 +180,7 @@ def main():
     ticks_since_last_frame = 0
 
     # players current direction
-    current_direction = library.LEFT
+    current_direction = library.BACKWARDS
 
     # main game loop
     while True:
