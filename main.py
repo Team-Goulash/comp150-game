@@ -244,34 +244,24 @@ def main():
             GameStore.playerX -= movement_speed
             GameStore.x += movement_speed
             # set the current direction
-            # current_direction = change_direction(current_direction, library.LEFT)
-            # player_idle = False
 
         if library.KEY_PRESSED["right"]:
             # right key action
             GameStore.playerX += movement_speed
             GameStore.x -= movement_speed
             # set the current direction
-            # current_direction = change_direction(current_direction, library.RIGHT)
-            # player_idle = False
 
         if library.KEY_PRESSED["forwards"]:
             # forwards key action
             GameStore.playerY -= movement_speed
             GameStore.y += movement_speed
             # set the current direction
-            # current_direction = change_direction(current_direction, library.FORWARDS)
-            # player_idle = False
 
         if library.KEY_PRESSED["backwards"]:
             # backwards key action
             GameStore.playerY += movement_speed
             GameStore.y -= movement_speed
             # set the current direction
-            # current_direction = change_direction(current_direction, library.BACKWARDS)
-            # player_idle = False
-
-
 
         # switch between active and idle
         if not player_idle:
