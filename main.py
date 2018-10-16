@@ -11,7 +11,9 @@ WINDOW_WIDTH = 1334
 
 # create the window
 screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
-buttons = {"resume": None, "options": None, "exit": None, "controls": None}
+buttons = {"resume": None, "options": None, "controls": None, "exit": None}
+buttons["resume"] = UI.UIButtons("UI/Button_000_hover.png", "UI/Button_000_normal.png", "UI/button_000_pressed.png",
+                                                            (260, 200))
 
 # set the window caption
 pygame.display.set_caption("Well Escape")
@@ -114,7 +116,7 @@ def event_inputs():
 
 
 def text_objects(text, font):
-    text_surface = font.render(text, True, black)
+    text_surface = font.render(text, True, library.BLACK)
     return text_surface, text_surface.get_rect()
 
 
@@ -123,7 +125,7 @@ def pause_menu():
     screen.fill(library.WHITE)
     text_surf, text_rect = text_objects("Paused", pause_text)
     text_rect.center = ((WINDOW_WIDTH / 2), (WINDOW_HEIGHT / 6))
-    UI.UIButtons.draw_button()
+    screen.blit(buttons["resume"].draw_button(pygame.mouse.get_pos(), library.KEY_PRESSED["mouse"]), (0, 0))
     screen.blit(text_surf, text_rect)
 
 
