@@ -1,6 +1,7 @@
 import pygame
 
-    class UIButtons:
+
+class UIButtons:
         button_hover = None
         button_normal = None
         button_pressed = None
@@ -16,26 +17,20 @@ import pygame
             self.button_size = size
             self.screen_pos = screen_pos
 
-
         def is_hover(self, cursor_pos):
             top_left = cursor_pos[0] > self.screen_pos[0] and cursor_pos[1] > (self.screen_pos[1] + self.button_size)
-            bottom_right = (cursor_pos[0] > self.screen_pos[0] and cursor_pos[1] > (self.screen_pos[1] + self.button_size)
-                 return top_left and bottom_right
-
+            bottom_right = (cursor_pos[0] > self.screen_pos[0] and cursor_pos[1] > (self.screen_pos[1] +
+                                                                                    self.button_size))
+            return top_left and bottom_right
 
         def is_pressed(self, cursor_pos, button_click):
             return self.is_hover and button_click
 
+        def draw_button(self, cursor_pos, button_click):
 
-        def draw_button(self, cursor_pos, is_pressed):
             if self.is_hover(cursor_pos):
                 return self.button_hover
             elif self.is_pressed(cursor_pos, button_click):
                 return self.button_pressed
-            else
+            else:
                 return self.button_normal
-
-
-
-
-

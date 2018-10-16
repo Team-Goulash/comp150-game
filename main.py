@@ -1,5 +1,5 @@
 # DON'T FORGET TO COMMENT YOUR CODE PLEASE!!!
-import pygame, sys, library, random
+import pygame, sys, library, random, UI
 from pygame.locals import *
 from random import choices
 
@@ -8,11 +8,11 @@ pygame.init()
 # Set the window size
 WINDOW_HEIGHT = 750
 WINDOW_WIDTH = 1334
-black = (0,0,0)
-white = (255,255,255)
-red = (255,0,0)
+
 # create the window
 screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
+buttons = {"resume": None, "options": None, "exit": None, "controls": None}
+
 # set the window caption
 pygame.display.set_caption("Well Escape")
 
@@ -103,6 +103,8 @@ def event_inputs():
         if event.type == KEYUP:
             if event.key == K_r:
                 start()  # resets the level
+            elif event.key == library.PAUSE:
+                library.PAUSED = not library.PAUSED
         elif event.type == MOUSEBUTTONDOWN:                     # has a mouse button just been pressed?
             library.KEY_PRESSED["mouse"] = True
             print("This is mouse down")
@@ -117,16 +119,15 @@ def text_objects(text, font):
 
 
 def pause_menu():
-    game_display = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
-    pause_text = pygame.font("AMS hand writing_2", 115)
+    pause_text = pygame.font.Font("UI/AMS hand writing.ttf", 115)
+    screen.fill(library.WHITE)
     text_surf, text_rect = text_objects("Paused", pause_text)
-    text_rect.center = ((WINDOW_WIDTH / 2), (WINDOW_HEIGHT / 2))
-    game_display.blit(text_surf, text_rect)
+    text_rect.center = ((WINDOW_WIDTH / 2), (WINDOW_HEIGHT / 6))
+    UI.UIButtons.draw_button()
+    screen.blit(text_surf, text_rect)
 
 
 def pausing_game():
-    paused = False
-    print("pause test")
     for event in pygame.event.get():
         if paused is False:
             if event.type == library.PAUSE:
@@ -173,36 +174,38 @@ def main():
     ticks_since_last_frame = 0
     # main game loop
     while True:
-        print("test position ", pygame.mouse.get_pos())
         t = pygame.time.get_ticks()
         # amount of time that passed since the last frame in seconds
         delta_time = (t - ticks_since_last_frame) / 1000.0
         # Get inputs
         event_inputs()
+        display_pause_menu = False
 
         # multiply the movement by delta_time to ensure constant speed no matter the FPS
         movement_speed = 75 * delta_time
+        if not library.PAUSED:
+            # Key press actions
+            if library.KEY_PRESSED["forwards"]:
+                # forwards key action
+                GameStore.playerY -= movement_speed
+                GameStore.y += movement_speed
 
-        # Key press actions
-        if library.KEY_PRESSED["forwards"]:
-            # forwards key action
-            GameStore.playerY -= movement_speed
-            GameStore.y += movement_speed
+            if library.KEY_PRESSED["backwards"]:
+                # backwards key action
+                GameStore.playerY += movement_speed
+                GameStore.y -= movement_speed
 
-        if library.KEY_PRESSED["backwards"]:
-            # backwards key action
-            GameStore.playerY += movement_speed
-            GameStore.y -= movement_speed
+            if library.KEY_PRESSED["left"]:
+                # left key action
+                GameStore.playerX -= movement_speed
+                GameStore.x += movement_speed
 
-        if library.KEY_PRESSED["left"]:
-            # left key action
-            GameStore.playerX -= movement_speed
-            GameStore.x += movement_speed
-
-        if library.KEY_PRESSED["right"]:
-            # right key action
-            GameStore.playerX += movement_speed
-            GameStore.x -= movement_speed
+            if library.KEY_PRESSED["right"]:
+                # right key action
+                GameStore.playerX += movement_speed
+                GameStore.x -= movement_speed
+        else:
+            display_pause_menu = True
 
         # wait for the frame to end
         fps_clock.tick(FPS)
@@ -219,9 +222,14 @@ def main():
         # draw the player
         screen.blit(player, (GameStore.x + GameStore.playerX - GameStore.offsetX,
                              GameStore.y + GameStore.playerY - GameStore.offsetY))
+
+        if display_pause_menu is True:
+            pause_menu()
+
         # update the display.
         pygame.display.flip()
         ticks_since_last_frame = t
+
 
 
 if __name__ == "__main__":
