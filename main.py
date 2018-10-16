@@ -21,7 +21,7 @@ FPS = 60
 fps_clock = pygame.time.Clock()
 
 # Tile Size
-TILE_SIZE = library.floorImg.get_rect().width
+TILE_SIZE = library.Tiles.floorImg.get_rect().width
 MAP_WIDTH = 10
 MAP_HEIGHT = 5
 print(TILE_SIZE * MAP_WIDTH)
@@ -29,9 +29,15 @@ print(TILE_SIZE * MAP_WIDTH)
 level = pygame.Surface((TILE_SIZE * MAP_WIDTH, TILE_SIZE * MAP_HEIGHT))
 # [] = array
 tiles = []
+tileMats = []
+
+materials = library.Tiles.tileTypes
+
 floorTiles = []
 wallTiles = []
 doorTiles = []
+
+player = library.playerImg
 
 # set player animations
 player_animation = ["", "", "", ""]
@@ -77,14 +83,22 @@ def gen_rand_map_tiles():
     :return: tile type ID [x][y]
     """
     tiles.clear()
+    tileMats.clear()
     population = [0, 1, 2]
     weights = [0.75, 0.3, 0.075]
+    material_weights = [0.5, 0.75, 0.1]
     for y in range(MAP_HEIGHT):
-        tile = []
+        tile_row = []
+        mat_row = []
         for x in range(MAP_WIDTH):
-            item = choices(population, weights)[0]
-            tile.append(item)
-        tiles.append(tile)
+            tile = choices(population, weights)[0]                  # single tile
+            tile_row.append(tile)                    # horizontal row of tiles
+
+            material = choices(population, material_weights)[0]                  # single material
+            mat_row.append(material)                 # horizontal row of materials
+
+        tiles.append(tile_row)               # vertical column of horizontal tile rows
+        tileMats.append(mat_row)             # vertical column of horizontal material rows
     return tiles
 
 
@@ -92,18 +106,19 @@ def initialize_level():
     """Draws the tiles with according images on a blank surface"""
     # generate the map
     gen_rand_map_tiles()
+    library.generate_material(library.Tiles.floorImg, 0)
     # draw the tiles to the level surface
     for row in range(MAP_HEIGHT):
         for column in range(MAP_WIDTH):
-            level.blit(library.materials[tiles[row][column]],
-                       (column * TILE_SIZE, row * TILE_SIZE, TILE_SIZE, TILE_SIZE))
-
             if tiles[row][column] == 0:
                 floorTiles.append([column * TILE_SIZE, row * TILE_SIZE, TILE_SIZE, TILE_SIZE])
             elif tiles[row][column] == 1:
                 wallTiles.append([column * TILE_SIZE, row * TILE_SIZE, TILE_SIZE, TILE_SIZE])
             elif tiles[row][column] == 2:
                 doorTiles.append([column * TILE_SIZE, row * TILE_SIZE, TILE_SIZE, TILE_SIZE])
+
+            level.blit(materials[tileMats[row][column]],
+                       (column * TILE_SIZE, row * TILE_SIZE, TILE_SIZE, TILE_SIZE))
 
 
 def event_inputs():
@@ -184,9 +199,9 @@ def animation_direction(last_direction):
     idle = not library.KEY_PRESSED["left"] and not library.KEY_PRESSED["right"] \
         and not library.KEY_PRESSED["forwards"] and not library.KEY_PRESSED["backwards"]
 
-    # if theres no keys pressed return early as theres nothing to test
+    # if there's no keys pressed return early as theres nothing to test
     if idle:
-        return (last_direction, idle)
+        return last_direction, idle
 
     # set direction to last direction encase there is opposite keys being pressed
     direction = last_direction
@@ -211,7 +226,7 @@ def animation_direction(last_direction):
         direction = library.BACKWARDS       # set backwards direction
         idle = False
 
-    return (direction, idle)
+    return direction, idle
 
 
 def main():
