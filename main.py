@@ -8,6 +8,9 @@ pygame.init()
 # Set the window size
 WINDOW_HEIGHT = 750
 WINDOW_WIDTH = 1334
+black = (0,0,0)
+white = (255,255,255)
+red = (255,0,0)
 # create the window
 screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
 # set the window caption
@@ -98,12 +101,41 @@ def event_inputs():
                 library.KEY_PRESSED["backwards"] = event.type == KEYDOWN
 
         if event.type == KEYUP:
-            if event.key == library.PAUSE:                     # get paused key down.
-                start()     # resets the level
+            if event.key == K_r:
+                start()  # resets the level
         elif event.type == MOUSEBUTTONDOWN:                     # has a mouse button just been pressed?
-            pass      # replace pass with mouse button up action/function.
+            library.KEY_PRESSED["mouse"] = True
+            print("This is mouse down")
         elif event.type == MOUSEBUTTONUP:                       # has a mouse button just been released?
-            pass      # replace pass with pause action/function.
+            library.KEY_PRESSED["mouse"] = False
+            print("This is mouse up")
+
+
+def text_objects(text, font):
+    text_surface = font.render(text, True, black)
+    return text_surface, text_surface.get_rect()
+
+
+def pause_menu():
+    game_display = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
+    pause_text = pygame.font("AMS hand writing_2", 115)
+    text_surf, text_rect = text_objects("Paused", pause_text)
+    text_rect.center = ((WINDOW_WIDTH / 2), (WINDOW_HEIGHT / 2))
+    game_display.blit(text_surf, text_rect)
+
+
+def pausing_game():
+    paused = False
+    print("pause test")
+    for event in pygame.event.get():
+        if paused is False:
+            if event.type == library.PAUSE:
+                paused = not paused
+                pause_menu()
+
+        if paused:
+            pause_menu()
+            continue
 
 
 def exit_game():
@@ -141,6 +173,7 @@ def main():
     ticks_since_last_frame = 0
     # main game loop
     while True:
+        print("test position ", pygame.mouse.get_pos())
         t = pygame.time.get_ticks()
         # amount of time that passed since the last frame in seconds
         delta_time = (t - ticks_since_last_frame) / 1000.0
