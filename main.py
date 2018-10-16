@@ -13,7 +13,13 @@ WINDOW_WIDTH = 1334
 screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
 buttons = {"resume": None, "options": None, "controls": None, "exit": None}
 buttons["resume"] = UI.UIButtons("UI/Button_000_hover.png", "UI/Button_000_normal.png", "UI/button_000_pressed.png",
-                                                            (260, 200))
+                                                            (460, 110))
+buttons["options"] = UI.UIButtons("UI/Button_000_hover.png", "UI/Button_000_normal.png", "UI/button_000_pressed.png",
+                                  (460, 110))
+buttons["controls"] = UI.UIButtons("UI/Button_000_hover.png", "UI/Button_000_normal.png", "UI/button_000_pressed.png",
+                                   (460, 110))
+buttons["exit"] = UI.UIButtons("UI/Button_000_hover.png", "UI/Button_000_normal.png", "UI/button_000_pressed.png",
+                               (460, 110))
 
 # set the window caption
 pygame.display.set_caption("Well Escape")
@@ -111,8 +117,17 @@ def event_inputs():
             library.KEY_PRESSED["mouse"] = True
             print("This is mouse down")
         elif event.type == MOUSEBUTTONUP:                       # has a mouse button just been released?
+            if buttons["resume"].is_pressed(pygame.mouse.get_pos(), (460, 238), library.KEY_PRESSED["mouse"]):
+                print("resume test")
+                library.PAUSED = False
+            elif buttons["options"].is_pressed(pygame.mouse.get_pos(), (460, 388), library.KEY_PRESSED["mouse"]):
+                options_menu()
+            elif buttons["controls"].is_pressed(pygame.mouse.get_pos(), (460, 538), library.KEY_PRESSED["mouse"]):
+                controls_menu()
+            elif buttons["exit"].is_pressed(pygame.mouse.get_pos(), (460, 688), library.KEY_PRESSED["mouse"]):
+                exit_game()
             library.KEY_PRESSED["mouse"] = False
-            print("This is mouse up")
+            print("This is mouse up", pygame.mouse.get_pos())
 
 
 def text_objects(text, font):
@@ -120,13 +135,41 @@ def text_objects(text, font):
     return text_surface, text_surface.get_rect()
 
 
+def controls_menu():
+    pass
+
+
+def options_menu():
+    pass
+
+
 def pause_menu():
     pause_text = pygame.font.Font("UI/AMS hand writing.ttf", 115)
+    button_text = pygame.font.Font("UI/AMS hand writing.ttf", 60)
     screen.fill(library.WHITE)
     text_surf, text_rect = text_objects("Paused", pause_text)
     text_rect.center = ((WINDOW_WIDTH / 2), (WINDOW_HEIGHT / 6))
-    screen.blit(buttons["resume"].draw_button(pygame.mouse.get_pos(), library.KEY_PRESSED["mouse"]), (0, 0))
+    screen.blit(buttons["resume"].draw_button(pygame.mouse.get_pos(), library.KEY_PRESSED["mouse"], (460, 238)),
+                (460, 238))
+    screen.blit(buttons["options"].draw_button(pygame.mouse.get_pos(), library.KEY_PRESSED["mouse"], (460, 388)),
+                (460, 388))
+    screen.blit(buttons["controls"].draw_button(pygame.mouse.get_pos(), library.KEY_PRESSED["mouse"], (460, 538)),
+                (460, 538))
+    screen.blit(buttons["exit"].draw_button(pygame.mouse.get_pos(), library.KEY_PRESSED["mouse"], (460, 688)),
+                (460, 688))
+    resume_surf, resume_rect = text_objects("Resume", button_text)
+    resume_rect.center = (690, 288)
+    options_surf, options_rect = text_objects("Options", button_text)
+    options_rect.center = (690, 438)
+    controls_surf, controls_rect = text_objects("Controls", button_text)
+    controls_rect.center = (690, 588)
+    quit_surf, quit_rect = text_objects("Quit Game", button_text)
+    quit_rect.center = (690, 738)
+    screen.blit(quit_surf, quit_rect)
+    screen.blit(controls_surf, controls_rect)
+    screen.blit(options_surf, options_rect)
     screen.blit(text_surf, text_rect)
+    screen.blit(resume_surf, resume_rect)
 
 
 def pausing_game():
