@@ -54,33 +54,33 @@ class Tiles:
         x_px_count = 0
         y_px_count = 0
 
-        for x in range(texture.get_width()):
-            for y in range(texture.get_height()):
+        for x in range(texture.get_width() - 6):
+            for y in range(texture.get_height() - 6):
                 values = [0, 1]
 
                 if x_px_count == 0:
                     if draw:
                         x_px_count = random.randrange(3, 7)
                     else:
-                        x_px_count = random.randrange(20, 30)
+                        x_px_count = random.randrange(10, 20)
 
                 if y_px_count == 0:
                     if draw:
-                        y_px_count = random.randrange(5, 25)
+                        y_px_count = random.randrange(5, 10)
                     else:
-                        y_px_count = random.randrange(20, 30)
+                        y_px_count = random.randrange(10, 20)
 
-                mud_weights = [0.1, 0.9]
+                mud_weights = [0.5, 0.5]
                 draw_mud = bool(random.choices(values, mud_weights)[0])
 
-                moss_weights = [0.1, 0.9]
+                moss_weights = [0.2, 0.8]
                 draw_moss = bool(random.choices(values, moss_weights)[0])
 
                 if draw:
                     if (id == 1 or id == 2) and draw_mud:
-                        texture.set_at((x, y), MUD)
-                    if id == 2 and draw_moss:
-                        texture.set_at((x, y), MOSS)
+                        texture.set_at((x + 3, y + 3), MUD)
+                    elif id == 2 and draw_moss:
+                        texture.set_at((x + 3, y + 3), MOSS)
 
                 y_px_count -= 1
                 x_px_count -= 1
