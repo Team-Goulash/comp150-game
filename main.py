@@ -64,7 +64,7 @@ player_idle_animation[library.FORWARDS] = Animator("Characters/girl_backIdle_spr
 # set backwards idle animation
 player_idle_animation[library.BACKWARDS] = Animator("Characters/girl_frontIdle_spriteSheet.png",
                                                     library.scaleNum, 3, 7, 1.5)
-
+tile_class = library.Tiles()
 
 class GameStore:
     playerX = 0
@@ -106,7 +106,7 @@ def initialize_level():
     """Draws the tiles with according images on a blank surface"""
     # generate the map
     gen_rand_map_tiles()
-    library.generate_material(library.Tiles.floorImg, 0)
+    tile_class.generate_material(library.Tiles.floorImg, 0)
     # draw the tiles to the level surface
     for row in range(MAP_HEIGHT):
         for column in range(MAP_WIDTH):

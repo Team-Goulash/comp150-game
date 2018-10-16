@@ -26,6 +26,7 @@ scaleNum = 90
 playerImg = pygame.transform.scale(pygame.image.load("Characters/Player.png"),
                                    (int(scaleNum * 0.75), int(scaleNum * 0.75)))
 
+
 class Tiles:
     # set images
 
@@ -41,14 +42,13 @@ class Tiles:
     # set colors to materials
     tileTypes = {FLOOR: floorImg, WALL: wallImg, DOOR: doorImg}
 
+    def generate_material(self, base_image, mat_type):
+        """
+        :arg mat_type:      specifies the type of material the function will generate
+        :arg base_image:    input image the function will modify
+        :return: Tile texture with randomly generated features
+        """
+        texture = base_image
 
-def generate_material(base_image, mat_type):
-    """
-    :arg mat_type:      specifies the type of material the function will generate
-    :arg base_image:    input image the function will modify
-    :return: Tile texture with randomly generated features
-    """
-    texture = base_image
-
-    pygame.image.save(texture, "Well Escape tiles/randomGen.png")
-    return texture
+        pygame.image.save(texture, "Well Escape tiles/randomGen.png")
+        return texture
