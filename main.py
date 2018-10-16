@@ -82,11 +82,14 @@ def gen_rand_map_tiles():
     Generates the random map tiles with different probabilities
     :return: tile type ID [x][y]
     """
+    floorTiles.clear()
+    wallTiles.clear()
+    doorTiles.clear()
     tiles.clear()
     tileMats.clear()
     population = [0, 1, 2]
     weights = [0.75, 0.3, 0.075]
-    material_weights = [0.5, 0.75, 0.1]
+    material_weights = [0.4, 0.6, 0.3]
     for y in range(MAP_HEIGHT):
         tile_row = []
         mat_row = []
@@ -106,19 +109,18 @@ def initialize_level():
     """Draws the tiles with according images on a blank surface"""
     # generate the map
     gen_rand_map_tiles()
-    tile_class.generate_material(library.Tiles.floorImg, 0)
     # draw the tiles to the level surface
-    for row in range(MAP_HEIGHT):
-        for column in range(MAP_WIDTH):
-            if tiles[row][column] == 0:
-                floorTiles.append([column * TILE_SIZE, row * TILE_SIZE, TILE_SIZE, TILE_SIZE])
-            elif tiles[row][column] == 1:
-                wallTiles.append([column * TILE_SIZE, row * TILE_SIZE, TILE_SIZE, TILE_SIZE])
-            elif tiles[row][column] == 2:
-                doorTiles.append([column * TILE_SIZE, row * TILE_SIZE, TILE_SIZE, TILE_SIZE])
+    for column in range(MAP_HEIGHT):
+        for row in range(MAP_WIDTH):
+            if tiles[column][row] == 0:
+                floorTiles.append([row * TILE_SIZE, column * TILE_SIZE, TILE_SIZE, TILE_SIZE])
+            elif tiles[column][row] == 1:
+                wallTiles.append([row * TILE_SIZE, column * TILE_SIZE, TILE_SIZE, TILE_SIZE])
+            elif tiles[column][row] == 2:
+                doorTiles.append([row * TILE_SIZE, column * TILE_SIZE, TILE_SIZE, TILE_SIZE])
 
-            level.blit(materials[tileMats[row][column]],
-                       (column * TILE_SIZE, row * TILE_SIZE, TILE_SIZE, TILE_SIZE))
+            material = tile_class.generate_material(tiles[column][row], tileMats[column][row])
+            level.blit(material, (row * TILE_SIZE, column * TILE_SIZE, TILE_SIZE, TILE_SIZE))
 
 
 def event_inputs():
@@ -157,14 +159,13 @@ def exit_game():
 def start():
     # create the level
     initialize_level()
-
     # create movement variables
 
     screen_rect = screen.get_rect()
     level_rect = level.get_rect()
 
     # find a random floor tile and get it's position coordinates
-    GameStore.playerSpawnPoint = floorTiles[random.randint(0, len(floorTiles))]
+    GameStore.playerSpawnPoint = floorTiles[random.randint(0, len(floorTiles)-1)]
     GameStore.playerX = GameStore.playerSpawnPoint[0]
     GameStore.playerY = GameStore.playerSpawnPoint[1]
 
