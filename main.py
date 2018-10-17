@@ -443,8 +443,12 @@ def main():
         # set the current direction
         current_direction = change_direction(current_direction, next_animation_direction)
 
-        # multiply the movement by delta_time to ensure constant speed no matter the FPS
-        movement_speed = 75 * delta_time
+        if not library.PAUSED and library.HAS_STARTED:
+            # multiply the movement by delta_time to ensure constant speed no matter the FPS
+            movement_speed = 75 * delta_time
+        else:
+            # prevent the player moving if the game is paused or has not started yet!
+            movement_speed = 0
 
         if not library.PAUSED:
             # Key press actions
@@ -468,7 +472,7 @@ def main():
                 GameStore.playerX += movement_speed
                 GameStore.x -= movement_speed
                 
-             # switch between active and idle
+            # switch between active and idle
             if not player_idle:
                 player = player_animation[current_direction]
             else:
@@ -482,16 +486,6 @@ def main():
 
         # wait for the frame to end
         fps_clock.tick(FPS)
-        # fill the background
-        screen.fill(library.BLACK)
-        # render the level on screen
-        screen.blit(level, (GameStore.x - GameStore.offsetX, GameStore.y - GameStore.offsetY))
-        # draw starting point rect (testing)
-        pygame.draw.rect(screen, library.BLUE,
-                         [GameStore.x + GameStore.playerSpawnPoint[0] - GameStore.offsetX,
-                          GameStore.y + GameStore.playerSpawnPoint[1] - GameStore.offsetY,
-                          GameStore.playerSpawnPoint[2],
-                          GameStore.playerSpawnPoint[3]])
 
         # Display main menu if the game has not started
         if not library.HAS_STARTED:
@@ -499,17 +493,26 @@ def main():
         # display the pause menu if the game paused
         elif display_pause_menu is True:
             pause_menu()
-        
-        # draw the player
-        screen.blit(pygame.transform.scale(player.get_current_sprite(),
-                    (int(library.scaleNum * 0.9), int(library.scaleNum * 0.9))),
-                    (GameStore.x + GameStore.playerX - GameStore.offsetX,
-                     GameStore.y + GameStore.playerY - GameStore.offsetY))
+        else:
+            # fill the background
+            screen.fill(library.BLACK)
+            # render the level on screen
+            screen.blit(level, (GameStore.x - GameStore.offsetX, GameStore.y - GameStore.offsetY))
+            # draw starting point rect (testing)
+            pygame.draw.rect(screen, library.BLUE,
+                             [GameStore.x + GameStore.playerSpawnPoint[0] - GameStore.offsetX,
+                              GameStore.y + GameStore.playerSpawnPoint[1] - GameStore.offsetY,
+                              GameStore.playerSpawnPoint[2],
+                              GameStore.playerSpawnPoint[3]])
+            # draw the player
+            screen.blit(pygame.transform.scale(player.get_current_sprite(),
+                        (int(library.scaleNum * 0.9), int(library.scaleNum * 0.9))),
+                        (GameStore.x + GameStore.playerX - GameStore.offsetX,
+                         GameStore.y + GameStore.playerY - GameStore.offsetY))
 
         # update the display.
         pygame.display.flip()
         ticks_since_last_frame = t
-
 
 
 if __name__ == "__main__":
