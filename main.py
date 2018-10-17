@@ -13,6 +13,8 @@ WINDOW_WIDTH = 1334
 
 # create the window
 screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
+
+# UI Buttons
 main_menu_buttons = {"new game": None, "continue": None, "options": None, "controls": None, "quit game": None, "back": None}
 main_menu_buttons["new game"] = UI.UIButtons("UI/Button_000_hover.png", "UI/Button_000_normal.png", "Ui/button_000_pressed.png",
                                              (460, 75))
@@ -152,7 +154,7 @@ def event_inputs():
         if event.type == KEYUP:
             if event.key == K_r:
                 start()  # resets the level
-            elif event.key == library.PAUSE:
+            elif event.key == library.PAUSE: # Pauses the game
                 library.PAUSED = not library.PAUSED
                 library.CONTROLS = False
                 library.OPTIONS = False
@@ -162,39 +164,52 @@ def event_inputs():
         elif event.type == MOUSEBUTTONUP:                       # has a mouse button just been released?
             if main_menu_buttons["new game"].is_pressed(pygame.mouse.get_pos(), (460, 188),
                                                         library.KEY_PRESSED["mouse"]):
+                # Starts a new game
                 library.HAS_STARTED = True
             elif main_menu_buttons["continue"].is_pressed(pygame.mouse.get_pos(), (460, 288),
                                                           library.KEY_PRESSED["mouse"]):
+                #   just starts a new game for now will be changed to a load game function
                 library.HAS_STARTED = True
             elif main_menu_buttons["options"].is_pressed(pygame.mouse.get_pos(), (460, 388),
                                                          library.KEY_PRESSED["mouse"]):
+                #   Opens up settings from the main menu
                 library.SETTINGS = True
             elif main_menu_buttons["controls"].is_pressed(pygame.mouse.get_pos(), (460, 488),
                                                           library.KEY_PRESSED["mouse"]):
+                # Opens up controls from the main menu
                 library.MAIN_MENU_CONTROLS = True
             elif main_menu_buttons["quit game"].is_pressed(pygame.mouse.get_pos(), (460, 588),
                                                            library.KEY_PRESSED["mouse"]):
+                # Quits the game
                 exit_game()
             elif library.SETTINGS is True and main_menu_buttons["back"].is_pressed(pygame.mouse.get_pos(), (51, 613),
                                                                                    library.KEY_PRESSED["mouse"]):
+                # Checks to see if you're in settings before going back to the main menu
                 library.SETTINGS = False
-            elif library.MAIN_MENU_CONTROLS is True and main_menu_buttons["back"].is_pressed(pygame.mouse.get_pos(), (51, 613),
-                                                                                   library.KEY_PRESSED["mouse"]):
+            elif library.MAIN_MENU_CONTROLS is True and main_menu_buttons["back"].is_pressed(pygame.mouse.get_pos(),
+                                                                        (51, 613),library.KEY_PRESSED["mouse"]):
+                # Checks to see if you're in controls before going back to the main menu
                 library.MAIN_MENU_CONTROLS = False
             if option_buttons["resume"].is_pressed(pygame.mouse.get_pos(), (460, 188), library.KEY_PRESSED["mouse"]):
+                #   Resumes the game
                 library.PAUSED = False
             elif option_buttons["options"].is_pressed(pygame.mouse.get_pos(), (460, 338), library.KEY_PRESSED["mouse"]):
+                #   Opens the options interface
                 library.OPTIONS = True
             elif option_buttons["controls"].is_pressed(pygame.mouse.get_pos(), (460, 488), library.KEY_PRESSED["mouse"]):
+                # Opens the controls interface
                 library.CONTROLS = True
             elif option_buttons["exit"].is_pressed(pygame.mouse.get_pos(), (460, 638), library.KEY_PRESSED["mouse"]):
+                # Sends you to the main menu
                 main_menu()
                 library.HAS_STARTED = False
             elif library.CONTROLS is True and option_buttons["back"].is_pressed(pygame.mouse.get_pos(), (51, 613),
                                                                                 library.KEY_PRESSED["mouse"]):
+                #   A check to make sure you're in controls when clicking back
                 library.CONTROLS = False
             elif library.OPTIONS is True and option_buttons["back"].is_pressed(pygame.mouse.get_pos(), (51, 613),
                                                                                library.KEY_PRESSED["mouse"]):
+                #    this is a check to see if you're in options when clicking back
                 library.OPTIONS = False
             library.KEY_PRESSED["mouse"] = False
             print("This is mouse up", pygame.mouse.get_pos())
@@ -206,7 +221,7 @@ def text_objects(text, font):
 
 
 def main_menu():
-    if library.MAIN_MENU_CONTROLS is True:
+    if library.MAIN_MENU_CONTROLS is True: # if the controls are true it'll display the controls from the main menu
         controls_text = pygame.font.Font("UI/AMS hand writing.ttf", 115)
         button_text = pygame.font.Font("UI/AMS hand writing.ttf", 55)
         controls = pygame.transform.scale(pygame.image.load("UI/Controls.png"), (800, 600))
@@ -221,7 +236,7 @@ def main_menu():
         screen.blit(back_surf, back_rect)
         screen.blit(controls, (250, 130))
         pygame.display.flip()
-    elif library.SETTINGS is True:
+    elif library.SETTINGS is True: # if the settings are true it'll display the settings interface from the main menu
         options_text = pygame.font.Font("UI/AMS hand writing.ttf", 115)
         button_text = pygame.font.Font("UI/AMS hand writing.ttf", 55)
         screen.fill(library.WHITE)
@@ -233,7 +248,7 @@ def main_menu():
                     (51, 613))
         screen.blit(text_surf, text_rect)
         screen.blit(back_surf, back_rect)
-    else:
+    else: # if neither are true it'll display the main menu
         controls_text = pygame.font.Font("UI/AMS hand writing.ttf", 175)
         button_text = pygame.font.Font("UI/AMS hand writing.ttf", 60)
         screen.fill(library.WHITE)
@@ -268,7 +283,7 @@ def main_menu():
 
 
 def pause_menu():
-    if library.CONTROLS is True:
+    if library.CONTROLS is True: # checks if the library.conrols is true before displaying the controls interface
         controls_text = pygame.font.Font("UI/AMS hand writing.ttf", 115)
         button_text = pygame.font.Font("UI/AMS hand writing.ttf", 55)
         controls = pygame.transform.scale(pygame.image.load("UI/Controls.png"), (800,600))
@@ -283,7 +298,7 @@ def pause_menu():
         screen.blit(back_surf, back_rect)
         screen.blit(controls, (250, 130))
         pygame.display.flip()
-    elif library.OPTIONS is True:
+    elif library.OPTIONS is True:   #   this checks if library.options is true before displaying the options interface
         options_text = pygame.font.Font("UI/AMS hand writing.ttf", 115)
         button_text = pygame.font.Font("UI/AMS hand writing.ttf", 55)
         screen.fill(library.WHITE)
@@ -296,7 +311,7 @@ def pause_menu():
         screen.blit(text_surf, text_rect)
         screen.blit(back_surf, back_rect)
 
-    else:
+    else: # if neither are true it'll display the pause screen
         pause_text = pygame.font.Font("UI/AMS hand writing.ttf", 115)
         button_text = pygame.font.Font("UI/AMS hand writing.ttf", 60)
         button_text2 = pygame.font.Font("UI/AMS hand writing.ttf", 50)
