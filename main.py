@@ -1,5 +1,5 @@
 # DON'T FORGET TO COMMENT YOUR CODE PLEASE!!!
-import pygame, sys, library, random
+import pygame, sys, library, random, os, shutil
 from pygame.locals import *
 from random import choices
 # import the Animator class
@@ -23,7 +23,7 @@ fps_clock = pygame.time.Clock()
 # Tile Size
 TILE_SIZE = library.Tiles.floorImg.get_rect().width
 MAP_WIDTH = 10
-MAP_HEIGHT = 5
+MAP_HEIGHT = 10
 print(TILE_SIZE * MAP_WIDTH)
 
 level = pygame.Surface((TILE_SIZE * MAP_WIDTH, TILE_SIZE * MAP_HEIGHT))
@@ -66,6 +66,13 @@ player_idle_animation[library.BACKWARDS] = Animator("Characters/girl_frontIdle_s
                                                     library.scaleNum, 3, 7, 1.5)
 tile_class = library.Tiles()
 
+if not os.path.exists("Well Escape tiles/varieties"):
+    os.makedirs("Well Escape tiles/varieties")
+else:
+    shutil.rmtree("Well Escape tiles/varieties")
+    os.makedirs("Well Escape tiles/varieties")
+
+
 class GameStore:
     playerX = 0
     playerY = 0
@@ -74,6 +81,7 @@ class GameStore:
     x = 0
     y = 0
     playerSpawnPoint = []
+    instance = 0
 
 
 def gen_rand_map_tiles():
@@ -119,7 +127,18 @@ def initialize_level():
             elif tiles[column][row] == 2:
                 doorTiles.append([row * TILE_SIZE, column * TILE_SIZE, TILE_SIZE, TILE_SIZE])
 
-            material = tile_class.generate_material(tiles[column][row], tileMats[column][row])
+            files = [f for f in os.listdir("Well Escape tiles/varieties")
+                     if os.path.isfile(os.path.join("Well Escape tiles/varieties", f))]
+            variety_amount = len(files)
+
+            if tiles[column][row] == 1 and tileMats[column][row] > 0:
+                GameStore.instance += 1
+
+            if GameStore.instance > variety_amount:
+                material = tile_class.generate_material(tiles[column][row], tileMats[column][row], GameStore.instance)
+            else:
+                material = tile_class.assign_material(tiles[column][row], tileMats[column][row])
+
             level.blit(material, (row * TILE_SIZE, column * TILE_SIZE, TILE_SIZE, TILE_SIZE))
 
 
@@ -151,12 +170,14 @@ def event_inputs():
 
 def exit_game():
     """Exits the game to desktop"""
+    shutil.rmtree("Well Escape tiles/varieties")
     pygame.quit()
     sys.exit()
 
 
 # creates a new level and positions everything accordingly in that level
 def start():
+    GameStore.instance = 0
     # create the level
     initialize_level()
     # create movement variables
