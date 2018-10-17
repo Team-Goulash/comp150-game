@@ -31,3 +31,18 @@ class UIButtons:
                 return self.button_hover
             else:
                 return self.button_normal
+
+class UISilder(UIButtons):
+    slider_bar = None
+    silder_width = 100
+    slider_pos = (0, 0)
+    value = 0; # value = 0 - 1
+
+    def __init__(self,button_hover_src, button_normal_src, button_pressed_src, slider_bar_src, button_size, slider_pos, s_width):
+        UIButtons.__init__(button_hover_src, button_normal_src, button_pressed_src, button_size)
+        slider_bar = pygame.image.load(slider_bar_src)
+        slider_width = s_width
+        slider_pos = slider_pos
+
+    def draw_slider(self, cursor_pos, button_click, handle_pos):
+        pass
