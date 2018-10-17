@@ -8,8 +8,12 @@ MOVE = {"left": K_a, "right": K_d, "forwards": K_w, "backwards": K_s}
 # boolean values for key pressed states
 KEY_PRESSED = {"left": False, "right": False, "forwards": False, "backwards": False, "mouse": False}
 PAUSED = False
-OPTIONS = True
-CONTROLS = True
+OPTIONS = False
+CONTROLS = False
+SETTINGS = False
+MAIN_MENU_CONTROLS = False
+HAS_STARTED = False
+
 
 # set Colors
 BLUE = (0, 0, 255)
