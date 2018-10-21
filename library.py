@@ -19,14 +19,19 @@ CONTROLS = False
 SETTINGS = False
 MAIN_MENU_CONTROLS = False
 HAS_STARTED = False
+EDITOR = True
 
 
 # set Colors
 BLUE = (0, 0, 255)
 GREEN = (0, 255, 0)
 GREY = (100, 100, 100)
+DARK_GREY = (75, 75, 75)
+LIGHT_GREY = (200, 200, 200)
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
+RED = (255, 0, 0)
+
 
 # set images
 scaleNum = 90
