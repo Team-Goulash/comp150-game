@@ -133,3 +133,4 @@ def run_effect(effect_name, image_to_update, effect_inputs=None, loading_functio
             loading_function[0](loading_function[1], loading_function[2], (updated_pixel_count/total_pixels))
     # remove the pixel_array so we can display the image
     del pixel_array
+
