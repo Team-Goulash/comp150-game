@@ -1,15 +1,13 @@
-import main
-import pygame
-import sys
+import main, pygame, sys
 
 
 class var():
     light = 100
-    change = False                      '''variable that activates lightning sequence'''
+    change = False                      #variable that activates lightning sequence
     currentposx = main.GameStore.playerX    #characters position
     currentposy = main.GameStore.playerY    #characters position
-    ctx = 4                        #x tile that character is on
-    cty = 4                        #y tile that character is on
+    ctx = 1                      #x tile that character is on
+    cty = 1                        #y tile that character is on
     previoustilex = 0                       #x tile that character was on 1 frame ago
     previoustiley = 0                       #y tile that character was on 1 frame ago
     xtilelength = 10           #finds amount of tiles in width
@@ -56,32 +54,43 @@ def aply():
         var.xarray = [var.ctx - 3, var.ctx - 2, var.ctx - 1, var.ctx, var.ctx + 1, var.ctx + 2, var.ctx + 3]
         var.yarray = [var.cty - 3, var.cty - 2, var.cty - 1, var.cty, var.cty + 1, var.cty + 2, var.cty + 3]
     elif var.light > 33:
-        var.xarray = [var.ctx - 2, var.ctx - 1, var.ctx, var.ctx + 1, var.ctx + 2, ]
-        var.yarray = [var.cty - 2, var.cty - 1, var.cty, var.cty + 1, var.cty + 2, ]
+        var.xarray = [var.ctx - 2, var.ctx - 1, var.ctx, var.ctx + 1, var.ctx + 2]
+        var.yarray = [var.cty - 2, var.cty - 1, var.cty, var.cty + 1, var.cty + 2]
     else:
         var.xarray = [var.ctx - 1, var.ctx, var.ctx + 1]
         var.yarray = [var.cty - 1, var.cty, var.cty + 1]
 
-    for y in range(var.ytilelength):
-        for x in range(var.xtilelength):
-            var.tile[x] = 0
-        var.tiles[y] = var.tile
+    print(var.xarray)
+    print(var.yarray)
+    for yx in range(var.ytilelength):
+        for xy in range(var.xtilelength):
+            var.tile[xy] = 0
+        var.tiles[yx] = var.tile
     print(var.tiles)
 
-    for x in range(var.xtilelength):
-        for y in range(var.ytilelength):
+    temp_tiles = []
 
-            if y in var.yarray and x in var.xarray:
-                var.tiles[y][x] = 1
+    for yy in range(var.ytilelength):
+        temp_light = []
+        for xx in range(var.xtilelength):
+
+            print(xx, ":", yy, "::", 1 - ((xx / var.xtilelength) + (yy / var.ytilelength) / 2))
+            if xx + 1 in var.xarray and yy + 1 in var.yarray:
+                temp_light.append(1)
+
+
             else:
-                var.tiles[y][x] = 0
+                temp_light.append(0)
 
-            #line = pygame.draw.line(main.screen, (255, 0, 0), (currentposx, currentposy), tilesPoisition)
-
-            #for x in line.collidelist:
-                #if x = wall
-                #tile texture = its texture
-            #destroy line
+        temp_tiles.append(temp_light)
+        #    """#line = pygame.draw.line(main.screen, (255, 0, 0), (currentposx, currentposy), tilesPoisition)
+        #
+        #   #for x in line.collidelist:
+        #       #if x = wall
+        #       #tile texture = its texture
+        #   #destroy line"""
+    var.tiles = temp_tiles
     print(var.tiles)
+
 
 aply()
