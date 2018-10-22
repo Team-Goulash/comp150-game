@@ -119,11 +119,14 @@ def display_select_tile():
     if EditorStore.update_image_directory:
         EditorStore.directory_tiles = get_files_in_directory(".\Well Escape tiles", ".png")
 
+    # Todo move this into the if, when the optimize is done in display_select_tile_button
     display_select_tile_button()
 
 
 def display_select_tile_button():
     """Draws the buttons to screen and selects the tile for edit if pressed"""
+    # todo: optimize this so the buttons are called from the main button function so they dont get draw every frame
+
     # loop each image that can be edited
     for i in range(len(EditorStore.directory_tiles)):
         # Add File name text
