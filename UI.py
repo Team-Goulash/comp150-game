@@ -9,10 +9,23 @@ class UIButtons:
         button_size = (0, 0)
 
         def __init__(self, button_hover_src, button_normal_src, button_pressed_src, size):
+            """
+            # Driver: Callum; Navigator: Ashley
+            # Edited: Ashley
+            button sources can be none. this can be useful if you want to set the value to an image that is already
+            a surface. Beware if it is none it will cause an error if you try to blit it to screen!
+            :param button_hover_src:    File path for hover button (can be none)
+            :param button_normal_src:   File path for normal button (can be none)
+            :param button_pressed_src:  File path for pressed button (can be none)
+            :param size:                The size of the button (width, height)
+            """
             self.button_size = size
-            self.button_hover = pygame.transform.scale(pygame.image.load(button_hover_src), self.button_size)
-            self.button_normal = pygame.transform.scale(pygame.image.load(button_normal_src),  self.button_size)
-            self.button_pressed = pygame.transform.scale(pygame.image.load(button_pressed_src), self.button_size)
+            if button_hover_src is not None:
+                self.button_hover = pygame.transform.scale(pygame.image.load(button_hover_src), self.button_size)
+            if button_normal_src is not None:
+                self.button_normal = pygame.transform.scale(pygame.image.load(button_normal_src),  self.button_size)
+            if button_pressed_src is not None:
+                self.button_pressed = pygame.transform.scale(pygame.image.load(button_pressed_src), self.button_size)
 
         def is_hover(self, cursor_pos, screen_pos):
             top_left = cursor_pos[0] > screen_pos[0] and cursor_pos[1] > screen_pos[1]
@@ -60,6 +73,7 @@ class UISilder(UIButtons):
             slider = UIButtons.draw_button(self, cursor_pos, button_click, ((self.slider_pos[0] + self.slider_width), self.slider_pos[1]))
         else:
             slider = UIButtons.draw_button(self, cursor_pos, button_click, handle_pos)
+
 
         surface.blit(self.slider_bar, self.slider_pos)
         surface.blit(slider, handle_pos)
