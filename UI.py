@@ -32,6 +32,7 @@ class UIButtons:
             else:
                 return self.button_normal
 
+
 class UISilder(UIButtons):
     slider_bar = None
     silder_width = 100
@@ -39,10 +40,26 @@ class UISilder(UIButtons):
     value = 0; # value = 0 - 1
 
     def __init__(self,button_hover_src, button_normal_src, button_pressed_src, slider_bar_src, button_size, slider_pos, s_width):
-        UIButtons.__init__(button_hover_src, button_normal_src, button_pressed_src, button_size)
-        slider_bar = pygame.image.load(slider_bar_src)
-        slider_width = s_width
-        slider_pos = slider_pos
+        UIButtons.__init__(self, button_hover_src, button_normal_src, button_pressed_src, button_size)
+        self.slider_bar = pygame.image.load(slider_bar_src)
+        self.slider_width = s_width
+        self.slider_pos = slider_pos
 
-    def draw_slider(self, cursor_pos, button_click, handle_pos):
-        pass
+    def draw_slider(self, cursor_pos, button_click, handle_pos, surface):
+        """
+        draws the slider
+        :param cursor_pos: cursor position
+        :param button_click: when mouse is clicked
+        :param handle_pos: treat as is it is button position
+        """
+        slider = None
+
+        if handle_pos[0] <= self.slider_pos[0]:
+            slider = UIButtons.draw_button(self, cursor_pos, button_click, self.slider_pos)
+        elif handle_pos[0] >= self.slider_pos[0] + self.slider_width:
+            slider = UIButtons.draw_button(self, cursor_pos, button_click, ((self.slider_pos[0] + self.slider_width), self.slider_pos[1]))
+        else:
+            slider = UIButtons.draw_button(self, cursor_pos, button_click, handle_pos)
+
+        surface.blit(self.slider_bar, self.slider_pos)
+        surface.blit(slider, handle_pos)
