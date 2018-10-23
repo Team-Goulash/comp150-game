@@ -4,6 +4,8 @@ from pygame.locals import *
 from random import choices
 # import the Animator class
 from animator import Animator
+# import the tile editor as editor
+import tileEditor as Editor
 
 # initialize py game
 pygame.init()
@@ -458,8 +460,15 @@ def main():
         t = pygame.time.get_ticks()
         # amount of time that passed since the last frame in seconds
         delta_time = (t - ticks_since_last_frame) / 1000.0
+
+        if library.EDITOR:
+            Editor.display()
+            ticks_since_last_frame = t
+            continue
+
         # Get inputs
         event_inputs()
+
         display_pause_menu = False
 
         # set the players animation direction and idle for the animation
@@ -542,3 +551,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
