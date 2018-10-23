@@ -614,32 +614,7 @@ def main():
         if not library.PAUSED and library.HAS_STARTED:
             # multiply the movement by delta_time to ensure constant speed no matter the FPS
             movement_speed = 75 * delta_time
-
-        # Key press actions
-        if library.KEY_PRESSED["left"] and not GameStore.left_col:
-            # left key action
-            GameStore.playerX -= movement_speed
-            GameStore.x += movement_speed
-            # set the current direction
-
-        if library.KEY_PRESSED["right"] and not GameStore.right_col:
-            # right key action
-            GameStore.playerX += movement_speed
-            GameStore.x -= movement_speed
-            # set the current direction
-
-        if library.KEY_PRESSED["forwards"] and not GameStore.top_col:
-            # forwards key action
-            GameStore.playerY -= movement_speed
-            GameStore.y += movement_speed
-            # set the current direction
-
-        if library.KEY_PRESSED["backwards"] and not GameStore.bottom_col:
-            # backwards key action
-            GameStore.playerY += movement_speed
-            GameStore.y -= movement_speed
-            # set the current direction
-
+            
         # switch between active and idle
         if not player_idle:
             player = player_animation[current_direction]
