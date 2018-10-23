@@ -1,17 +1,48 @@
 # DON'T FORGET TO COMMENT YOUR CODE PLEASE!!!
-import pygame, sys, library, random, os, shutil
+import pygame, sys, library, random, UI, os, shutil
+
 from pygame.locals import *
 from random import choices
 # import the Animator class
 from animator import Animator
+# import the tile editor as editor
+import tileEditor as Editor
 
 # initialize py game
 pygame.init()
 # Set the window size
 WINDOW_HEIGHT = 750
 WINDOW_WIDTH = 1334
+
 # create the window
 screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
+
+# UI Buttons
+main_menu_buttons = {"new game": None, "continue": None, "options": None, "controls": None, "quit game": None, "back": None}
+main_menu_buttons["new game"] = UI.UIButtons("UI/Button_000_hover.png", "UI/Button_000_normal.png", "Ui/button_000_pressed.png",
+                                             (460, 75))
+main_menu_buttons["continue"] = UI.UIButtons("UI/Button_000_hover.png", "UI/Button_000_normal.png", "Ui/button_000_pressed.png",
+                                             (460, 75))
+main_menu_buttons["options"] = UI.UIButtons("UI/Button_000_hover.png", "UI/Button_000_normal.png", "Ui/button_000_pressed.png",
+                                            (460, 75))
+main_menu_buttons["controls"] = UI.UIButtons("UI/Button_000_hover.png", "UI/Button_000_normal.png", "Ui/button_000_pressed.png",
+                                             (460, 75))
+main_menu_buttons["quit game"] = UI.UIButtons("UI/Button_000_hover.png", "UI/Button_000_normal.png", "Ui/button_000_pressed.png",
+                                              (460, 75))
+main_menu_buttons["back"] = UI.UIButtons("UI/Button_000_hover.png", "UI/Button_000_normal.png", "UI/button_000_pressed.png",
+                                      (160, 110))
+option_buttons = {"resume": None, "options": None, "controls": None, "exit": None, "back": None}
+option_buttons["resume"] = UI.UIButtons("UI/Button_000_hover.png", "UI/Button_000_normal.png", "UI/button_000_pressed.png",
+                                        (460, 110))
+option_buttons["options"] = UI.UIButtons("UI/Button_000_hover.png", "UI/Button_000_normal.png", "UI/button_000_pressed.png",
+                                         (460, 110))
+option_buttons["controls"] = UI.UIButtons("UI/Button_000_hover.png", "UI/Button_000_normal.png", "UI/button_000_pressed.png",
+                                          (460, 110))
+option_buttons["exit"] = UI.UIButtons("UI/Button_000_hover.png", "UI/Button_000_normal.png", "UI/button_000_pressed.png",
+                                      (460, 110))
+option_buttons["back"] = UI.UIButtons("UI/Button_000_hover.png", "UI/Button_000_normal.png", "UI/button_000_pressed.png",
+                                      (160, 110))
+test_slider = UI.UISilder("UI/temp_slider.png", "UI/temp_slider_handle.png", "UI/temp_slider_handle.png", "UI/temp_slider_handle.png", (50, 100), (0, 0), 500)
 # set the window caption
 pygame.display.set_caption("Well Escape")
 
@@ -23,7 +54,11 @@ fps_clock = pygame.time.Clock()
 # Tile Size
 TILE_SIZE = library.Tiles.floorImg.get_rect().width
 
-# [] = list
+# text size
+title_text = pygame.font.Font("UI/AMS hand writing.ttf", 115)
+button_text = pygame.font.Font("UI/AMS hand writing.ttf", 55)
+button_text_60 = pygame.font.Font("UI/AMS hand writing.ttf", 60)
+
 tiles = []
 tileTypes = []
 tileMats = []
@@ -232,12 +267,209 @@ def event_inputs():
                 library.KEY_PRESSED["backwards"] = event.type == KEYDOWN
 
         if event.type == KEYUP:
-            if event.key == library.PAUSE:                     # get paused key down.
-                start()     # resets the level
+            if event.key == K_r:
+                start()  # resets the level
+            elif event.key == library.PAUSE: # Pauses the game
+                library.PAUSED = not library.PAUSED
+                library.CONTROLS = False
+                library.OPTIONS = False
         elif event.type == MOUSEBUTTONDOWN:                     # has a mouse button just been pressed?
-            pass      # replace pass with mouse button up action/function.
+            library.KEY_PRESSED["mouse"] = True
+            print("This is mouse down")
         elif event.type == MOUSEBUTTONUP:                       # has a mouse button just been released?
-            pass      # replace pass with pause action/function.
+            if main_menu_buttons["new game"].is_pressed(pygame.mouse.get_pos(), (460, 188),
+                                                        library.KEY_PRESSED["mouse"]):
+                # Starts a new game
+                library.HAS_STARTED = True
+            elif main_menu_buttons["continue"].is_pressed(pygame.mouse.get_pos(), (460, 288),
+                                                          library.KEY_PRESSED["mouse"]):
+                #   just starts a new game for now will be changed to a load game function
+                library.HAS_STARTED = True
+            elif main_menu_buttons["options"].is_pressed(pygame.mouse.get_pos(), (460, 388),
+                                                         library.KEY_PRESSED["mouse"]):
+                #   Opens up settings from the main menu
+                library.SETTINGS = True
+            elif main_menu_buttons["controls"].is_pressed(pygame.mouse.get_pos(), (460, 488),
+                                                          library.KEY_PRESSED["mouse"]):
+                # Opens up controls from the main menu
+                library.MAIN_MENU_CONTROLS = True
+            elif main_menu_buttons["quit game"].is_pressed(pygame.mouse.get_pos(), (460, 588),
+                                                           library.KEY_PRESSED["mouse"]):
+                # Quits the game
+                exit_game()
+            elif library.SETTINGS is True and main_menu_buttons["back"].is_pressed(pygame.mouse.get_pos(), (51, 613),
+                                                                                   library.KEY_PRESSED["mouse"]):
+                # Checks to see if you're in settings before going back to the main menu
+                library.SETTINGS = False
+            elif library.MAIN_MENU_CONTROLS is True and main_menu_buttons["back"].is_pressed(pygame.mouse.get_pos(),
+                                                                        (51, 613),library.KEY_PRESSED["mouse"]):
+                # Checks to see if you're in controls before going back to the main menu
+                library.MAIN_MENU_CONTROLS = False
+            if option_buttons["resume"].is_pressed(pygame.mouse.get_pos(), (460, 188), library.KEY_PRESSED["mouse"]):
+                #   Resumes the game
+                library.PAUSED = False
+            elif option_buttons["options"].is_pressed(pygame.mouse.get_pos(), (460, 338), library.KEY_PRESSED["mouse"]):
+                #   Opens the options interface
+                library.OPTIONS = True
+            elif option_buttons["controls"].is_pressed(pygame.mouse.get_pos(), (460, 488), library.KEY_PRESSED["mouse"]):
+                # Opens the controls interface
+                library.CONTROLS = True
+            elif option_buttons["exit"].is_pressed(pygame.mouse.get_pos(), (460, 638), library.KEY_PRESSED["mouse"]):
+                # Sends you to the main menu
+                main_menu()
+                library.HAS_STARTED = False
+            elif library.CONTROLS is True and option_buttons["back"].is_pressed(pygame.mouse.get_pos(), (51, 613),
+                                                                                library.KEY_PRESSED["mouse"]):
+                #   A check to make sure you're in controls when clicking back
+                library.CONTROLS = False
+            elif library.OPTIONS is True and option_buttons["back"].is_pressed(pygame.mouse.get_pos(), (51, 613),
+                                                                               library.KEY_PRESSED["mouse"]):
+                #    this is a check to see if you're in options when clicking back
+                library.OPTIONS = False
+            library.KEY_PRESSED["mouse"] = False
+            print("This is mouse up", pygame.mouse.get_pos())
+
+
+def text_objects(text, font):
+    text_surface = font.render(text, True, library.BLACK)
+    return text_surface, text_surface.get_rect()
+
+
+def main_menu():
+    if library.MAIN_MENU_CONTROLS is True: # if the controls are true it'll display the controls from the main menu
+        controls = pygame.transform.scale(pygame.image.load("UI/Controls.png"), (800, 600))
+        screen.fill(library.WHITE)
+        text_surf, text_rect = text_objects("Controls", title_text)
+        text_rect.center = ((WINDOW_WIDTH / 2), (WINDOW_HEIGHT / 8))
+        back_surf, back_rect = text_objects("Back", button_text_60)
+        back_rect.center = (134, 664)
+        screen.blit(main_menu_buttons["back"].draw_button(pygame.mouse.get_pos(), library.KEY_PRESSED["mouse"], (60, 640)),
+                    (51, 613))
+        screen.blit(text_surf, text_rect)
+        screen.blit(back_surf, back_rect)
+        screen.blit(controls, (250, 130))
+        pygame.display.flip()
+    elif library.SETTINGS is True: # if the settings are true it'll display the settings interface from the main menu
+        screen.fill(library.WHITE)
+        text_surf, text_rect = text_objects("Settings", title_text)
+        text_rect.center = ((WINDOW_WIDTH / 2), (WINDOW_HEIGHT / 7))
+        back_surf, back_rect = text_objects("Back", button_text_60)
+        back_rect.center = (134, 664)
+        screen.blit(main_menu_buttons["back"].draw_button(pygame.mouse.get_pos(), library.KEY_PRESSED["mouse"], (60, 640)),
+                    (51, 613))
+        screen.blit(text_surf, text_rect)
+        screen.blit(back_surf, back_rect)
+    else: # if neither are true it'll display the main menu
+        controls_text = pygame.font.Font("UI/AMS hand writing.ttf", 175)
+        screen.fill(library.WHITE)
+        # title
+        text_surf, text_rect = text_objects("Well Escape", controls_text)
+        text_rect.center = ((WINDOW_WIDTH / 2), (WINDOW_HEIGHT / 8))
+        # New Game button
+        new_game_surf, new_game_rect = text_objects("New Game", button_text_60)
+        new_game_rect.center = (690, 224)
+        # Load Game Button
+        continue_game_surf, continue_game_rect = text_objects("Load Game", button_text_60)
+        continue_game_rect.center = (690, 326)
+        # Settings button
+        options_surf, options_rect = text_objects("Settings", button_text_60)
+        options_rect.center = (690, 423)
+        # Controls button
+        controls_surf, controls_rect = text_objects("Controls", button_text_60)
+        controls_rect.center = (690, 524)
+        # Quit Game button
+        quit_surf, quit_rect = text_objects("Quit Game", button_text_60)
+        quit_rect.center = (690, 624)
+        # blits the buttons
+        screen.blit(text_surf, text_rect)
+        # button positioning
+        screen.blit(main_menu_buttons["new game"].draw_button(pygame.mouse.get_pos(), library.KEY_PRESSED["mouse"],
+                                                              (460, 208)), (460, 188))
+        screen.blit(main_menu_buttons["continue"].draw_button(pygame.mouse.get_pos(), library.KEY_PRESSED["mouse"],
+                                                              (460, 308)), (460, 288))
+        screen.blit(main_menu_buttons["options"].draw_button(pygame.mouse.get_pos(), library.KEY_PRESSED["mouse"],
+                                                              (460, 408)), (460, 388))
+        screen.blit(main_menu_buttons["controls"].draw_button(pygame.mouse.get_pos(), library.KEY_PRESSED["mouse"],
+                                                              (460, 508)), (460, 488))
+        screen.blit(main_menu_buttons["quit game"].draw_button(pygame.mouse.get_pos(), library.KEY_PRESSED["mouse"],
+                                                              (460, 608)), (460, 588))
+        # blits
+        screen.blit(new_game_surf, new_game_rect)
+        screen.blit(continue_game_surf, continue_game_rect)
+        screen.blit(options_surf, options_rect)
+        screen.blit(controls_surf, controls_rect)
+        screen.blit(quit_surf, quit_rect)
+
+
+def pause_menu():
+    if library.CONTROLS is True: # checks if the library.conrols is true before displaying the controls interface
+        controls = pygame.transform.scale(pygame.image.load("UI/Controls.png"), (800,600))
+        screen.fill(library.WHITE)
+        text_surf, text_rect = text_objects("Controls", title_text)
+        text_rect.center = ((WINDOW_WIDTH / 2), (WINDOW_HEIGHT / 8))
+        back_surf, back_rect = text_objects("Back", button_text_60)
+        back_rect.center = (134, 664)
+        screen.blit(option_buttons["back"].draw_button(pygame.mouse.get_pos(), library.KEY_PRESSED["mouse"], (60, 640)),
+                    (51, 613))
+        screen.blit(text_surf, text_rect)
+        screen.blit(back_surf, back_rect)
+        screen.blit(controls, (250, 130))
+        pygame.display.flip()
+    elif library.OPTIONS is True:   # this checks if library.options is true before displaying the options interface
+        screen.fill(library.WHITE)
+        text_surf, text_rect = text_objects("Options", title_text)
+        text_rect.center = ((WINDOW_WIDTH / 2), (WINDOW_HEIGHT / 7))
+        back_surf, back_rect = text_objects("Back", button_text_60)
+        back_rect.center = (134, 664)
+        screen.blit(option_buttons["back"].draw_button(pygame.mouse.get_pos(), library.KEY_PRESSED["mouse"], (60, 640)),
+                    (51, 613))
+        screen.blit(text_surf, text_rect)
+        screen.blit(back_surf, back_rect)
+
+    else: # if neither are true it'll display the pause screen
+        button_text2 = pygame.font.Font("UI/AMS hand writing.ttf", 50)
+        screen.fill(library.WHITE)
+        # title
+        text_surf, text_rect = text_objects("Paused", title_text)
+        text_rect.center = ((WINDOW_WIDTH / 2), (WINDOW_HEIGHT / 7))
+        # Resume button
+        screen.blit(option_buttons["resume"].draw_button(pygame.mouse.get_pos(), library.KEY_PRESSED["mouse"], (460, 208)),
+                    (460, 188))
+        # Options button
+        screen.blit(option_buttons["options"].draw_button(pygame.mouse.get_pos(), library.KEY_PRESSED["mouse"], (460, 358)),
+                    (460, 338))
+        # Controls button
+        screen.blit(option_buttons["controls"].draw_button(pygame.mouse.get_pos(), library.KEY_PRESSED["mouse"], (460, 508)),
+                    (460, 488))
+        # Exit button
+        screen.blit(option_buttons["exit"].draw_button(pygame.mouse.get_pos(), library.KEY_PRESSED["mouse"], (460, 658)),
+                    (460, 638))
+        resume_surf, resume_rect = text_objects("Resume", button_text_60)
+        resume_rect.center = (690, 238)
+        options_surf, options_rect = text_objects("Options", button_text_60)
+        options_rect.center = (690, 388)
+        controls_surf, controls_rect = text_objects("Controls", button_text_60)
+        controls_rect.center = (690, 538)
+        quit_surf, quit_rect = text_objects("Exit to Main Menu", button_text2)
+        quit_rect.center = (690, 688)
+        # Blits
+        screen.blit(quit_surf, quit_rect)
+        screen.blit(controls_surf, controls_rect)
+        screen.blit(options_surf, options_rect)
+        screen.blit(text_surf, text_rect)
+        screen.blit(resume_surf, resume_rect)
+
+
+def pausing_game():
+    for event in pygame.event.get():
+        if paused is False:
+            if event.type == library.PAUSE:
+                paused = not paused
+                pause_menu()
+
+        if paused:
+            pause_menu()
+            continue
 
 
 def exit_game():
@@ -347,7 +579,10 @@ def detect_collision(player_pos_x, player_pos_y):
     return GameStore.top_col, GameStore.bottom_col, GameStore.left_col, GameStore.right_col
 
 
+
 def main():
+
+    level_init = False
     start()
     ticks_since_last_frame = 0
 
@@ -359,8 +594,16 @@ def main():
         t = pygame.time.get_ticks()
         # amount of time that passed since the last frame in seconds
         delta_time = (t - ticks_since_last_frame) / 1000.0
+
+        if library.EDITOR:
+            Editor.display()
+            ticks_since_last_frame = t
+            continue
+
         # Get inputs
         event_inputs()
+
+        display_pause_menu = False
 
         # set the players animation direction and idle for the animation
         next_animation_direction, player_idle = animation_direction(current_direction)
@@ -368,7 +611,9 @@ def main():
         current_direction = change_direction(current_direction, next_animation_direction)
 
         # multiply the movement by delta_time to ensure constant speed no matter the FPS
-        movement_speed = 75 * delta_time
+        if not library.PAUSED and library.HAS_STARTED:
+            # multiply the movement by delta_time to ensure constant speed no matter the FPS
+            movement_speed = 75 * delta_time
 
         # Key press actions
         if library.KEY_PRESSED["left"] and not GameStore.left_col:
@@ -399,30 +644,69 @@ def main():
         if not player_idle:
             player = player_animation[current_direction]
         else:
-            player = player_idle_animation[current_direction]
+            # prevent the player moving if the game is paused or has not started yet!
+            movement_speed = 0
 
-        # update the avatars animation time
-        player.update_time(delta_time)
+        if not library.PAUSED:
+            # Key press actions
+            if library.KEY_PRESSED["forwards"]:
+                # forwards key action
+                GameStore.playerY -= movement_speed
+                GameStore.y += movement_speed
+
+            if library.KEY_PRESSED["backwards"]:
+                # backwards key action
+                GameStore.playerY += movement_speed
+                GameStore.y -= movement_speed
+
+            if library.KEY_PRESSED["left"]:
+                # left key action
+                GameStore.playerX -= movement_speed
+                GameStore.x += movement_speed
+
+            if library.KEY_PRESSED["right"]:
+                # right key action
+                GameStore.playerX += movement_speed
+                GameStore.x -= movement_speed
+                
+            # switch between active and idle
+            if not player_idle:
+                player = player_animation[current_direction]
+            else:
+                player = player_idle_animation[current_direction]
+
+            # update the avatars animation time
+            player.update_time(delta_time)
+                
+        else:
+            display_pause_menu = True
 
         # wait for the frame to end
         fps_clock.tick(FPS)
 
-        # fill the background
-        screen.fill(library.BLACK)
+        # Display main menu if the game has not started
+        if not library.HAS_STARTED:
+            main_menu()
+        # display the pause menu if the game paused
+        elif display_pause_menu is True:
+            pause_menu()
+        else:
+            # fill the background
+            screen.fill(library.BLACK)
+            # render the level on screen
+            for i in range(len(GameStore.levels) - 1, -1, -1):
+                screen.blit(GameStore.levels[i], (GameStore.x + GameStore.starting_point_x[i] - GameStore.offsetX,
+                                                  GameStore.y + GameStore.starting_point_y[i] - GameStore.offsetY))
 
-        # render the level on screen
-        for i in range(len(GameStore.levels) - 1, -1, -1):
-            screen.blit(GameStore.levels[i], (GameStore.x + GameStore.starting_point_x[i] - GameStore.offsetX,
-                                              GameStore.y + GameStore.starting_point_y[i] - GameStore.offsetY))
+            # update player's position
+            player_x_pos = GameStore.x + GameStore.playerX - GameStore.offsetX
+            player_y_pos = GameStore.y + GameStore.playerY - GameStore.offsetY
+            # detect_collision(player_x_pos, player_y_pos)
+            # draw the player
+            screen.blit(pygame.transform.scale(player.get_current_sprite(),
+                        (int(TILE_SIZE * 0.9), int(TILE_SIZE * 0.9))), (player_x_pos, player_y_pos))
 
-        # update player's position
-        player_x_pos = GameStore.x + GameStore.playerX - GameStore.offsetX
-        player_y_pos = GameStore.y + GameStore.playerY - GameStore.offsetY
-        # detect_collision(player_x_pos, player_y_pos)
-        # draw the player
-        screen.blit(pygame.transform.scale(player.get_current_sprite(),
-                    (int(TILE_SIZE * 0.9), int(TILE_SIZE * 0.9))), (player_x_pos, player_y_pos))
-
+        test_slider.draw_slider((0,0), False, (50, 0), screen)
         # update the display.
         pygame.display.flip()
         ticks_since_last_frame = t
@@ -430,3 +714,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+

@@ -77,3 +77,4 @@ class Animator:
                                                 (self.sprite_spacing*self.current_frame_id),
                                                 0, self.sprite_size, self.sprite_size))
 
+

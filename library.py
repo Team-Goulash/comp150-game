@@ -13,26 +13,48 @@ FORWARDS = 2
 BACKWARDS = 3
 
 # boolean values for key pressed states
-KEY_PRESSED = {"left": False, "right": False, "forwards": False, "backwards": False}
+KEY_PRESSED = {"left": False, "right": False, "forwards": False, "backwards": False, "mouse": False}
+PAUSED = False
+OPTIONS = False
+CONTROLS = False
+SETTINGS = False
+MAIN_MENU_CONTROLS = False
+HAS_STARTED = False
+EDITOR = True
+
 
 # set Colors
-WHITE = (255, 255, 255)
-GREY = (100, 100, 100)
-BLACK = (0, 0, 0)
-
-RED = (255, 0, 0)
-GREEN = (0, 255, 0)
 BLUE = (0, 0, 255)
+GREEN = (0, 255, 0)
+GREY = (100, 100, 100)
+DARK_GREY = (75, 75, 75)
+LIGHT_GREY = (200, 200, 200)
+WHITE = (255, 255, 255)
+BLACK = (0, 0, 0)
+RED = (255, 0, 0)
 
 MUD = (139, 69, 19)
 MOSS = (61, 142, 31)
 
+# set images
+scaleNum = 90
+buttonSize = (600, 100)
+
+doorImg = pygame.transform.scale(pygame.image.load("Well Escape tiles/DoorTile.png"), (scaleNum, scaleNum))
+floorImg = pygame.transform.scale(pygame.image.load("Well Escape tiles/FloorTile.png"), (scaleNum, scaleNum))
+wallImg = pygame.transform.scale(pygame.image.load("Well Escape tiles/WallTile.png"), (scaleNum, scaleNum))
+#   UI Buttons
+buttonOneHover = pygame.transform.scale(pygame.image.load("UI/Button_000_hover.png"), buttonSize)
+buttonTwoHover = pygame.transform.scale(pygame.image.load("UI/Button_001_hover.png"), buttonSize)
+buttonOneClick = pygame.transform.scale(pygame.image.load("UI/Button_000_pressed.png"), buttonSize)
+buttonTwoClick = pygame.transform.scale(pygame.image.load("UI/Button_001_pressed.png"), buttonSize)
+buttonOne = pygame.transform.scale(pygame.image.load("UI/Button_000_normal.png"), buttonSize)
+buttonTwo = pygame.transform.scale(pygame.image.load("UI/Button_001_normal.png"), buttonSize)
 
 scaleNum = 90
 # load the player image
 playerImg = pygame.transform.scale(pygame.image.load("Characters/Player.png"),
                                    (int(scaleNum * 0.75), int(scaleNum * 0.75)))
-
 
 class Tiles:
     # load tile images
@@ -246,4 +268,3 @@ class Tiles:
             current_module = random.choices(rooms, room_weights)[0]
 
         return current_module
-
