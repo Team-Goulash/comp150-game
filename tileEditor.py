@@ -19,6 +19,7 @@ class EditorStore:
 
     # The amount the tile is zoomed in/out
     tile_zoom = 2.5
+    test_text_input = ""
 
 
 WINDOW_MARGIN_X, WINDOW_MARGIN_Y = 50, 50
@@ -48,6 +49,8 @@ start_menu_button_data = []
 tile_select_menu_button_data = []
 edit_tile_button_data = []
 
+
+text_text_input = UI.UIInput((450, 50), 30)
 
 def initialize():
     """
@@ -208,6 +211,9 @@ def button_pressed():
         # event: exit game! (via window X or alt-F4)
         if event.type == QUIT:
             main.exit_game()
+        elif event.type == KEYUP:
+            EditorStore.test_text_input = text_input(event, EditorStore.test_text_input, text_text_input)
+            print(EditorStore.test_text_input)
         elif event.type == MOUSEBUTTONDOWN and event.button == 1:
             library.KEY_PRESSED["mouse"] = True
         elif event.type == MOUSEBUTTONUP and event.button == 1:
@@ -257,6 +263,7 @@ def button_action(action_type, button_data=None):
     else:
         print("Error button action", action_type, "not found")
 
+
 def set_menu(menu_id, buttons=None):
     """
     Sets the current menu
@@ -288,7 +295,6 @@ def run_effect(effect_name):
                                                                         ))
 
 
-
 def loading_bar(surface, rect, percent):
     """
     Displays a loading bar on surface and updates display
@@ -302,6 +308,36 @@ def loading_bar(surface, rect, percent):
     pygame.draw.rect(surface, library.WHITE, (rect[0] + 5, rect[1] + 5, (rect[2] - 10) * percent, rect[3] - 8))
     surface.blit(text_surface, (50, 10))
     pygame.display.flip()
+
+
+def text_input(event, current_text, ui_text_input):
+
+    if not ui_text_input.has_focus(pygame.mouse.get_pos(), library.KEY_PRESSED["mouse"], (50, 100)):
+        return current_text
+
+    letters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u',
+               'v', 'w', 'x', 'y', 'z']
+    numbers = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
+
+    if event.key == K_BACKSPACE:
+        new_str = ""
+        for s in range(0, len(current_text)-1):
+            new_str += current_text[s]
+        return new_str
+    elif event.key == K_SPACE:
+        return current_text + " "
+
+    if event.key >= 48 < 48 + len(numbers):
+        for n in range(len(numbers)):
+            if event.key == 48 + n:
+                return current_text + numbers[n]
+
+    if event.key >= 97 < 97 + len(letters):
+        for l in range(len(letters)):
+            if event.key == 97 + l:
+                return current_text + letters[l]
+
+    return current_text
 
 
 def display():
@@ -332,6 +368,8 @@ def display():
 
     draw_menu_buttons()
     button_pressed()
+
+    text_text_input.draw_text_input(pygame.mouse.get_pos(), library.KEY_PRESSED["mouse"], (500, 25), EditorStore.test_text_input, main.screen)
 
     pygame.display.flip()
 
