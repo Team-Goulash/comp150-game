@@ -2,11 +2,11 @@
 import pygame, sys, library, random, UI, os, shutil
 
 from pygame.locals import *
-from random import choices
 # import the Animator class
 from animator import Animator
 # import the tile editor as editor
 import tileEditor as Editor
+import dungeonGenerator
 
 # initialize py game
 pygame.init()
@@ -16,6 +16,8 @@ WINDOW_WIDTH = 1334
 
 # create the window
 screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
+
+dunGen = dungeonGenerator
 
 # UI Buttons
 main_menu_buttons = {"new game": None, "continue": None, "options": None, "controls": None, "quit game": None, "back": None}
@@ -51,23 +53,10 @@ FPS = 60
 # initialize the FPS clock
 fps_clock = pygame.time.Clock()
 
-# Tile Size
-TILE_SIZE = library.Tiles.floorImg.get_rect().width
-
 # text size
 title_text = pygame.font.Font("UI/AMS hand writing.ttf", 115)
 button_text = pygame.font.Font("UI/AMS hand writing.ttf", 55)
 button_text_60 = pygame.font.Font("UI/AMS hand writing.ttf", 60)
-
-tiles = []
-tileTypes = []
-tileMats = []
-floorTiles = []
-wallTiles = []
-doorTiles = []
-
-tile_class = library.Tiles()
-materials = tile_class.tileTypes
 
 # set player animations
 player_animation = ["", "", "", ""]
@@ -100,153 +89,6 @@ if not os.path.exists("Well Escape tiles/varieties"):
 else:
     shutil.rmtree("Well Escape tiles/varieties")
     os.makedirs("Well Escape tiles/varieties")
-
-
-class GameStore:
-    playerX = 0
-    playerY = 0
-    offsetX = 0
-    offsetY = 0
-    x = 0
-    y = 0
-    playerSpawnPoint = []
-    mud_variations = 15
-    moss_variations = 15
-    pixel_map = pygame.Surface
-    MAP_WIDTH = 0
-    MAP_HEIGHT = 0
-    top_col = False
-    bottom_col = False
-    left_col = False
-    right_col = False
-    start_x = 0
-    start_y = 0
-    levelCount = 5
-    levels = []
-    starting_point_x = []
-    starting_point_y = []
-
-
-for num in range(GameStore.levelCount):
-    GameStore.levels.append(pygame.Surface)
-    GameStore.starting_point_x.append(0)
-    GameStore.starting_point_y.append(0)
-
-
-def gen_rand_map_tiles(instance):
-    # use """ """ to add a description to your functions
-    """
-    Generates the random map tiles with different probabilities
-    :return: tile type ID [x][y]
-    """
-
-    # choose a random pixel map and generate a surface for the tiles
-    if instance == 0:
-        GameStore.pixel_map = tile_class.get_dungeon_room(True)
-    else:
-        GameStore.pixel_map = tile_class.get_dungeon_room(False)
-    GameStore.MAP_WIDTH = GameStore.pixel_map.get_width()
-    GameStore.MAP_HEIGHT = GameStore.pixel_map.get_height()
-
-    # reset all lists
-    tiles.clear()
-    tileTypes.clear()
-    tileMats.clear()
-
-    # set variables for random material variation
-    material_types = [0, 1, 2]
-    material_weights = [0.9, 0.6, 0.3]
-
-    # choose random types of the floor and wall images
-    floor = random.randrange(len(tile_class.tileTypes[0]))
-    wall = random.randrange(len(tile_class.tileTypes[1]))
-
-    '''
-    Scroll through each pixel in a map and assign according tiles depending on the pixel brightness.
-    
-    Assign a randomly chosen material type value to each tile.
-    '''
-    for y in range(GameStore.MAP_HEIGHT):
-        tile_row = []
-        type_row = []
-        mat_row = []
-        for x in range(GameStore.MAP_WIDTH):
-            pixel = GameStore.pixel_map.get_at((x, y))
-            pixel_tone = (pixel.r + pixel.g + pixel.b) / 3      # pixel brightness
-            if pixel_tone == 255:
-                tile = 0
-                t_type = floor
-            elif pixel_tone == 0:
-                tile = 1
-                t_type = wall
-            elif pixel_tone < 150:
-                if instance == 0:
-                    tile = 2
-                    t_type = 0
-                else:
-                    tile = 0
-                    t_type = floor
-            else:
-                if instance == len(GameStore.levels) - 1:
-                    tile = 2
-                    t_type = 1
-                else:
-                    tile = 0
-                    t_type = floor
-                GameStore.start_x = x
-                GameStore.start_y = y
-            tile_row.append(tile)                    # horizontal row of tiles
-            type_row.append(t_type)                    # horizontal row of tile types
-
-            material = choices(material_types, material_weights)[0]                  # single material
-            mat_row.append(material)                 # horizontal row of materials
-
-        tiles.append(tile_row)               # vertical column of horizontal tile rows
-        tileTypes.append(type_row)           # vertical column of horizontal type rows
-        tileMats.append(mat_row)             # vertical column of horizontal material rows
-    return tiles
-
-
-def initialize_level(surface_id):
-    """Draws the tiles with according images on a blank surface"""
-    # generate the map
-    gen_rand_map_tiles(surface_id)
-    GameStore.levels[surface_id] = pygame.Surface((GameStore.MAP_WIDTH * TILE_SIZE, GameStore.MAP_HEIGHT * TILE_SIZE))
-    # generate material variations
-    while GameStore.mud_variations > 0:
-        for i in range(len(tile_class.tileTypes[1])):
-            tile_class.generate_material(1, i, 1, GameStore.mud_variations)
-        GameStore.mud_variations -= 1
-    while GameStore.moss_variations > 0:
-        for i in range(len(tile_class.tileTypes[1])):
-            tile_class.generate_material(1, i, 2, GameStore.moss_variations)
-        GameStore.moss_variations -= 1
-    # draw the tiles to the level surface
-    for column in range(GameStore.MAP_HEIGHT):
-        for row in range(GameStore.MAP_WIDTH):
-            x_pos = row * TILE_SIZE
-            y_pos = column * TILE_SIZE
-            if tiles[column][row] == 0:
-                if surface_id == 0:
-                    floorTiles.append([x_pos + GameStore.starting_point_x[surface_id], y_pos +
-                                       GameStore.starting_point_y[surface_id]])
-                material = tile_class.assign_material(tiles[column][row], tileTypes[column][row], tileMats[column][row])
-            elif tiles[column][row] == 1:
-                wallTiles.append([x_pos + GameStore.starting_point_x[surface_id], y_pos +
-                                  GameStore.starting_point_y[surface_id]])
-                material = tile_class.assign_material(tiles[column][row], tileTypes[column][row], tileMats[column][row])
-            elif tiles[column][row] == 2:
-                doorTiles.append([x_pos + GameStore.starting_point_x[surface_id], y_pos +
-                                  GameStore.starting_point_y[surface_id]])
-                material = tile_class.assign_material(tiles[column][row], tileTypes[column][row], tileMats[column][row])
-
-            """
-            files = [f for f in os.listdir("Well Escape tiles/varieties")
-                     if os.path.isfile(os.path.join("Well Escape tiles/varieties", f))]
-            variety_amount = len(files)
-            """
-
-            GameStore.levels[surface_id].blit(material, (x_pos, y_pos, TILE_SIZE, TILE_SIZE))
 
 
 def event_inputs():
@@ -482,33 +324,33 @@ def exit_game():
 # creates a new level and positions everything accordingly in that level
 def start():
     # reset all lists
-    floorTiles.clear()
-    wallTiles.clear()
-    doorTiles.clear()
+    dunGen.floorTiles.clear()
+    dunGen.wallTiles.clear()
+    dunGen.doorTiles.clear()
     # generate the dungeon
-    for i in range(len(GameStore.levels)):
+    for i in range(len(dunGen.GameStore.levels)):
         if i > 0:
             # set the starting point for the next room
-            GameStore.starting_point_x[i] = GameStore.starting_point_x[i-1] + GameStore.start_x * TILE_SIZE - TILE_SIZE
-            GameStore.starting_point_y[i] = GameStore.starting_point_y[i-1] + GameStore.start_y * TILE_SIZE
+            dunGen.GameStore.starting_point_x[i] = dunGen.GameStore.starting_point_x[i-1] + dunGen.GameStore.start_x * dunGen.TILE_SIZE - dunGen.TILE_SIZE
+            dunGen.GameStore.starting_point_y[i] = dunGen.GameStore.starting_point_y[i-1] + dunGen.GameStore.start_y * dunGen.TILE_SIZE
         # create the room
-        initialize_level(i)
+        dunGen.initialize_level(i)
     # create movement variables
     screen_rect = screen.get_rect()
-    level_rect = GameStore.levels[0].get_rect()
+    level_rect = dunGen.GameStore.levels[0].get_rect()
 
     # find a random floor tile and get it's position coordinates
-    GameStore.playerSpawnPoint = floorTiles[random.randint(0, len(floorTiles)-1)]
-    GameStore.playerX = GameStore.playerSpawnPoint[0]
-    GameStore.playerY = GameStore.playerSpawnPoint[1]
+    dunGen.GameStore.playerSpawnPoint = dunGen.floorTiles[random.randint(0, len(dunGen.floorTiles)-1)]
+    dunGen.GameStore.playerX = dunGen.GameStore.playerSpawnPoint[0]
+    dunGen.GameStore.playerY = dunGen.GameStore.playerSpawnPoint[1]
 
     # variables for centering the level
-    GameStore.x = screen_rect.centerx - level_rect.centerx
-    GameStore.y = screen_rect.centery - level_rect.centery
+    dunGen.GameStore.x = screen_rect.centerx - level_rect.centerx
+    dunGen.GameStore.y = screen_rect.centery - level_rect.centery
 
     # variables for offsetting everything so the starting tile is always at the center
-    GameStore.offsetX = -level_rect.centerx + GameStore.playerSpawnPoint[0]
-    GameStore.offsetY = -level_rect.centery + GameStore.playerSpawnPoint[1]
+    dunGen.GameStore.offsetX = -level_rect.centerx + dunGen.GameStore.playerSpawnPoint[0]
+    dunGen.GameStore.offsetY = -level_rect.centery + dunGen.GameStore.playerSpawnPoint[1]
 
 
 def change_direction(last_dir, current_dir):
@@ -566,17 +408,17 @@ def animation_direction(last_direction):
 def detect_collision(player_pos_x, player_pos_y):
 
     # create and draw the player col
-    player_col = Rect(player_pos_x + 14, player_pos_y + (TILE_SIZE * 0.6), TILE_SIZE * 0.6, TILE_SIZE * 0.3)
+    player_col = Rect(player_pos_x + 14, player_pos_y + (dunGen.TILE_SIZE * 0.6), dunGen.TILE_SIZE * 0.6, dunGen.TILE_SIZE * 0.3)
     pygame.draw.rect(screen, Color("white"), player_col, 2)
 
     # create and draw tile cols
-    for tile in range(len(wallTiles)):
-        x = GameStore.x + wallTiles[tile][0] - GameStore.offsetX
-        y = GameStore.y + wallTiles[tile][1] - GameStore.offsetY
-        tile_col = Rect(x, y, TILE_SIZE, TILE_SIZE)
+    for tile in range(len(dunGen.wallTiles)):
+        x = dunGen.GameStore.x + dunGen.wallTiles[tile][0] - dunGen.GameStore.offsetX
+        y = dunGen.GameStore.y + dunGen.wallTiles[tile][1] - dunGen.GameStore.offsetY
+        tile_col = Rect(x, y, dunGen.TILE_SIZE, dunGen.TILE_SIZE)
         pygame.draw.rect(screen, Color("white"), tile_col, 2)
 
-    return GameStore.top_col, GameStore.bottom_col, GameStore.left_col, GameStore.right_col
+    return dunGen.GameStore.top_col, dunGen.GameStore.bottom_col, dunGen.GameStore.left_col, dunGen.GameStore.right_col
 
 
 
@@ -614,32 +456,7 @@ def main():
         if not library.PAUSED and library.HAS_STARTED:
             # multiply the movement by delta_time to ensure constant speed no matter the FPS
             movement_speed = 75 * delta_time
-
-        # Key press actions
-        if library.KEY_PRESSED["left"] and not GameStore.left_col:
-            # left key action
-            GameStore.playerX -= movement_speed
-            GameStore.x += movement_speed
-            # set the current direction
-
-        if library.KEY_PRESSED["right"] and not GameStore.right_col:
-            # right key action
-            GameStore.playerX += movement_speed
-            GameStore.x -= movement_speed
-            # set the current direction
-
-        if library.KEY_PRESSED["forwards"] and not GameStore.top_col:
-            # forwards key action
-            GameStore.playerY -= movement_speed
-            GameStore.y += movement_speed
-            # set the current direction
-
-        if library.KEY_PRESSED["backwards"] and not GameStore.bottom_col:
-            # backwards key action
-            GameStore.playerY += movement_speed
-            GameStore.y -= movement_speed
-            # set the current direction
-
+            
         # switch between active and idle
         if not player_idle:
             player = player_animation[current_direction]
@@ -651,23 +468,23 @@ def main():
             # Key press actions
             if library.KEY_PRESSED["forwards"]:
                 # forwards key action
-                GameStore.playerY -= movement_speed
-                GameStore.y += movement_speed
+                dunGen.GameStore.playerY -= movement_speed
+                dunGen.GameStore.y += movement_speed
 
             if library.KEY_PRESSED["backwards"]:
                 # backwards key action
-                GameStore.playerY += movement_speed
-                GameStore.y -= movement_speed
+                dunGen.GameStore.playerY += movement_speed
+                dunGen.GameStore.y -= movement_speed
 
             if library.KEY_PRESSED["left"]:
                 # left key action
-                GameStore.playerX -= movement_speed
-                GameStore.x += movement_speed
+                dunGen.GameStore.playerX -= movement_speed
+                dunGen.GameStore.x += movement_speed
 
             if library.KEY_PRESSED["right"]:
                 # right key action
-                GameStore.playerX += movement_speed
-                GameStore.x -= movement_speed
+                dunGen.GameStore.playerX += movement_speed
+                dunGen.GameStore.x -= movement_speed
                 
             # switch between active and idle
             if not player_idle:
@@ -694,17 +511,20 @@ def main():
             # fill the background
             screen.fill(library.BLACK)
             # render the level on screen
-            for i in range(len(GameStore.levels) - 1, -1, -1):
-                screen.blit(GameStore.levels[i], (GameStore.x + GameStore.starting_point_x[i] - GameStore.offsetX,
-                                                  GameStore.y + GameStore.starting_point_y[i] - GameStore.offsetY))
+            for i in range(len(dunGen.GameStore.levels) - 1, -1, -1):
+                screen.blit(dunGen.GameStore.levels[i], (dunGen.GameStore.x +
+                                                         dunGen.GameStore.starting_point_x[i] -
+                                                         dunGen.GameStore.offsetX, dunGen.GameStore.y +
+                                                         dunGen.GameStore.starting_point_y[i] -
+                                                         dunGen.GameStore.offsetY))
 
             # update player's position
-            player_x_pos = GameStore.x + GameStore.playerX - GameStore.offsetX
-            player_y_pos = GameStore.y + GameStore.playerY - GameStore.offsetY
+            player_x_pos = dunGen.GameStore.x + dunGen.GameStore.playerX - dunGen.GameStore.offsetX
+            player_y_pos = dunGen.GameStore.y + dunGen.GameStore.playerY - dunGen.GameStore.offsetY
             # detect_collision(player_x_pos, player_y_pos)
             # draw the player
             screen.blit(pygame.transform.scale(player.get_current_sprite(),
-                        (int(TILE_SIZE * 0.9), int(TILE_SIZE * 0.9))), (player_x_pos, player_y_pos))
+                        (int(dunGen.TILE_SIZE * 0.9), int(dunGen.TILE_SIZE * 0.9))), (player_x_pos, player_y_pos))
 
         test_slider.draw_slider((0,0), False, (50, 0), screen)
         # update the display.
