@@ -36,19 +36,31 @@ playerImg = pygame.transform.scale(pygame.image.load("Characters/Player.png"),
 
 class Tiles:
     # load tile images
+    floorPath = "Well Escape tiles/FloorTiles/"
+    floorPathImages = os.listdir(floorPath)
+    floorImages = []
+    for img in range(len(floorPathImages)):
+        floorImg = pygame.transform.scale(pygame.image.load(floorPath + floorPathImages[img]), (scaleNum, scaleNum))
+        floorImages.append(floorImg)
+
+    wallPath = "Well Escape tiles/WallTiles/"
+    wallPathImages = os.listdir(wallPath)
+    wallImages = []
+    for img in range(len(wallPathImages)):
+        wallImg = pygame.transform.scale(pygame.image.load(wallPath + wallPathImages[img]), (scaleNum, scaleNum))
+        wallImages.append(wallImg)
+
     doorImg = pygame.transform.scale(pygame.image.load("Well Escape tiles/DoorTile.png"), (scaleNum, scaleNum))
     exitDoorImg = pygame.transform.scale(pygame.image.load("Well Escape tiles/ExitDoorTile.png"), (scaleNum, scaleNum))
-    floorImg = pygame.transform.scale(pygame.image.load("Well Escape tiles/FloorTile.png"), (scaleNum, scaleNum))
-    wallImg = pygame.transform.scale(pygame.image.load("Well Escape tiles/WallTile.png"), (scaleNum, scaleNum))
+    interactive = [doorImg, exitDoorImg]
 
     # set materials
     FLOOR = 0
     WALL = 1
     DOOR = 2
-    EXIT = 3
 
     # set colors to materials
-    tileTypes = {FLOOR: floorImg, WALL: wallImg, DOOR: doorImg, EXIT: exitDoorImg}
+    tileTypes = {FLOOR: floorImages, WALL: wallImages, DOOR: interactive}
 
     @staticmethod
     def mud(texture):
@@ -143,18 +155,19 @@ class Tiles:
     type_1_inst = []
     type_2_inst = []
 
-    def generate_material(self, image_id, material_id, inst):
+    def generate_material(self, image_id, type_id, material_id, inst):
         """
         Generates a procedurally modified texture.
 
         :arg inst       instance number
         :arg material_id:   specifies the type of material the function will generate
+        :arg type_id        specifies the type of image that will be used as a base image
         :arg image_id:      input image the function will modify
         :return: Tile texture with randomly generated features
         """
 
         # load up the base image
-        base_image = self.tileTypes[image_id]
+        base_image = self.tileTypes[image_id][type_id]
         # copy the base image
         pygame.image.save(base_image, "Well Escape tiles/copy.png")
         # load up the copy of the base image
@@ -171,21 +184,23 @@ class Tiles:
                 self.type_1_inst.append(inst)   # add the generated dirty material instance number to a list
 
             # save the generated image to the varieties folder
-            name = "Procedural-" + str(image_id) + "_type-" + str(material_id) + "_inst-" + str(inst)
+            name = "Procedural-" + str(image_id) + "_type-" + str(type_id) + \
+                   "_mat-" + str(material_id) + "_inst-" + str(inst)
             pygame.image.save(texture, "Well Escape tiles/varieties/" + name + ".png")
 
         return texture
 
-    def assign_material(self, image_id, material_id):
+    def assign_material(self, image_id, type_id, material_id):
         """
         Assigns a randomly chosen variation texture.
 
         :arg material_id:   specifies the type of material the function will assign
+        :arg type_id        specifies the type of image that will be used as a base image
         :arg image_id:      input image the function will modify
         :return: Tile texture with randomly generated features
         """
         # load up the base image
-        base_image = self.tileTypes[image_id]
+        base_image = self.tileTypes[image_id][type_id]
         # if the image type is a floor and material type is not in perfect condition
         if image_id == 1 and material_id > 0:
             # if the material type is really old
@@ -198,7 +213,8 @@ class Tiles:
 
             # assign the variation texture
             texture = pygame.image.load("Well Escape tiles/varieties/" +
-                                        "Procedural-" + str(image_id) + "_type-" + str(material_id) +
+                                        "Procedural-" + str(image_id) + "_type-" + str(type_id) +
+                                        "_mat-" + str(material_id) +
                                         "_inst-" + str(self.random_inst) + ".png")
         else:
             # keep the texture the same

@@ -25,6 +25,7 @@ TILE_SIZE = library.Tiles.floorImg.get_rect().width
 
 # [] = list
 tiles = []
+tileTypes = []
 tileMats = []
 floorTiles = []
 wallTiles = []
@@ -85,7 +86,7 @@ class GameStore:
     right_col = False
     start_x = 0
     start_y = 0
-    levelCount = 10
+    levelCount = 5
     levels = []
     starting_point_x = []
     starting_point_y = []
@@ -114,11 +115,16 @@ def gen_rand_map_tiles(instance):
 
     # reset all lists
     tiles.clear()
+    tileTypes.clear()
     tileMats.clear()
 
     # set variables for random material variation
     material_types = [0, 1, 2]
     material_weights = [0.9, 0.6, 0.3]
+
+    # choose random types of the floor and wall images
+    floor = random.randrange(len(tile_class.tileTypes[0]))
+    wall = random.randrange(len(tile_class.tileTypes[1]))
 
     '''
     Scroll through each pixel in a map and assign according tiles depending on the pixel brightness.
@@ -127,32 +133,41 @@ def gen_rand_map_tiles(instance):
     '''
     for y in range(GameStore.MAP_HEIGHT):
         tile_row = []
+        type_row = []
         mat_row = []
         for x in range(GameStore.MAP_WIDTH):
             pixel = GameStore.pixel_map.get_at((x, y))
             pixel_tone = (pixel.r + pixel.g + pixel.b) / 3      # pixel brightness
             if pixel_tone == 255:
                 tile = 0
+                t_type = floor
             elif pixel_tone == 0:
                 tile = 1
+                t_type = wall
             elif pixel_tone < 150:
                 if instance == 0:
                     tile = 2
+                    t_type = 0
                 else:
                     tile = 0
+                    t_type = floor
             else:
                 if instance == len(GameStore.levels) - 1:
-                    tile = 3
+                    tile = 2
+                    t_type = 1
                 else:
                     tile = 0
+                    t_type = floor
                 GameStore.start_x = x
                 GameStore.start_y = y
             tile_row.append(tile)                    # horizontal row of tiles
+            type_row.append(t_type)                    # horizontal row of tile types
 
             material = choices(material_types, material_weights)[0]                  # single material
             mat_row.append(material)                 # horizontal row of materials
 
         tiles.append(tile_row)               # vertical column of horizontal tile rows
+        tileTypes.append(type_row)           # vertical column of horizontal type rows
         tileMats.append(mat_row)             # vertical column of horizontal material rows
     return tiles
 
@@ -162,33 +177,39 @@ def initialize_level(surface_id):
     # generate the map
     gen_rand_map_tiles(surface_id)
     GameStore.levels[surface_id] = pygame.Surface((GameStore.MAP_WIDTH * TILE_SIZE, GameStore.MAP_HEIGHT * TILE_SIZE))
-
     # generate material variations
     while GameStore.mud_variations > 0:
-        tile_class.generate_material(1, 1, GameStore.mud_variations)
+        for i in range(len(tile_class.tileTypes[1])):
+            tile_class.generate_material(1, i, 1, GameStore.mud_variations)
         GameStore.mud_variations -= 1
     while GameStore.moss_variations > 0:
-        tile_class.generate_material(1, 2, GameStore.moss_variations)
+        for i in range(len(tile_class.tileTypes[1])):
+            tile_class.generate_material(1, i, 2, GameStore.moss_variations)
         GameStore.moss_variations -= 1
-
     # draw the tiles to the level surface
     for column in range(GameStore.MAP_HEIGHT):
         for row in range(GameStore.MAP_WIDTH):
             x_pos = row * TILE_SIZE
             y_pos = column * TILE_SIZE
-            if tiles[column][row] == 0 and surface_id == 0:
-                floorTiles.append([x_pos + GameStore.starting_point_x[surface_id], y_pos + GameStore.starting_point_y[surface_id]])
+            if tiles[column][row] == 0:
+                if surface_id == 0:
+                    floorTiles.append([x_pos + GameStore.starting_point_x[surface_id], y_pos +
+                                       GameStore.starting_point_y[surface_id]])
+                material = tile_class.assign_material(tiles[column][row], tileTypes[column][row], tileMats[column][row])
             elif tiles[column][row] == 1:
-                wallTiles.append([x_pos + GameStore.starting_point_x[surface_id], y_pos + GameStore.starting_point_y[surface_id]])
+                wallTiles.append([x_pos + GameStore.starting_point_x[surface_id], y_pos +
+                                  GameStore.starting_point_y[surface_id]])
+                material = tile_class.assign_material(tiles[column][row], tileTypes[column][row], tileMats[column][row])
             elif tiles[column][row] == 2:
-                doorTiles.append([x_pos + GameStore.starting_point_x[surface_id], y_pos + GameStore.starting_point_y[surface_id]])
+                doorTiles.append([x_pos + GameStore.starting_point_x[surface_id], y_pos +
+                                  GameStore.starting_point_y[surface_id]])
+                material = tile_class.assign_material(tiles[column][row], tileTypes[column][row], tileMats[column][row])
 
             """
             files = [f for f in os.listdir("Well Escape tiles/varieties")
                      if os.path.isfile(os.path.join("Well Escape tiles/varieties", f))]
             variety_amount = len(files)
             """
-            material = tile_class.assign_material(tiles[column][row], tileMats[column][row])
 
             GameStore.levels[surface_id].blit(material, (x_pos, y_pos, TILE_SIZE, TILE_SIZE))
 
@@ -313,7 +334,7 @@ def animation_direction(last_direction):
 def detect_collision(player_pos_x, player_pos_y):
 
     # create and draw the player col
-    player_col = Rect(player_pos_x + 10, player_pos_y, TILE_SIZE * 0.7, TILE_SIZE * 0.9)
+    player_col = Rect(player_pos_x + 14, player_pos_y + (TILE_SIZE * 0.6), TILE_SIZE * 0.6, TILE_SIZE * 0.3)
     pygame.draw.rect(screen, Color("white"), player_col, 2)
 
     # create and draw tile cols
