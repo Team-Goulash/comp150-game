@@ -53,6 +53,21 @@ scaleNum = 90
 playerImg = pygame.transform.scale(pygame.image.load("Characters/Player.png"),
                                    (int(scaleNum * 0.75), int(scaleNum * 0.75)))
 
+
+def clamp(min, max, value):
+    """
+        clamps value between min and max
+    :return:    Clamped value
+    """
+
+    if value < min:
+        value = min
+    elif value > max:
+        value = max
+
+    return value
+
+
 class Tiles:
     # load tile images
     floorPath = "Well Escape tiles/FloorTiles/"
