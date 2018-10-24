@@ -20,12 +20,27 @@ class UIButtons:
             :param size:                The size of the button (width, height)
             """
             self.button_size = size
-            if button_hover_src is not None:
-                self.button_hover = pygame.transform.scale(pygame.image.load(button_hover_src), self.button_size)
-            if button_normal_src is not None:
-                self.button_normal = pygame.transform.scale(pygame.image.load(button_normal_src),  self.button_size)
-            if button_pressed_src is not None:
-                self.button_pressed = pygame.transform.scale(pygame.image.load(button_pressed_src), self.button_size)
+            self.button_hover = self.set_button_image(button_hover_src, size, library.GREY)
+            self.button_normal = self.set_button_image(button_normal_src, size, library.WHITE)
+            self.button_pressed = self.set_button_image(button_hover_src, size, library.LIGHT_GREY)
+
+        def set_button_image(self, image_src, size, color):
+            """
+            set the button to image if there is no image it get set to a white surface.
+            :param image_src:   image source
+            :param size:        Size of button
+            :return:            button surface
+            """
+
+            # set to white surface if None is passed to image_src
+            if image_src is None:
+                temp_surface = pygame.Surface(size)
+                temp_surface.fill(color)
+                return temp_surface
+            else:
+                return pygame.transform.scale(pygame.image.load(image_src), size)
+
+
 
         def is_hover(self, cursor_pos, screen_pos):
             top_left = cursor_pos[0] > screen_pos[0] and cursor_pos[1] > screen_pos[1]
@@ -57,11 +72,19 @@ class UISlider(UIButtons):
     slider_pos = [0, 0]
     value = 0; # value = 0 - 1
 
-    def __init__(self, button_hover_src, button_normal_src, button_pressed_src, slider_bar_src, slider_size, handle_width, slider_pos):
+    def __init__(self, button_hover_src, button_normal_src, button_pressed_src,
+                 slider_bar_src, slider_size, handle_width, slider_pos, start_value=0.5):
+
         UIButtons.__init__(self, slider_bar_src, slider_bar_src, slider_bar_src, slider_size)
         self.slider_handle = pygame.transform.scale((pygame.image.load(button_normal_src)), (handle_width, slider_size[1]))
         self.slider_pos = slider_pos
         self.slider_width = slider_size[0]
+        self.handle_position = [slider_pos[0] + (slider_size[0] * start_value), slider_pos[1]]
+        self.value = start_value
+
+    def set_value(self, value):
+        """sets the value and puts the handle into position"""
+        self.handle_position[0] = self.slider_pos[0] + (self.slider_width * value)
 
     def draw_slider(self, cursor_pos, button_click, surface):
 

@@ -20,18 +20,18 @@ CONTROLS = False
 SETTINGS = False
 MAIN_MENU_CONTROLS = False
 HAS_STARTED = False
-EDITOR = True
+EDITOR = False
 
 
-# set Colors
-BLUE = (0, 0, 255)
-GREEN = (0, 255, 0)
-GREY = (100, 100, 100)
-DARK_GREY = (75, 75, 75)
-LIGHT_GREY = (200, 200, 200)
-WHITE = (255, 255, 255)
-BLACK = (0, 0, 0)
-RED = (255, 0, 0)
+# set Colors (r, g, b, a)
+BLUE = (0, 0, 255, 255)
+GREEN = (0, 255, 0, 255)
+GREY = (100, 100, 100, 255)
+DARK_GREY = (75, 75, 75, 255)
+LIGHT_GREY = (200, 200, 200, 255)
+WHITE = (255, 255, 255, 255)
+BLACK = (0, 0, 0, 255)
+RED = (255, 0, 0, 255)
 
 MUD = (139, 69, 19)
 MOSS = (61, 142, 31)
