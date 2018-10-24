@@ -44,7 +44,7 @@ option_buttons["exit"] = UI.UIButtons("UI/Button_000_hover.png", "UI/Button_000_
                                       (460, 110))
 option_buttons["back"] = UI.UIButtons("UI/Button_000_hover.png", "UI/Button_000_normal.png", "UI/button_000_pressed.png",
                                       (160, 110))
-test_slider = UI.UISilder("UI/temp_slider.png", "UI/temp_slider_handle.png", "UI/temp_slider_handle.png", "UI/temp_slider_handle.png", (50, 100), (0, 0), 500)
+test_slider = UI.UISlider("UI/temp_slider.png", "UI/temp_slider_handle.png", "UI/temp_slider_handle.png", "UI/temp_slider.png", (300, 50), 15, (0, 0))
 # set the window caption
 pygame.display.set_caption("Well Escape")
 
@@ -526,7 +526,7 @@ def main():
             screen.blit(pygame.transform.scale(player.get_current_sprite(),
                         (int(dunGen.TILE_SIZE * 0.9), int(dunGen.TILE_SIZE * 0.9))), (player_x_pos, player_y_pos))
 
-        test_slider.draw_slider((0,0), False, (50, 0), screen)
+        test_slider.draw_slider(pygame.mouse.get_pos(), library.KEY_PRESSED["mouse"], screen)
         # update the display.
         pygame.display.flip()
         ticks_since_last_frame = t
