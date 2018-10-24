@@ -53,7 +53,7 @@ class UISlider(UIButtons):
     slider_handle = None
     handle_position = [0, 0]
 
-    silder_width = 100
+    slider_width = 100
     slider_pos = [0, 0]
     value = 0; # value = 0 - 1
 
@@ -61,6 +61,7 @@ class UISlider(UIButtons):
         UIButtons.__init__(self, slider_bar_src, slider_bar_src, slider_bar_src, slider_size)
         self.slider_handle = pygame.transform.scale((pygame.image.load(button_normal_src)), (handle_width, slider_size[1]))
         self.slider_pos = slider_pos
+        self.slider_width = slider_size[0]
 
     def draw_slider(self, cursor_pos, button_click, surface):
 
@@ -68,9 +69,14 @@ class UISlider(UIButtons):
             self.handle_position = list(cursor_pos)
             self.handle_position[0] -= 8
             self.handle_position[1] = self.slider_pos[1]
+            self.value = (self.handle_position[0] - self.slider_pos[0]) / (self.slider_width -
+                                                                           self.slider_handle.get_width())
+            self.value = library.clamp(0, 1, self.value)
 
         surface.blit(self.draw_button(cursor_pos, button_click, self.slider_pos), self.slider_pos)
         surface.blit(self.slider_handle, self.handle_position)
+
+        return self.value
 
 
 class UIInput(UIButtons):
