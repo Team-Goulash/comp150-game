@@ -193,6 +193,7 @@ def main_menu():
     elif library.SETTINGS is True: # if the settings are true it'll display the settings interface from the main menu
         #Todo move editor to its own button
         library.EDITOR = True
+        library.SETTINGS = False
         screen.fill(library.WHITE)
         text_surf, text_rect = text_objects("Settings", title_text)
         text_rect.center = ((WINDOW_WIDTH / 2), (WINDOW_HEIGHT / 7))
