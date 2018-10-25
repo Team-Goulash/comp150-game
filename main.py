@@ -388,15 +388,15 @@ def main_menu():
         screen.blit(text_surf, text_rect)
         # button positioning
         screen.blit(main_menu_buttons["new game"].draw_button(pygame.mouse.get_pos(), library.KEY_PRESSED["mouse"],
-                                                              (460, 208)), (460, 188))
+                                                              (460, 188)), (460, 188))
         screen.blit(main_menu_buttons["continue"].draw_button(pygame.mouse.get_pos(), library.KEY_PRESSED["mouse"],
-                                                              (460, 308)), (460, 288))
+                                                              (460, 288)), (460, 288))
         screen.blit(main_menu_buttons["options"].draw_button(pygame.mouse.get_pos(), library.KEY_PRESSED["mouse"],
-                                                              (460, 408)), (460, 388))
+                                                              (460, 388)), (460, 388))
         screen.blit(main_menu_buttons["controls"].draw_button(pygame.mouse.get_pos(), library.KEY_PRESSED["mouse"],
-                                                              (460, 508)), (460, 488))
+                                                              (460, 488)), (460, 488))
         screen.blit(main_menu_buttons["quit game"].draw_button(pygame.mouse.get_pos(), library.KEY_PRESSED["mouse"],
-                                                              (460, 608)), (460, 588))
+                                                              (460, 588)), (460, 588))
         # blits
         screen.blit(new_game_surf, new_game_rect)
         screen.blit(continue_game_surf, continue_game_rect)
@@ -437,16 +437,16 @@ def pause_menu():
         text_surf, text_rect = text_objects("Paused", title_text)
         text_rect.center = ((WINDOW_WIDTH / 2), (WINDOW_HEIGHT / 7))
         # Resume button
-        screen.blit(option_buttons["resume"].draw_button(pygame.mouse.get_pos(), library.KEY_PRESSED["mouse"], (460, 208)),
+        screen.blit(option_buttons["resume"].draw_button(pygame.mouse.get_pos(), library.KEY_PRESSED["mouse"], (460, 188)),
                     (460, 188))
         # Options button
-        screen.blit(option_buttons["options"].draw_button(pygame.mouse.get_pos(), library.KEY_PRESSED["mouse"], (460, 358)),
+        screen.blit(option_buttons["options"].draw_button(pygame.mouse.get_pos(), library.KEY_PRESSED["mouse"], (460, 338)),
                     (460, 338))
         # Controls button
-        screen.blit(option_buttons["controls"].draw_button(pygame.mouse.get_pos(), library.KEY_PRESSED["mouse"], (460, 508)),
+        screen.blit(option_buttons["controls"].draw_button(pygame.mouse.get_pos(), library.KEY_PRESSED["mouse"], (460, 488)),
                     (460, 488))
         # Exit button
-        screen.blit(option_buttons["exit"].draw_button(pygame.mouse.get_pos(), library.KEY_PRESSED["mouse"], (460, 658)),
+        screen.blit(option_buttons["exit"].draw_button(pygame.mouse.get_pos(), library.KEY_PRESSED["mouse"], (460, 638)),
                     (460, 638))
         resume_surf, resume_rect = text_objects("Resume", button_text_60)
         resume_rect.center = (690, 238)
