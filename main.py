@@ -111,6 +111,9 @@ def event_inputs():
             elif event.key == K_p:
                 colorBlindFilter.color_blind_filter()
                 print("taking color blind screenshot")
+            elif event.key == K_t:
+                color_blind_test()
+                print("Test color blind image")
 
         if event.type == KEYUP:
             if event.key == K_r:
@@ -531,6 +534,7 @@ def main():
             # draw the player
             screen.blit(pygame.transform.scale(player.get_current_sprite(),
                         (int(dunGen.TILE_SIZE * 0.9), int(dunGen.TILE_SIZE * 0.9))), (player_x_pos, player_y_pos))
+
 
         # update the display.
         pygame.display.flip()
