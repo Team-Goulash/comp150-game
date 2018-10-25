@@ -42,7 +42,7 @@ def pull_image(cb_filter):
             image.set_at((x, y), new_pixel_color)
 
     del pixel_array
-    
+
 
 def grey_scale_screen_shot():
         pull_image()
