@@ -22,12 +22,18 @@ class EditorStore:
 
     # the surface of the tile we are editing
     edit_tile = None
+    # selected fx id
+    selected_fx_id = -1
+    current_fx_options = 0
+    # prevents the FX geting applied more than one on a single click
+    next_options_pressed = False
 
     # The amount the tile is zoomed in/out
-    tile_zoom = 2.5
+    tile_zoom = 1
     save_file_name_input = ""
 
 
+TILE_SIZE = library.Tiles.floorImg.get_rect().width
 WINDOW_HEIGHT, WINDOW_WIDTH = 750, 1334
 WINDOW_MARGIN_X, WINDOW_MARGIN_Y = 50, 50
 screen = main.screen
@@ -46,6 +52,16 @@ MENU_SELECT = 1
 MENU_EDIT = 2
 MENU_SAVE = 3
 
+# FX panels
+FX_GRAYSCALE = 0
+FX_CHANGECOLOR = 1
+FX_POSTER = 2
+FX_POSTER_DIST = 3
+FX_TINT = 4
+FX_BLUR = 5
+FX_SETALPHA_DIST = 6
+
+
 # todo: remove and replace tile_text once cal has push his code.
 header_fontface = pygame.font.Font("UI/AMS hand writing.ttf", 55)
 sub_header_fontface = pygame.font.Font("UI/AMS hand writing.ttf", 35)
@@ -57,16 +73,26 @@ sub_headers = {MENU_START: "Main Menu", MENU_SELECT: "Tile Select", MENU_EDIT: "
 
 button = UI.UIButtons("UI/Button_000_hover.png", "UI/Button_000_normal.png", "Ui/button_000_pressed.png", (360, 75))
 button_small = UI.UIButtons("UI/Button_000_hover.png", "UI/Button_000_normal.png", "Ui/button_000_pressed.png", (50, 50))
+button_fx = UI.UIButtons(None, None, None, (175, 75))
 image_select_button = UI.UIButtons(None, None, None, (750, 113))
-button_type = {"default": button, "small": button_small}
+button_type = {"default": button, "small": button_small, "fx": button_fx}
+
 # list of tuples (label->str, position->tuple, x_position->int, action->str, button_type -> str)
-# tuples with action == run_effect also has effect_type -> str on the end of the tuple
+# tuples with action == run_effect also has effect_ID -> int on the end of the tuple
 # tuples with action == tile_select also has directory -> str on the end of the tuple
 start_menu_button_data = []
 tile_select_menu_button_data = []
 edit_tile_button_data = []
 
+# theses are muti purpose sliders
+sliders = [None, None, None, None]
+sliders[0] = UI.UISlider(None, "UI/temp_slider_handle.png", None, "UI/temp_slider.png", (250, 50), 15, (950, 150))
 
+sliders_r = UI.UISlider(None, "UI/temp_slider_handle.png", None, "UI/temp_slider.png", (250, 50), 15, (950, 150))
+sliders_g = UI.UISlider(None, "UI/temp_slider_handle.png", None, "UI/temp_slider.png", (250, 50), 15, (950, 250))
+sliders_b = UI.UISlider(None, "UI/temp_slider_handle.png", None, "UI/temp_slider.png", (250, 50), 15, (950, 350))
+
+slider_values = [0]
 save_text_input = UI.UIInput((400, 50), 30)
 
 
@@ -111,10 +137,14 @@ def initialize():
     edit_tile_button_data.append(("-", (390, 75), 20, "-_zoom", "small"))
     edit_tile_button_data.append(("+", (575, 75), 20, "+_zoom", "small"))
     # edit tile fx buttons
-    edit_tile_button_data.append(("Apply Grey Scale", (60, 180), 70, "run_effect", "default", "greyscale"))
-    edit_tile_button_data.append(("Change Color (testing)", (60, 280), 70, "run_effect", "default", "change_color"))
-    edit_tile_button_data.append(("Posterization (testing)", (60, 380), 70, "run_effect", "default", "poster"))
-    edit_tile_button_data.append(("Posterization By Distance (testing)", (60, 480), 70, "run_effect", "default", "poster_dist"))
+    edit_tile_button_data.append(("Apply Grey Scale...", (60, 180), 5, "run_effect", "fx", FX_GRAYSCALE))
+    edit_tile_button_data.append(("Change Color...", (60, 280), 5, "run_effect", "fx", FX_CHANGECOLOR))
+    edit_tile_button_data.append(("Posterization...", (60, 380), 5, "run_effect", "fx", FX_POSTER))
+    edit_tile_button_data.append(("Posterization By Distance Tolerance...", (60, 480), 5, "run_effect", "fx", FX_POSTER_DIST))
+    edit_tile_button_data.append(("Tint...", (250, 180), 5, "run_effect", "fx", FX_TINT))
+    edit_tile_button_data.append(("Blur...", (250, 280), 5, "run_effect", "fx", FX_BLUR))
+    edit_tile_button_data.append(("Set Alpha by Color Tolerance...", (250, 380), 5, "run_effect", "fx", FX_SETALPHA_DIST))
+    edit_tile_button_data.append(("Some name", (250, 480), 5, "run_effect", "fx", -1))
     # edit tile save button
     edit_tile_button_data.append(("Save Image", (900, 600), 70, "save", "default"))
     # edit tile back button
@@ -167,7 +197,7 @@ def display_select_tile_button():
         # Add path text
         temp_surface = label_button(temp_surface, EditorStore.directory_tiles[i], text_fontface, 117, 35)
         # display the image on the button
-        temp_surface.blit(pygame.image.load(EditorStore.directory_tiles[i]), (10, 10))
+        temp_surface.blit(resize_preview_image(pygame.image.load(EditorStore.directory_tiles[i])), (10, 10))
 
         screen_position = (450, 100 + (125 * i))
         # display the button
@@ -204,7 +234,55 @@ def display_tile_editor():
     screen.blit(zoom_text, (450, 75))
     # display the image being edited
     screen.blit(pygame.transform.scale(EditorStore.edit_tile, (zoomed_size_x, zoomed_size_y)),
-                     (100+x_center, 200+y_center))
+                (100+x_center, 200+y_center))
+
+    display_fx_panel(EditorStore.selected_fx_id)
+
+
+def display_fx_panel(panel_id):
+    """
+    Displays the FX pannel for the selected fx
+    :param panel_id:    fx id
+    :return:            None
+    """
+
+    total_options = 1
+
+    if panel_id == FX_GRAYSCALE:
+        rgb_sliders("Color Weights")
+    if panel_id == FX_BLUR:
+        fx_panel_header("Blend Tolerance")
+        draw_slider(0, "Amount")
+
+    # add apporate text to the apply button
+    button_position = 1025, 500
+    if total_options - (EditorStore.current_fx_options + 1) <= 0:
+        fx_button = label_button(button_fx.draw_button(pygame.mouse.get_pos(), library.KEY_PRESSED["mouse"],
+                                                      button_position), "Apply FX", sub_header_fontface, 15, 15)
+    else:
+        fx_button = label_button(button_fx.draw_button(pygame.mouse.get_pos(), library.KEY_PRESSED["mouse"],
+                                                       button_position), "Next", sub_header_fontface, 15, 15)
+
+    if panel_id > -1:
+        # display the apply button if in a valid panel
+        screen.blit(fx_button, button_position)
+        if button_fx.is_pressed(pygame.mouse.get_pos(), button_position, library.KEY_PRESSED["mouse"]) and \
+                not EditorStore.next_options_pressed:
+            # run fx if apply button is pressed and reset the selected FX
+            if total_options - (EditorStore.current_fx_options + 1) <= 0:
+                run_effect(panel_id)
+                EditorStore.selected_fx_id = -1
+                EditorStore.current_fx_options = 0
+
+            EditorStore.current_fx_options += 1
+            EditorStore.next_options_pressed = True
+            print(EditorStore.current_fx_options, total_options, (total_options - (EditorStore.current_fx_options + 1)))
+        elif not button_fx.is_pressed(pygame.mouse.get_pos(), button_position, library.KEY_PRESSED["mouse"]) and \
+                not library.KEY_PRESSED["mouse"]:
+            EditorStore.next_options_pressed = False
+
+
+
 
 
 def save_tile(surface, path, file_name):
@@ -215,21 +293,70 @@ def save_tile(surface, path, file_name):
         return
     path = path + "/" + file_name + ".png"
     pygame.image.save(surface, path)
-    print("Image save to ", path + "/" + file_name + ".png")
+    print("Image save to ", path)
+
+
+def rgb_sliders(header):
+
+    fx_panel_header(header)
+    screen.blit(get_label("Red", text_fontface, (75, 30), library.BLACK, library.WHITE), (950, 125))
+    sliders_r.draw_slider(pygame.mouse.get_pos(), library.KEY_PRESSED["mouse"], screen)  # (950, 150)
+    screen.blit(get_label(str(sliders_r.value), text_fontface, (75, 30), library.BLACK, library.WHITE),
+                (1200, 160))
+
+    screen.blit(get_label("Green", text_fontface, (75, 30), library.BLACK, library.WHITE), (950, 225))
+    sliders_g.draw_slider(pygame.mouse.get_pos(), library.KEY_PRESSED["mouse"], screen)
+    screen.blit(get_label(str(sliders_g.value), text_fontface, (75, 30), library.BLACK, library.WHITE),
+                (1200, 260))
+
+    screen.blit(get_label("Blue", text_fontface, (75, 30), library.BLACK, library.WHITE), (950, 325))
+    sliders_b.draw_slider(pygame.mouse.get_pos(), library.KEY_PRESSED["mouse"], screen)
+    screen.blit(get_label(str(sliders_b.value), text_fontface, (75, 30), library.BLACK, library.WHITE),
+                (1200, 360))
+
+
+def draw_slider(slider_id, label):
+
+    screen.blit(get_label(label, text_fontface, (100, 30), library.BLACK, library.WHITE), (950, 125))
+    sliders[slider_id].draw_slider(pygame.mouse.get_pos(), library.KEY_PRESSED["mouse"], screen)  # (950, 150)
+    screen.blit(get_label(str(sliders[slider_id].value), text_fontface, (75, 30), library.BLACK, library.WHITE),
+                (1200, 160))
+
+
+def fx_panel_header(header):
+    screen.blit(get_label(header, sub_header_fontface, (250, 50), library.BLACK, library.WHITE), (950, 55))
 
 
 def label_button(button_surface, text, fontface, x_position, y_position):
     """Adds labels to buttons"""
-    # button_surface.blit(label_surface, (90, 15))
+
     temp_surface = pygame.Surface(button_surface.get_size(), pygame.SRCALPHA)
     temp_surface.blit(button_surface, (0, 0))
     temp_surface.blit(fontface.render(text, True, library.BLACK), (x_position, y_position))
     return temp_surface
 
 
+def get_label(text, fontface, size, text_color=(0, 0, 0, 255), background_color = (255, 255, 255, 0)):
+    """
+    creates a text label
+    :param text:                Label text
+    :param fontface:            Fontface
+    :param text_color:          font color (r, g, b, a)
+    :param background_color:    background color (r, g, b, a)
+    :param size:                label size (x, y)
+    :return:                    label surface
+    """
+
+    label_surface = pygame.Surface(size, pygame.SRCALPHA)
+    label_surface.fill(background_color)
+    label_surface.blit(fontface.render(text, True, text_color), (5, 5))
+
+    return label_surface
+
+
 def draw_menu_buttons():
     """Draws buttons for the current menu"""
-    # loop buttons for the current menu
+    # loop button for the current menu
     for bt in list(button_type):
         for b in EditorStore.current_menu_buttons:
             # skip if this is not the correct button time
@@ -238,7 +365,20 @@ def draw_menu_buttons():
             # draw buttons
             screen.blit(
                 label_button(button_type[bt].draw_button(pygame.mouse.get_pos(), library.KEY_PRESSED["mouse"], b[1]),
-                             b[0], sub_header_fontface, b[2], 15), b[1])
+                             b[0], get_button_type_fontface(bt), b[2], 15), b[1])
+
+
+def get_button_type_fontface(button_type):
+    """
+    get the fontface for a button type.
+    :param button_type:     type of button
+    :return:                fontface for button type
+    """
+
+    if button_type == "fx":
+        return text_fontface
+    else:
+        return sub_header_fontface
 
 
 def button_pressed():
@@ -311,7 +451,7 @@ def button_action(action_type, button_data=None):
         if EditorStore.tile_zoom > 0.5:
             EditorStore.tile_zoom -= 0.25
     elif action_type == "run_effect":
-        run_effect(button_data[5])
+        EditorStore.selected_fx_id = button_data[5]
     elif action_type == "save":
         save_tile(EditorStore.edit_tile, EditorStore.current_directory, EditorStore.save_file_name_input)
         EditorStore.save_file_name_input = ""
@@ -332,26 +472,49 @@ def set_menu(menu_id, buttons=None):
         EditorStore.current_menu_buttons = buttons
 
 
-def run_effect(effect_name):
+def run_effect(effect_id):
     """Calls the effect in image_effects"""
 
     effect_inputs = None
 
-    if effect_name == "greyscale":
+    if effect_id == FX_GRAYSCALE:
+        effect_inputs = (sliders_r.value, sliders_g.value, sliders_b.value)
+        effect_id = "greyscale"
+    elif effect_id == "change_color":
         pass
-    elif effect_name == "change_color":
+    elif effect_id == "poster":
         pass
-    elif effect_name == "poster":
+    elif effect_id == "poster_dist":
         pass
-    elif effect_name == "poster_dist":
+    elif effect_id == "tint":
+        pass
+    elif effect_id == FX_BLUR:
+        effect_inputs = sliders[0].value
+        effect_id = "blur"
+    elif effect_id == "set_alpha_dist":
         pass
     else:
         # display error message if effect is not found
-        print("[tileEditor.run_effect] Error: effect not found ", effect_name)
+        print("[tileEditor.run_effect] Error: effect not found ", effect_id)
 
-    image_effects.run_effect(effect_name, EditorStore.edit_tile, effect_inputs, (loading_bar, screen,
-                                                                        (0, 0, WINDOW_WIDTH, 50)
-                                                                        ))
+    image_effects.run_effect(effect_id, EditorStore.edit_tile, effect_inputs, (loading_bar, screen,
+                                                                               (0, 0, WINDOW_WIDTH, 50)))
+
+
+def resize_preview_image(preview_image):
+    """
+    get the size of an image when srunk to TILE_SIZE, keeping the aspect ratio
+    :param image_size:  image size (width, height)
+    :return:            new image size
+    """
+    image_size = preview_image.get_size()
+    multiplier = 1
+    if image_size[0] >= image_size[1]:
+        multiplier = TILE_SIZE / image_size[0]
+    else:
+        multiplier = TILE_SIZE / image_size[1]
+
+    return pygame.transform.scale(preview_image, (int(image_size[0] * multiplier), int(image_size[1] * multiplier)))
 
 
 def loading_bar(surface, rect, percent):
@@ -416,7 +579,7 @@ def display():
         EditorStore.initialized = True
 
     screen.fill(library.BLACK)
-    pygame.draw.rect(screen, library.GREY,
+    pygame.draw.rect(screen, library.LIGHT_GREY,
                      [WINDOW_MARGIN_X, WINDOW_MARGIN_Y,
                       WINDOW_WIDTH - (WINDOW_MARGIN_X * 2),
                       WINDOW_HEIGHT - (WINDOW_MARGIN_Y * 2)])
