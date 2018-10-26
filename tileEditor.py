@@ -4,7 +4,7 @@
 # Search '__Add_new__' for places to add new menus, edit windows, buttons & button function
 # Todo...
 
-import pygame, sys, library, UI, pathlib, os, image_effects, main
+import pygame, sys, library, UI, pathlib, os, image_effects, main, tileGenerator
 from pygame.locals import *
 
 class EditorStore:
@@ -33,7 +33,7 @@ class EditorStore:
     save_file_name_input = ""
 
 
-TILE_SIZE = library.Tiles.floorImg.get_rect().width
+TILE_SIZE = tileGenerator.Tiles.floorImg.get_rect().width
 WINDOW_HEIGHT, WINDOW_WIDTH = 750, 1334
 WINDOW_MARGIN_X, WINDOW_MARGIN_Y = 50, 50
 screen = main.screen

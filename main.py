@@ -1,4 +1,4 @@
-# DON'T FORGET TO COMMENT YOUR CODE PLEASE!!!
+"""MAIN CODEBASE."""
 import pygame
 import sys
 import library
@@ -59,7 +59,7 @@ option_buttons = {"resume": None, "options": None, "controls": None,
                   "exit": None, "back": None}
 
 option_buttons["resume"] = UI.UIButtons("UI/Button_000_hover.png",
-                                        "UI/Button_000_normal.png"
+                                        "UI/Button_000_normal.png",
                                         "UI/button_000_pressed.png",
                                         (460, 110))
 option_buttons["options"] = UI.UIButtons("UI/Button_000_hover.png",
@@ -138,7 +138,7 @@ else:
 
 
 def event_inputs():
-    """Gets the inputs and sets the key presses."""
+    """Get the inputs and set the key presses."""
     for event in pygame.event.get():
         # event: exit game! (via window X or alt-F4)
         if event.type == QUIT:
@@ -273,11 +273,13 @@ def event_inputs():
 
 
 def text_objects(text, font):
+    """Render the font."""
     text_surface = font.render(text, True, library.BLACK)
     return text_surface, text_surface.get_rect()
 
 
 def main_menu():
+    """Display the main menu."""
     # if the controls are true it'll display the controls from the main menu
     if library.MAIN_MENU_CONTROLS is True:
         controls = pygame.transform.scale(pygame.image.load("UI/Controls.png"),
@@ -390,6 +392,7 @@ def main_menu():
 
 
 def pause_menu():
+    """Display the pause menu."""
     # checks if the library.conrols is true
     # before displaying the controls interface
     if library.CONTROLS is True:
@@ -431,7 +434,7 @@ def pause_menu():
         screen.blit(text_surf, text_rect)
         screen.blit(back_surf, back_rect)
 
-    else: # if neither are true it'll display the pause screen
+    else:  # if neither are true it'll display the pause screen
         button_text2 = pygame.font.Font("UI/AMS hand writing.ttf", 50)
         screen.fill(library.WHITE)
         # title
@@ -478,6 +481,7 @@ def pause_menu():
 
 
 def pausing_game():
+    """Pause the game."""
     for event in pygame.event.get():
         if paused is False:
             if event.type == library.PAUSE:
@@ -490,7 +494,7 @@ def pausing_game():
 
 
 def exit_game():
-    """Exits the game to desktop"""
+    """Exit the game to desktop."""
     shutil.rmtree("Well Escape tiles/varieties")
     pygame.quit()
     sys.exit()
@@ -498,6 +502,7 @@ def exit_game():
 
 # creates a new level and positions everything accordingly in that level
 def start():
+    """Initialise the game."""
     # reset all lists
     dunGen.floorTiles.clear()
     dunGen.wallTiles.clear()
@@ -506,16 +511,25 @@ def start():
     for i in range(len(dunGen.GameStore.levels)):
         if i > 0:
             # set the starting point for the next room
-            dunGen.GameStore.starting_point_x[i] = dunGen.GameStore.starting_point_x[i-1] + dunGen.GameStore.start_x * dunGen.TILE_SIZE - dunGen.TILE_SIZE
-            dunGen.GameStore.starting_point_y[i] = dunGen.GameStore.starting_point_y[i-1] + dunGen.GameStore.start_y * dunGen.TILE_SIZE
+            dunGen.GameStore.starting_point_x[i] = \
+                dunGen.GameStore.starting_point_x[i-1] + \
+                dunGen.GameStore.start_x * dunGen.TILE_SIZE - dunGen.TILE_SIZE
+
+            dunGen.GameStore.starting_point_y[i] = \
+                dunGen.GameStore.starting_point_y[i-1] + \
+                dunGen.GameStore.start_y * dunGen.TILE_SIZE
+
         # create the room
         dunGen.initialize_level(i)
+
     # create movement variables
     screen_rect = screen.get_rect()
     level_rect = dunGen.GameStore.levels[0].get_rect()
 
     # find a random floor tile and get it's position coordinates
-    dunGen.GameStore.playerSpawnPoint = dunGen.floorTiles[random.randint(0, len(dunGen.floorTiles)-1)]
+    dunGen.GameStore.playerSpawnPoint = dunGen.floorTiles[
+        random.randint(0, len(dunGen.floorTiles)-1)]
+
     dunGen.GameStore.playerX = dunGen.GameStore.playerSpawnPoint[0]
     dunGen.GameStore.playerY = dunGen.GameStore.playerSpawnPoint[1]
 
@@ -523,14 +537,18 @@ def start():
     dunGen.GameStore.x = screen_rect.centerx - level_rect.centerx
     dunGen.GameStore.y = screen_rect.centery - level_rect.centery
 
-    # variables for offsetting everything so the starting tile is always at the center
-    dunGen.GameStore.offsetX = -level_rect.centerx + dunGen.GameStore.playerSpawnPoint[0]
-    dunGen.GameStore.offsetY = -level_rect.centery + dunGen.GameStore.playerSpawnPoint[1]
+    # variables for offsetting everything
+    # so the starting tile is always at the center
+    dunGen.GameStore.offsetX = -level_rect.centerx +\
+        dunGen.GameStore.playerSpawnPoint[0]
+    dunGen.GameStore.offsetY = -level_rect.centery +\
+        dunGen.GameStore.playerSpawnPoint[1]
 
 
 def change_direction(last_dir, current_dir):
     """
-    Reset the players animator if the direction changes
+    Reset the players animator if the direction changes.
+
     :param last_dir:        players direction from last frame
     :param current_dir:     players direction this frame
     :return:                current direction
@@ -542,19 +560,23 @@ def change_direction(last_dir, current_dir):
 
 def animation_direction(last_direction):
     """
-    Gets the next animation direction.
+    Get the next animation direction.
+
     this prevents it from resetting if two keys are pressed at the same time!
     :return: (Direction, idle)
     """
     # find if any keys are pressed and set it to idle
-    idle = not library.KEY_PRESSED["left"] and not library.KEY_PRESSED["right"] \
-        and not library.KEY_PRESSED["forwards"] and not library.KEY_PRESSED["backwards"]
+    idle = not library.KEY_PRESSED["left"] and not \
+        library.KEY_PRESSED["right"] and not \
+        library.KEY_PRESSED["forwards"] and not \
+        library.KEY_PRESSED["backwards"]
 
     # if there's no keys pressed return early as there's nothing to test
     if idle:
         return last_direction, idle
 
-    # set direction to last direction encase there is opposite keys being pressed
+    # set direction to last direction
+    # in case there is opposite keys being pressed
     direction = last_direction
 
     # set to idle if both left and right keys are pressed
@@ -565,11 +587,13 @@ def animation_direction(last_direction):
     elif library.KEY_PRESSED["right"]:      # set right direction
         direction = library.RIGHT
 
-    # do forwards and backwards in separate if as the animation trumps left and right
+    # do forwards and backwards in separate if
+    # as the animation trumps left and right
     # set to idle if both forwards and backwards keys are pressed
     if library.KEY_PRESSED["forwards"] and library.KEY_PRESSED["backwards"]:
         # set to idle if neither left or right is pressed
-        idle = not library.KEY_PRESSED["left"] and not library.KEY_PRESSED["right"]
+        idle = not library.KEY_PRESSED["left"] and not\
+            library.KEY_PRESSED["right"]
     elif library.KEY_PRESSED["forwards"]:
         direction = library.FORWARDS        # set forwards direction
         idle = False
@@ -581,23 +605,28 @@ def animation_direction(last_direction):
 
 
 def detect_collision(player_pos_x, player_pos_y):
-
+    """Draw the colliders on the player and wall tiles."""
     # create and draw the player col
-    player_col = Rect(player_pos_x + 14, player_pos_y + (dunGen.TILE_SIZE * 0.6), dunGen.TILE_SIZE * 0.6, dunGen.TILE_SIZE * 0.3)
+    player_col = Rect(player_pos_x + 14, player_pos_y +
+                      (dunGen.TILE_SIZE * 0.6),
+                      dunGen.TILE_SIZE * 0.6, dunGen.TILE_SIZE * 0.3)
     pygame.draw.rect(screen, Color("white"), player_col, 2)
 
     # create and draw tile cols
     for tile in range(len(dunGen.wallTiles)):
-        x = dunGen.GameStore.x + dunGen.wallTiles[tile][0] - dunGen.GameStore.offsetX
-        y = dunGen.GameStore.y + dunGen.wallTiles[tile][1] - dunGen.GameStore.offsetY
+        x = dunGen.GameStore.x + dunGen.wallTiles[tile][0] - \
+            dunGen.GameStore.offsetX
+        y = dunGen.GameStore.y + dunGen.wallTiles[tile][1] -\
+            dunGen.GameStore.offsetY
         tile_col = Rect(x, y, dunGen.TILE_SIZE, dunGen.TILE_SIZE)
         pygame.draw.rect(screen, Color("white"), tile_col, 2)
 
-    return dunGen.GameStore.top_col, dunGen.GameStore.bottom_col, dunGen.GameStore.left_col, dunGen.GameStore.right_col
+    return dunGen.GameStore.top_col, dunGen.GameStore.bottom_col,\
+        dunGen.GameStore.left_col, dunGen.GameStore.right_col
 
 
 def main():
-    level_init = False
+    """Main game loop."""
     start()
     ticks_since_last_frame = 0
 
@@ -622,20 +651,23 @@ def main():
         display_pause_menu = False
 
         # set the players animation direction and idle for the animation
-        next_animation_direction, player_idle = animation_direction(current_direction)
+        next_animation_direction, player_idle = \
+            animation_direction(current_direction)
         # set the current direction
-        current_direction = change_direction(current_direction, next_animation_direction)
+        current_direction = change_direction(current_direction,
+                                             next_animation_direction)
 
-        # multiply the movement by delta_time to ensure constant speed no matter the FPS
         if not library.PAUSED and library.HAS_STARTED:
-            # multiply the movement by delta_time to ensure constant speed no matter the FPS
+            # multiply the movement by delta_time to ensure constant speed
+            # no matter the FPS
             movement_speed = 75 * delta_time
-            
+
         # switch between active and idle
         if not player_idle:
             player = player_animation[current_direction]
         else:
-            # prevent the player moving if the game is paused or has not started yet!
+            # prevent the player moving
+            # if the game is paused or has not started yet!
             movement_speed = 0
 
         if not library.PAUSED:
@@ -659,7 +691,7 @@ def main():
                 # right key action
                 dunGen.GameStore.playerX += movement_speed
                 dunGen.GameStore.x -= movement_speed
-                
+
             # switch between active and idle
             if not player_idle:
                 player = player_animation[current_direction]
@@ -668,7 +700,7 @@ def main():
 
             # update the avatars animation time
             player.update_time(delta_time)
-                
+
         else:
             display_pause_menu = True
 
@@ -686,19 +718,24 @@ def main():
             screen.fill(library.BLACK)
             # render the level on screen
             for i in range(len(dunGen.GameStore.levels) - 1, -1, -1):
-                screen.blit(dunGen.GameStore.levels[i], (dunGen.GameStore.x +
-                                                         dunGen.GameStore.starting_point_x[i] -
-                                                         dunGen.GameStore.offsetX, dunGen.GameStore.y +
-                                                         dunGen.GameStore.starting_point_y[i] -
-                                                         dunGen.GameStore.offsetY))
+                screen.blit(dunGen.GameStore.levels[i],
+                            (dunGen.GameStore.x +
+                             dunGen.GameStore.starting_point_x[i] -
+                             dunGen.GameStore.offsetX, dunGen.GameStore.y +
+                             dunGen.GameStore.starting_point_y[i] -
+                             dunGen.GameStore.offsetY))
 
             # update player's position
-            player_x_pos = dunGen.GameStore.x + dunGen.GameStore.playerX - dunGen.GameStore.offsetX
-            player_y_pos = dunGen.GameStore.y + dunGen.GameStore.playerY - dunGen.GameStore.offsetY
+            player_x_pos = dunGen.GameStore.x + dunGen.GameStore.playerX - \
+                dunGen.GameStore.offsetX
+            player_y_pos = dunGen.GameStore.y + dunGen.GameStore.playerY - \
+                dunGen.GameStore.offsetY
             # detect_collision(player_x_pos, player_y_pos)
             # draw the player
             screen.blit(pygame.transform.scale(player.get_current_sprite(),
-                        (int(dunGen.TILE_SIZE * 0.9), int(dunGen.TILE_SIZE * 0.9))), (player_x_pos, player_y_pos))
+                        (int(dunGen.TILE_SIZE * 0.9),
+                         int(dunGen.TILE_SIZE * 0.9))),
+                        (player_x_pos, player_y_pos))
 
         # update the display.
         pygame.display.flip()
@@ -708,4 +745,3 @@ def main():
 if __name__ == "__main__":
     colorBlindFilter.initialization()
     main()
-
