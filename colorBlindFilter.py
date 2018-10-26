@@ -6,21 +6,6 @@ class CBFilterStore:
     surface = None
 
 
-cb_settings = [(0, 0, 0), (0, 1, 1), (100, 89, 255), (100, 89, 255)]
-
-def loop_cb_filters():
-    for f in cb_settings:
-        pull_image(cb_settings)
-
-def weight_color(color, weights):
-
-    color = list(color)
-    color[0] *= weights[0]
-    color[1] *= weights[1]
-    color[2] *= weights[2]
-
-    return color
-
 def greyscale_pixel(pixel_color):
     red = pixel_color[0]
     green = pixel_color[1]
@@ -31,26 +16,74 @@ def greyscale_pixel(pixel_color):
     return greyscale, greyscale, greyscale
 
 
-def pull_image(cb_filter):
+def protanopia_pixel(pixel_color):
+    red = pixel_color[0]
+    green = pixel_color[1]
+    blue = pixel_color[2]
+
+    protanopia = ((red * 0), green, blue)
+
+    return protanopia
+
+
+def deuteranopia_pixel(pixel_color):
+    red = pixel_color[0]
+    green = pixel_color[1]
+    blue = pixel_color[2]
+
+    deuteranopia = (red * 0, (green * 0), blue)
+
+    return deuteranopia
+
+
+def tritanopia_pixel(pixel_color):
+    red = pixel_color[0]
+    green = pixel_color[1]
+    blue = pixel_color[2]
+
+    tritanopia = (red * 0, green, (blue * 0))
+
+    return tritanopia
+
+
+def loop_image():
     image = pygame.image.load("ColorBlind.png")
-    pixel_array = pygame.PixelArray(image)
-    for x in range(0, len(pixel_array)):
-        for y in range(0, len(pixel_array[x])):
-            new_pixel_color = greyscale_pixel(image.get((x, y)))
-            # todo make tone function with a better name
-            new_pixel_color = (new_pixel_color, cb_filter)
-            image.set_at((x, y), new_pixel_color)
+    tritan_image = pygame.image.load("ColorBlind.png")
+    deuter_image = pygame.image.load("ColorBlind.png")
+    protan_image = pygame.image.load("ColorBlind.png")
+    grey_scale = pygame.PixelArray(image)
+    tritanopia = pygame.PixelArray(tritan_image)
+    deuteranopia = pygame.PixelArray(deuter_image)
+    protanopia = pygame.PixelArray(protan_image)
+    for x in range(0, len(grey_scale)):
+        for y in range(0, len(grey_scale[x])):
+            pixel_color = image.get_at((x, y))
+            grey_scale_col = greyscale_pixel(pixel_color)
+            grey_scale[x, y] = grey_scale_col
+    for x in range(0, len(tritanopia)):
+        for y in range(0, len(tritanopia[x])):
+            tritan_pixel_color = tritan_image.get_at((x, y))
+            tritan_col = tritanopia_pixel(tritan_pixel_color)
+            tritanopia[x, y] = tritan_col
+    for x in range(0, len(protanopia)):
+        for y in range(0, len(protanopia[x])):
+            pixel_color = protan_image.get_at((x, y))
+            protanopia_col = protanopia_pixel(pixel_color)
+            protanopia[x, y] = protanopia_col
+    for x in range(0, len(deuteranopia)):
+        for y in range(0, len(deuteranopia[x])):
+            pixel_color = deuter_image.get_at((x, y))
+            deuteranopia_col = deuteranopia_pixel(pixel_color)
+            deuteranopia[x, y] = deuteranopia_col
 
-    del pixel_array
-
-
-def grey_scale_screen_shot():
-        pull_image()
-        grey_scale = (pull_image().red + pull_image().green + pull_image().blue) // 3
-        pull_image().pixel_array[pull_image().x, pull_image().y] = grey_scale, grey_scale, grey_scale
-
-        del pull_image().pixel_array
-        pygame.image.save(pull_image().image, "./Screenshots/grey_scale.png")
+    del grey_scale
+    del tritanopia
+    del protanopia
+    del deuteranopia
+    pygame.image.save(image, "./Screenshots/grey_scale.png")
+    pygame.image.save(protan_image, "./Screenshots/protanopia.png")
+    pygame.image.save(deuter_image, "./Screenshots/deuteranopia.png")
+    pygame.image.save(tritan_image, "./Screenshots/tritanopia.png")
 
 
 def initialization():

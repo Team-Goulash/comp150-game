@@ -112,7 +112,7 @@ def event_inputs():
                 colorBlindFilter.color_blind_filter()
                 print("taking color blind screenshot")
             elif event.key == K_t:
-                color_blind_test()
+                colorBlindFilter.loop_image()
                 print("Test color blind image")
 
         if event.type == KEYUP:
