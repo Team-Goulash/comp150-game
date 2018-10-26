@@ -507,20 +507,8 @@ def start():
     dunGen.floorTiles.clear()
     dunGen.wallTiles.clear()
     dunGen.doorTiles.clear()
-    # generate the dungeon
-    for i in range(len(dunGen.GameStore.levels)):
-        if i > 0:
-            # set the starting point for the next room
-            dunGen.GameStore.starting_point_x[i] = \
-                dunGen.GameStore.starting_point_x[i-1] + \
-                dunGen.GameStore.start_x * dunGen.TILE_SIZE - dunGen.TILE_SIZE
 
-            dunGen.GameStore.starting_point_y[i] = \
-                dunGen.GameStore.starting_point_y[i-1] + \
-                dunGen.GameStore.start_y * dunGen.TILE_SIZE
-
-        # create the room
-        dunGen.initialize_level(i)
+    dunGen.create_dungeon()
 
     # create movement variables
     screen_rect = screen.get_rect()

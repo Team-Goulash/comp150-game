@@ -1,4 +1,4 @@
-"""This script handles the procedural tile generation."""
+"""Driver - Joachim / Navigator - None"""
 import pygame
 import random
 import os

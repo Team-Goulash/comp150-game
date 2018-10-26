@@ -1,4 +1,4 @@
-"""This script handles the procedural dungeon generation."""
+"""Driver - Joachim / Navigator - None"""
 import pygame
 import random
 import tileGenerator
@@ -48,6 +48,23 @@ for num in range(GameStore.levelCount):
     GameStore.levels.append(pygame.Surface)
     GameStore.starting_point_x.append(0)
     GameStore.starting_point_y.append(0)
+
+
+def create_dungeon():
+    """Generate the dungeon."""
+    for i in range(len(GameStore.levels)):
+        if i > 0:
+            # set the starting point for the next room
+            GameStore.starting_point_x[i] = \
+                GameStore.starting_point_x[i-1] + \
+                GameStore.start_x * TILE_SIZE - TILE_SIZE
+
+            GameStore.starting_point_y[i] = \
+                GameStore.starting_point_y[i-1] + \
+                GameStore.start_y * TILE_SIZE
+
+        # create the room
+        initialize_level(i)
 
 
 def gen_rand_map_tiles(instance):
