@@ -110,10 +110,8 @@ def event_inputs():
                 library.KEY_PRESSED["backwards"] = event.type == KEYDOWN
             elif event.key == K_p:
                 colorBlindFilter.color_blind_filter()
-                print("taking color blind screenshot")
-            elif event.key == K_t:
                 colorBlindFilter.loop_image()
-                print("Test color blind image")
+                print("taking color blind screenshot")
 
         if event.type == KEYUP:
             if event.key == K_r:

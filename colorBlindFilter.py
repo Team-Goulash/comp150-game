@@ -6,7 +6,7 @@ class CBFilterStore:
     surface = None
 
 
-def greyscale_pixel(pixel_color):
+def greyscale_pixel(pixel_color): # Changes the colour of the screenshot to the grey scale filter
     red = pixel_color[0]
     green = pixel_color[1]
     blue = pixel_color[2]
@@ -16,7 +16,7 @@ def greyscale_pixel(pixel_color):
     return greyscale, greyscale, greyscale
 
 
-def protanopia_pixel(pixel_color):
+def protanopia_pixel(pixel_color): # Changes the colour of the screenshot to the protanopia filter
     red = pixel_color[0]
     green = pixel_color[1]
     blue = pixel_color[2]
@@ -26,27 +26,28 @@ def protanopia_pixel(pixel_color):
     return protanopia
 
 
-def deuteranopia_pixel(pixel_color):
+def deuteranopia_pixel(pixel_color): # Changes the colour of the screenshot to the deuteranopia filter
     red = pixel_color[0]
     green = pixel_color[1]
     blue = pixel_color[2]
 
-    deuteranopia = (red * 0, (green * 0), blue)
+    deuteranopia = (red, (green * 0), blue)
 
     return deuteranopia
 
 
-def tritanopia_pixel(pixel_color):
+def tritanopia_pixel(pixel_color):# Changes the colour of the screenshot to the tritanopia filter
     red = pixel_color[0]
     green = pixel_color[1]
     blue = pixel_color[2]
 
-    tritanopia = (red * 0, green, (blue * 0))
+    tritanopia = (red, green, (blue * 0))
 
     return tritanopia
 
 
-def loop_image():
+def loop_image(): # Press "P" and it'll load 4 pictures in the Screenshot folder
+    # Loops through all the images and colours them accordingly
     image = pygame.image.load("ColorBlind.png")
     tritan_image = pygame.image.load("ColorBlind.png")
     deuter_image = pygame.image.load("ColorBlind.png")
@@ -95,6 +96,6 @@ def color_blind_filter():
     save(".", "ColorBlind", CBFilterStore.surface)
 
 
-def save(path, file_name, surf):
+def save(path, file_name, surf): # Saves the screenshot
     pygame.image.save(surf, path + "/" + file_name + ".png")
     print("saving image")
