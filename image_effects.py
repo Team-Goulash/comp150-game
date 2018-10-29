@@ -1,5 +1,7 @@
-# Driver Ashley Sands; Navigator: None
-import pygame, math, library
+"""Driver Ashley Sands; Navigator: None"""
+import pygame
+import math
+import library
 
 
 def gray_scale_image(pixel_color, color_weight=(1, 1, 1)):
@@ -12,12 +14,16 @@ def gray_scale_image(pixel_color, color_weight=(1, 1, 1)):
     # apply the weights the color
     weighted_color = multiply_color(pixel_color, color_weight)
     # get the average
-    color_average = (weighted_color[0] + weighted_color[1] + weighted_color[2]) // 3
+    color_average = (weighted_color[0] +
+                     weighted_color[1] +
+                     weighted_color[2]
+                     ) // 3
     # clamp the color to 255
     if color_average > 255:
         color_average = 255
 
-    # return color [2, 1, 0, 3] this prevents the red and green channels from flipping
+    # return color [2, 1, 0, 3] this prevents the red and blue
+    # channels from flipping
     # return the original pixel alpha to preserve the transparency
     return color_average, color_average, color_average, pixel_color[3]
 
@@ -52,12 +58,15 @@ def close_enough(pixle_color, color_comparitor, tolerance):
 
 def change_color(color_base, color_comparitor, tolerance, replace_color):
     if close_enough(color_base, color_comparitor, tolerance):
-        # return color [2, 1, 0, 3] this prevents the red and green channels from flipping
+        # return color [2, 1, 0, 3] this prevents the red and blue
+        # channels from flipping
         # return the alpha form color base to preserve the original alpha
-        return replace_color[2], replace_color[1], replace_color[0], color_base[3]
+        return (replace_color[0], replace_color[1],
+                replace_color[2], color_base[3])
     else:
-        # return color [2, 1, 0, 3] this prevents the red and green channels from flipping
-        return color_base[2], color_base[1], color_base[0], color_base[3]
+        # return color [2, 1, 0, 3] this prevents the red and blue
+        # channels from flipping
+        return color_base[0], color_base[1], color_base[2], color_base[3]
 
 
 def posterization(new_color_amount, pixel_color):
@@ -67,7 +76,7 @@ def posterization(new_color_amount, pixel_color):
     :param pixel_color: the current pixel color
     :return: Color (r, g, b, a)
     """
-    one_third = 255 // 3;
+    one_third = 255 // 3
 
     for c in range(3):
         if pixel_color[c] < one_third:
@@ -77,40 +86,48 @@ def posterization(new_color_amount, pixel_color):
         elif pixel_color[c] < 255:
             pixel_color[c] = new_color_amount[2]
 
-    # im not shore why but this one needs to be returned [0, 1, 2, 3] rather than [2, 1, 0, 3]
+    # im not shore why but this one needs to be returned [0, 1, 2, 3]
+    # rather than [2, 1, 0, 3]
     # to prevent the red and blue channels getting flipped
     return pixel_color[0], pixel_color[1], pixel_color[2], pixel_color[3]
 
 
-def posterization_color_distance(new_color, pixel_color, color_comparitor, tolerance):
+def posterization_color_distance(new_color, pixel_color,
+                                 color_comparitor, tolerance):
     """
 
     :param new_color: there needs to be one more color than tollerances
     :param pixel_color:
     :param color_comparitor:
-    :param tolerance: tuple or list of tolerance. must be in order smallest to largest
+    :param tolerance: tuple or list of tolerance.
+     must be in order smallest to largest
     :return:    new color (r, g, b, a)
     """
 
     for t in range(len(tolerance)):
         if close_enough(pixel_color, color_comparitor, tolerance[t]):
-            # return color [2, 1, 0, 3] this prevents the red and green channels from flipping
+            # return color [2, 1, 0, 3] this prevents the red and blue
+            # channels from flipping
             # return with the original pixel alpha to preserve the transparency
-            return new_color[t][2], new_color[t][1], new_color[t][0], pixel_color[3]
+            return (new_color[t][2], new_color[t][1],
+                    new_color[t][0], pixel_color[3])
 
-    # return color [2, 1, 0, 3] this prevents the red and green channels from flipping
+    # return color [2, 1, 0, 3] this prevents the red and blue
+    # channels from flipping
     # return with the original pixel alpha to preserve the transparency
-    return new_color[len(tolerance)-1][2], new_color[len(tolerance)-1][1], new_color[len(tolerance)-1][0], \
-        pixel_color[3]
+    return (new_color[len(tolerance)-1][2], new_color[len(tolerance)-1][1],
+            new_color[len(tolerance)-1][0], pixel_color[3])
 
 
-def tint_image(pixel_color, color_weight=(1.1, 0.9, 1), tones=(62, 191), base_color_id=0):
+def tint_image(pixel_color, color_weight=(1.1, 0.9, 1),
+               tones=(62, 191), base_color_id=0):
     """
 
     :param pixel_color:     color to update
     :param color_weight:    rgb
     :param tones:           tints[0] = shadows, [1] == midtones
-    :param base_color_id    0 = red, 1 = green, 2 = blue    (does nothing if image is grayscale)
+    :param base_color_id    0 = red, 1 = green, 2 = blue
+    (does nothing if image is grayscale)
     :return:                new color.
     """
 
@@ -134,7 +151,8 @@ def blur(x, y, amount, image, tolerance=0):
     :param x:           current X axis pixel id
     :param y:           current Y axis puxel id
     :param amount:      the amount of blue (0-n)
-    :param image:       the image that is getting blued (or a dif image of the same size for a funky effect)
+    :param image:       the image that is getting blued
+    (or a dif image of the same size for a funky effect)
     :return:            blued pixel
     """
 
@@ -150,11 +168,15 @@ def blur(x, y, amount, image, tolerance=0):
     for ix in range(-1, 1):
         for iy in range(-1, 1):
             # check the pixel exists or is not the current pixel
-            if (ix != 0 or iy != 0) and x + ix >= 0 < image.get_width() and y + iy >= 0 < image.get_height():
+            if (ix != 0 or iy != 0) and x + ix >= 0 < image.get_width()\
+                    and y + iy >= 0 < image.get_height():
+
                 # neighboring pixel color
                 pixel_color = image.get_at((x + ix, y + iy))
                 # check pixel color is in range and skip trans pixels
-                if close_enough(current_pixel_color, pixel_color, tolerance) and pixel_color[3] > 0:
+                if close_enough(current_pixel_color, pixel_color, tolerance)\
+                        and pixel_color[3] > 0:
+
                     # add the color and transparency
                     temp_col = add_color(temp_col, pixel_color, False)
                     trans += pixel_color[3]
@@ -184,9 +206,10 @@ def outline_image():
     pass
 
 
-def transparency_by_color_distance(pixel_color, color_comparitor, tolerance, new_alpha):
+def transparency_by_color_distance(pixel_color, color_comparitor,
+                                   tolerance, new_alpha):
     """
-    set the alpha if the pixel_color is in range of the color_comparitors tolerance
+    set the alpha if the pixel_color is in range of the color_comparitor
     :param pixel_color:         current pixel color
     :param color_comparitor:    color to test against pixel color
     :param tolerance:           the tolerance (0 - 1)
@@ -208,7 +231,6 @@ def add_color(color_a, color_b, clamp=True):
     :return:            new color
     """
     color_a = list(color_a)
-    print("a", color_a, "b", color_b)
     color_a[0] += color_b[0]
     color_a[1] += color_b[1]
     color_a[2] += color_b[2]
@@ -251,6 +273,11 @@ def multiply_color(pixel_color, color_weights):
     return tuple(pixel_color)
 
 
+def correct_color_value(color_value):
+    """makes shore that the color values are ints"""
+    return int(color_value[0]), int(color_value[1]), int(color_value[2])
+
+
 def clamp255_color(pixel_color):
     """clamps color chanel to 255"""
     # make shore that pixel color is list so we can edit it
@@ -271,19 +298,22 @@ def clamp0_color(pixel_color):
     return tuple(pixel_color)
 
 
-def run_effect(effect_name, image_to_update, effect_inputs=None, loading_function=None):
+def run_effect(effect_name, image_to_update,
+               effect_inputs=None, loading_function=None):
     """
     Runs a single effect
     :param effect_name:         name of effect to run
     :param image_to_update:     image to be updated
-    :param effect_inputs:       inputs for applied fx. See effect function for inputs. (must be tuple and in order)
-    :param loading_function:    loading function, surface and rect position. tuple(function, surface, rect).
+    :param effect_inputs:       inputs for applied fx.
+     See effect function for inputs. (must be tuple and in order)
+    :param loading_function:    loading function, surface and rect position.
+     tuple(function, surface, rect).
     if none then not displayed
     :return:                    None
     """
 
-    # if the effect type is blur make a copy of the image to pass into the blur function
-    # to prevent it from blurring from an already blurred pixel
+    # if the effect type is blur make a copy of the image to pass into the
+    # blur function to prevent it from blurring from an already blurred pixel
     if effect_name == "blur" or effect_name == "blue_distance":
         blur_original = image_to_update.copy()
 
@@ -302,23 +332,65 @@ def run_effect(effect_name, image_to_update, effect_inputs=None, loading_functio
             pixel_color = image_to_update.get_at((x, y))
 
             # find effect to run
+            # gray scale
             if effect_name == "greyscale":
                 pixel_color = gray_scale_image(pixel_color, effect_inputs)
+            # change color
             elif effect_name == "change_color":
-                pixel_color = change_color(pixel_color, library.BLUE, 0.5, library.RED)
+                color_comparator = multiply_color(
+                    effect_inputs[0], [255, 255, 255]
+                )
+                tolerance = effect_inputs[1]
+                replacement_color = multiply_color(
+                    effect_inputs[2], [255, 255, 255]
+                )
+                pixel_color = change_color(pixel_color, color_comparator,
+                                           tolerance, replacement_color)
+            # posterization
             elif effect_name == "poster":
-                pixel_color = posterization((50, 175, 225), pixel_color)
+                color_amounts = multiply_color(effect_inputs, [255, 255, 255])
+                color_amounts = correct_color_value(color_amounts)
+                pixel_color = posterization(color_amounts, pixel_color)
+            # posterization by color distance
             elif effect_name == "poster_dist":
-                pixel_color = posterization_color_distance((library.RED, library.DARK_GREY, library.BLUE, library.GREEN, library.GREY), pixel_color, library.BLUE, (0.2, 0.4, 0.6, 0.8))
+                color_level_1 = correct_color_value(
+                    multiply_color(effect_inputs[0][0], [255, 255, 255])
+                )
+                color_level_2 = correct_color_value(
+                    multiply_color(effect_inputs[0][1], [255, 255, 255])
+                )
+                color_level_3 = correct_color_value(
+                    multiply_color(effect_inputs[0][2], [255, 255, 255])
+                )
+                color_levels = color_level_1, color_level_2, color_level_3
+                color_comparator = correct_color_value(
+                    multiply_color(effect_inputs[1], [255, 255, 255])
+                )
+                tolerance = effect_inputs[2]
+                pixel_color = posterization_color_distance(
+                    color_levels, pixel_color, color_comparator, tolerance
+                )
+            # tint
             elif effect_name == "tint":
-                pixel_color = tint_image(pixel_color, base_color_id=2)  # needs other inputs
+                tones = [effect_inputs[1][0] * 255, effect_inputs[1][1] * 255]
+                color_weights = effect_inputs[0]
+                pixel_color = tint_image(
+                    pixel_color, color_weights, tones,  base_color_id=2
+                )  # todo add base color
             elif effect_name == "blur":
                 pixel_color = blur(x, y, 1, blur_original, effect_inputs)
             elif effect_name == "set_alpha_dist":
-                pixel_color = transparency_by_color_distance(pixel_color, library.BLACK, 0.5, 0)
+                color_comparator = correct_color_value(
+                    multiply_color(effect_inputs[0], [255, 255, 255])
+                )
+                alpha = int(effect_inputs[2] * 255)
+                pixel_color = transparency_by_color_distance(
+                    pixel_color, color_comparator, effect_inputs[1], alpha
+                )
             else:
                 # print message in console if fx is not found
-                print("[image_effects.run_effect]Error: effect not found ", effect_name)
+                print("[image_effects.run_effect]Error: effect not found ",
+                      effect_name)
 
             # update the current pixel
             pixel_array[x, y] = pixel_color
@@ -327,7 +399,9 @@ def run_effect(effect_name, image_to_update, effect_inputs=None, loading_functio
 
         # if there is a loading function display it
         if loading_function is not None:
-            loading_function[0](loading_function[1], loading_function[2], (updated_pixel_count/total_pixels))
+            loading_function[0](
+                loading_function[1], loading_function[2],
+                (updated_pixel_count/total_pixels)
+            )
     # remove the pixel_array so we can display the image
     del pixel_array
-
