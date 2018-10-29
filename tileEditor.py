@@ -133,6 +133,8 @@ def initialize():
     :return: None.
     """
 
+    print("Helloo World!!!!")
+
     # set current menu to start
     EditorStore.current_menu = MENU_START
 
@@ -262,6 +264,7 @@ def get_files_in_directory(directory, file_type):
     """
     file_list = []
     files = pathlib.Path(directory)
+
     for f in files.iterdir():
 
         if f.is_file() and os.path.splitext(f)[1] == file_type:
@@ -292,23 +295,29 @@ def display_select_tile_button():
     # todo: optimize this so the buttons are called from the main button
     # function so they don't get draw every frame
 
-    if EditorStore.select_tile_start_position < 0:
+    if EditorStore.select_tile_start_position < 1:
         EditorStore.select_tile_start_position = 0
     elif EditorStore.select_tile_start_position > (len(
-            EditorStore.directory_tiles) - 5):
+            EditorStore.directory_tiles) - 4):
         EditorStore.select_tile_start_position = len(
-            EditorStore.directory_tiles) - 5
+            EditorStore.directory_tiles) - 4
+
+    if EditorStore.select_tile_start_position + 3 < len(EditorStore.directory_tiles):
+        select_tile_end_position = EditorStore.select_tile_start_position + 4
+    else:
+        select_tile_end_position = len(EditorStore.directory_tiles)
 
     button_row = 0
     # loop each image that can be edited
     for i in range(EditorStore.select_tile_start_position,
-                   EditorStore.select_tile_start_position + 4):
+                   select_tile_end_position):
         # Add File name text
         temp_surface = label_button(image_select_button.draw_button(
             pygame.mouse.get_pos(), library.KEY_PRESSED["mouse"],
             (450, 100 + (125 * button_row))), "File Name:"+os.path.basename(
             EditorStore.directory_tiles[i]), text_fontface, 117, 15
         )
+
         # Add path text
         temp_surface = label_button(
             temp_surface, EditorStore.directory_tiles[i],
