@@ -1,12 +1,14 @@
 # DON'T FORGET TO COMMENT YOUR CODE PLEASE!!!
 import pygame, sys, library, random, UI, os, shutil
-
 from pygame.locals import *
 # import the Animator class
 from animator import Animator
 # import the tile editor as editor
+
 import tileEditor as Editor
 import dungeonGenerator
+import colorBlindFilter
+
 
 # initialize py game
 pygame.init()
@@ -106,6 +108,9 @@ def event_inputs():
                 library.KEY_PRESSED["forwards"] = event.type == KEYDOWN
             elif event.key == library.MOVE["backwards"]:         # set backwards key pressed (S)
                 library.KEY_PRESSED["backwards"] = event.type == KEYDOWN
+            elif event.key == K_p:
+                colorBlindFilter.color_blind_filter()
+                print("taking color blind screenshot")
 
         if event.type == KEYUP:
             if event.key == K_r:
@@ -423,9 +428,7 @@ def detect_collision(player_pos_x, player_pos_y):
     return dunGen.GameStore.top_col, dunGen.GameStore.bottom_col, dunGen.GameStore.left_col, dunGen.GameStore.right_col
 
 
-
 def main():
-
     level_init = False
     start()
     ticks_since_last_frame = 0
@@ -435,6 +438,7 @@ def main():
 
     # main game loop
     while True:
+
         t = pygame.time.get_ticks()
         # amount of time that passed since the last frame in seconds
         delta_time = (t - ticks_since_last_frame) / 1000.0
@@ -534,5 +538,6 @@ def main():
 
 
 if __name__ == "__main__":
+    colorBlindFilter.initialization()
     main()
 
