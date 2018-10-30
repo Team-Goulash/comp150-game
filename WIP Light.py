@@ -1,96 +1,123 @@
-import main, pygame, sys
+import main
+import pygame
+import sys
+import dungeonGenerator
 
 
-class var():
-    light = 100
-    change = False                      #variable that activates lightning sequence
-    currentposx = main.GameStore.playerX    #characters position
-    currentposy = main.GameStore.playerY    #characters position
-    ctx = 1                      #x tile that character is on
-    cty = 1                        #y tile that character is on
+class Variables:
+    """
+
+    """
+    light = 100                     #variable that activates lightning sequence
+    currentposx = 0  #dungeonGenerator.GameStore.playerX    #characters position
+    currentposy = 0  #dungeonGenerator.GameStore.playerY    #characters position
+    ctx = 1                    #x tile that character is on
+    cty = 1                     #y tile that character is on
     previoustilex = 0                       #x tile that character was on 1 frame ago
     previoustiley = 0                       #y tile that character was on 1 frame ago
-    xtilelength = 10           #finds amount of tiles in width
-    ytilelength = 10           #finds amount of tiles in height
-    tile = []
+    MAP_WIDTH = dungeonGenerator.GameStore.MAP_WIDTH
+    MAP_HEIGHT = dungeonGenerator.GameStore.MAP_HEIGHT
     tiles = []
-    xarray = []
-    yarray = []
 
 
-for y in range(var.ytilelength):
-    var.tile = []
-    for x in range(var.xtilelength):
-        item = 1
-        var.tile.append(item)
-    var.tiles.append(var.tile)
-print(var.tiles)
+"""PUTTING GRID ITO THE GAME"""
+
+
+def translate_light_map(light_map):
+    temp_tiles = []
+    for yy in range(len(light_map[0])):
+        temp_light = []
+        for xx in range(len(light_map)):
+            xa = -4 + xx
+            ya = -4 + yy
+            if xa < 0:
+                xa = xa * -1
+            if ya < 0:
+                ya = ya * -1
+            xintens = (-1 * xa + 5) / 10
+            yintens = (-1 * ya + 5) / 10
+            lintens = (xintens + yintens)
+            lintens = round(lintens*10)/10
+            temp_light.append(lintens)
+
+        temp_tiles.append(temp_light)
+    Variables.tiles = temp_tiles
+    print(Variables.tiles)
+
+
+def create_light_map(range_value):
+    """
+
+    :param range_value:
+    :return:
+    """
+    temp_storage = []
+    for y in range(range_value):
+        temp_small_storage = []
+        for x in range(range_value):
+            temp_small_storage.append(-round(range_value/2) + x)
+        temp_storage.append(temp_small_storage)
+    light_map = temp_storage
+    translate_light_map(light_map)
+
+
+def check_light_distance(light_intensity):
+    """
+
+    :param light_intensity:
+    :return:
+    """
+    if light_intensity > 66:
+        range_value = 9
+    elif Variables.light > 33:
+        range_value = 7
+    else:
+        range_value = 5
+    create_light_map(range_value)
+
+
+def apply():
+    """
+
+    :return:
+    """
+    Variables.previoustilex = Variables.ctx
+    Variables.previoustiley = Variables.cty
+    check_light_distance(Variables.light)
+
+
+def position_check(current_position, current_tile, previous_tile, length):
+    """
+
+    :param current_position:
+    :param current_tile:
+    :param previous_tile:
+    :param length:
+    :return:
+    """
+    for i in range(length):
+        r = i * 90
+        t = current_position - r
+        if t < 0:
+            current_tile = i - 1
+        if current_tile is not previous_tile:
+            return True
+        if i == (length - 1):
+            return False
 
 
 def check():
-        for i in main.MAP_WIDTH:
-            r = i * 90
-            t = var.currentposx - r
-            if t < 0:
-                var.ctx = i - 1
-                if var.ctx is not var.previoustilex:
-                    aply()
-                break
+    """
 
-        for i in main.MAP_HEIGHT:
-            r = i * 90
-            t = var.currentposx - r
-            if t < 0:
-                var.cty = i - 1
-                if var.cty is not var.previoustiley:
-                    aply()
-                break
+    :return:
+    """
+    change_in_x = position_check(Variables.currentposx, Variables.ctx,
+                                 Variables.previoustilex, Variables.MAP_WIDTH)
+    change_in_y = position_check(Variables.currentposy, Variables.cty,
+                                 Variables.previoustiley, Variables.MAP_HEIGHT)
+
+    if change_in_x or change_in_y:
+        apply()
 
 
-def aply():
-    var.previoustilex = var.ctx
-    var.previoustiley = var.cty
-    if var.light > 66:
-        var.xarray = [var.ctx - 3, var.ctx - 2, var.ctx - 1, var.ctx, var.ctx + 1, var.ctx + 2, var.ctx + 3]
-        var.yarray = [var.cty - 3, var.cty - 2, var.cty - 1, var.cty, var.cty + 1, var.cty + 2, var.cty + 3]
-    elif var.light > 33:
-        var.xarray = [var.ctx - 2, var.ctx - 1, var.ctx, var.ctx + 1, var.ctx + 2]
-        var.yarray = [var.cty - 2, var.cty - 1, var.cty, var.cty + 1, var.cty + 2]
-    else:
-        var.xarray = [var.ctx - 1, var.ctx, var.ctx + 1]
-        var.yarray = [var.cty - 1, var.cty, var.cty + 1]
-
-    print(var.xarray)
-    print(var.yarray)
-    for yx in range(var.ytilelength):
-        for xy in range(var.xtilelength):
-            var.tile[xy] = 0
-        var.tiles[yx] = var.tile
-    print(var.tiles)
-
-    temp_tiles = []
-
-    for yy in range(var.ytilelength):
-        temp_light = []
-        for xx in range(var.xtilelength):
-
-            print(xx, ":", yy, "::", 1 - ((xx / var.xtilelength) + (yy / var.ytilelength) / 2))
-            if xx + 1 in var.xarray and yy + 1 in var.yarray:
-                temp_light.append(1)
-
-
-            else:
-                temp_light.append(0)
-
-        temp_tiles.append(temp_light)
-        #    """#line = pygame.draw.line(main.screen, (255, 0, 0), (currentposx, currentposy), tilesPoisition)
-        #
-        #   #for x in line.collidelist:
-        #       #if x = wall
-        #       #tile texture = its texture
-        #   #destroy line"""
-    var.tiles = temp_tiles
-    print(var.tiles)
-
-
-aply()
+check()

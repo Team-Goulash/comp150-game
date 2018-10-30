@@ -5,7 +5,7 @@ from pygame.locals import *
 from animator import Animator
 # import the tile editor as editor
 
-import tileEditor as Editor
+
 import dungeonGenerator
 import colorBlindFilter
 
@@ -18,6 +18,8 @@ WINDOW_WIDTH = 1334
 
 # create the window
 screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
+0
+import tileEditor as Editor
 
 dunGen = dungeonGenerator
 

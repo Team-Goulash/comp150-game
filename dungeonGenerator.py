@@ -28,8 +28,8 @@ class GameStore:
     mud_variations = 15
     moss_variations = 15
     pixel_map = pygame.Surface
-    MAP_WIDTH = 0
-    MAP_HEIGHT = 0
+    MAP_WIDTH = 10
+    MAP_HEIGHT = 10
     top_col = False
     bottom_col = False
     left_col = False
