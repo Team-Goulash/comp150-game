@@ -25,6 +25,8 @@ class GameStore:
 
     playerX = 0
     playerY = 0
+    previousPlayerX = 0
+    previousPlayerY = 0
     offsetX = 0
     offsetY = 0
     x = 0

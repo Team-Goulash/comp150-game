@@ -31,11 +31,6 @@ def detect_collision():
     current_tile_pos = dunGen.allTilePositions[current_tile_index]
     current_tile_type = dunGen.allTiles[dunGen.GameStore.current_tile]
     if current_tile_type == 0:
-        dunGen.GameStore.top_col = False
-        dunGen.GameStore.bottom_col = False
-        dunGen.GameStore.left_col = False
-        dunGen.GameStore.right_col = False
-
         dunGen.GameStore.last_tile = current_tile_index
         current_tile_rect = Rect(dunGen.GameStore.x + current_tile_pos[0]
                                  - dunGen.GameStore.offsetX,
