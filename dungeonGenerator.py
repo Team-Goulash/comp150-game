@@ -41,6 +41,10 @@ class GameStore:
     starting_point_x = []
     starting_point_y = []
 
+    # Todo remove temp animation variable
+    temp_lerp_timer = 0
+    temp_rev_lerp = False
+
 
 for num in range(GameStore.levelCount):
     GameStore.levels.append(pygame.Surface)
@@ -122,6 +126,21 @@ def gen_rand_map_tiles(instance):
     return tiles
 
 
+def get_position_with_offset(x_pos, y_pos):
+    """gets the objects position with the map offset included"""
+    x_pos = GameStore.x + x_pos - GameStore.offsetX
+    y_pos = GameStore.y + y_pos - GameStore.offsetY
+
+    return x_pos, y_pos
+
+
+def get_positon_by_tile_coordinates(x_cord, y_cord):
+
+    x_pos, y_pos = get_position_with_offset(TILE_SIZE * x_cord, TILE_SIZE * y_cord)
+
+    return x_pos, y_pos
+
+
 def initialize_level(surface_id):
     """Draws the tiles with according images on a blank surface"""
     # generate the map
@@ -162,3 +181,5 @@ def initialize_level(surface_id):
             """
 
             GameStore.levels[surface_id].blit(material, (x_pos, y_pos, TILE_SIZE, TILE_SIZE))
+
+
