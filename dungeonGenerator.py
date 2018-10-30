@@ -52,6 +52,8 @@ class GameStore:
     current_tiles = []
     prediction_X = 0
     prediction_Y = 0
+    secondary_prediction_X = 0
+    secondary_prediction_Y = 0
 
 
 for num in range(GameStore.levelCount):
