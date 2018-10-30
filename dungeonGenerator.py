@@ -13,6 +13,9 @@ floorTiles = []
 wallTiles = []
 doorTiles = []
 
+allTilePositions = []
+allTiles = []
+
 TILE_SIZE = tile_class.floorImg.get_rect().width
 materials = tile_class.tileTypes
 
@@ -42,6 +45,11 @@ class GameStore:
     levels = []
     starting_point_x = []
     starting_point_y = []
+    current_tile = 0
+    last_tile = 0
+    current_tiles = []
+    prediction_X = 0
+    prediction_Y = 0
 
 
 for num in range(GameStore.levelCount):
@@ -199,6 +207,11 @@ def initialize_level(surface_id):
                     tile_class, tiles[column][row],
                     tileTypes[column][row], tileMats[column][row])
 
+            allTiles.append(tiles[column][row])
+            allTilePositions.append([x_pos +
+                                    GameStore.starting_point_x[surface_id],
+                                    y_pos +
+                                    GameStore.starting_point_y[surface_id]])
             GameStore.levels[surface_id].blit(material, (x_pos, y_pos,
                                                          TILE_SIZE, TILE_SIZE))
 

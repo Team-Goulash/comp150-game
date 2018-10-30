@@ -9,8 +9,9 @@ import shutil
 from pygame.locals import *
 from animator import Animator
 import tileEditor as Editor
-import dungeonGenerator
+import dungeonGenerator as dunGen
 import colorBlindFilter
+import CollisionDetection as colDetect
 
 
 # initialize py game
@@ -21,8 +22,6 @@ WINDOW_WIDTH = 1334
 
 # create the window
 screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
-
-dunGen = dungeonGenerator
 
 # UI Buttons
 main_menu_buttons = {"new game": None, "continue": None, "options": None,
@@ -383,7 +382,6 @@ def main_menu():
                                 library.KEY_PRESSED["mouse"],
                                 (460, 608)), (460, 588))
 
-        # blits
         screen.blit(new_game_surf, new_game_rect)
         screen.blit(continue_game_surf, continue_game_rect)
         screen.blit(options_surf, options_rect)
@@ -472,7 +470,7 @@ def pause_menu():
         controls_rect.center = (690, 538)
         quit_surf, quit_rect = text_objects("Exit to Main Menu", button_text2)
         quit_rect.center = (690, 688)
-        # Blits
+
         screen.blit(quit_surf, quit_rect)
         screen.blit(controls_surf, controls_rect)
         screen.blit(options_surf, options_rect)
@@ -592,27 +590,6 @@ def animation_direction(last_direction):
     return direction, idle
 
 
-def detect_collision(player_pos_x, player_pos_y):
-    """Draw the colliders on the player and wall tiles."""
-    # create and draw the player col
-    player_col = Rect(player_pos_x + 14, player_pos_y +
-                      (dunGen.TILE_SIZE * 0.6),
-                      dunGen.TILE_SIZE * 0.6, dunGen.TILE_SIZE * 0.3)
-    pygame.draw.rect(screen, Color("white"), player_col, 2)
-
-    # create and draw tile cols
-    for tile in range(len(dunGen.wallTiles)):
-        x = dunGen.GameStore.x + dunGen.wallTiles[tile][0] - \
-            dunGen.GameStore.offsetX
-        y = dunGen.GameStore.y + dunGen.wallTiles[tile][1] -\
-            dunGen.GameStore.offsetY
-        tile_col = Rect(x, y, dunGen.TILE_SIZE, dunGen.TILE_SIZE)
-        pygame.draw.rect(screen, Color("white"), tile_col, 2)
-
-    return dunGen.GameStore.top_col, dunGen.GameStore.bottom_col,\
-        dunGen.GameStore.left_col, dunGen.GameStore.right_col
-
-
 def main():
     """Main game loop."""
     start()
@@ -660,25 +637,33 @@ def main():
 
         if not library.PAUSED:
             # Key press actions
-            if library.KEY_PRESSED["forwards"]:
+            if library.KEY_PRESSED["forwards"] and \
+                    not dunGen.GameStore.top_col or dunGen.GameStore.bottom_col:
                 # forwards key action
                 dunGen.GameStore.playerY -= movement_speed
                 dunGen.GameStore.y += movement_speed
+                dunGen.GameStore.prediction_Y = -10
 
-            if library.KEY_PRESSED["backwards"]:
+            if library.KEY_PRESSED["backwards"] and \
+                    not dunGen.GameStore.bottom_col or dunGen.GameStore.top_col:
                 # backwards key action
                 dunGen.GameStore.playerY += movement_speed
                 dunGen.GameStore.y -= movement_speed
+                dunGen.GameStore.prediction_Y = 10
 
-            if library.KEY_PRESSED["left"]:
+            if library.KEY_PRESSED["left"] and \
+                    not dunGen.GameStore.left_col  or dunGen.GameStore.right_col:
                 # left key action
                 dunGen.GameStore.playerX -= movement_speed
                 dunGen.GameStore.x += movement_speed
+                dunGen.GameStore.prediction_X = -15
 
-            if library.KEY_PRESSED["right"]:
+            if library.KEY_PRESSED["right"] and \
+                    not dunGen.GameStore.right_col or dunGen.GameStore.left_col:
                 # right key action
                 dunGen.GameStore.playerX += movement_speed
                 dunGen.GameStore.x -= movement_speed
+                dunGen.GameStore.prediction_X = 15
 
             # switch between active and idle
             if not player_idle:
@@ -718,7 +703,10 @@ def main():
                 dunGen.GameStore.offsetX
             player_y_pos = dunGen.GameStore.y + dunGen.GameStore.playerY - \
                 dunGen.GameStore.offsetY
-            # detect_collision(player_x_pos, player_y_pos)
+
+            colDetect.detect_collision()
+
+            # colDetect.detect_collision(player_x_pos, player_y_pos)
             # draw the player
             screen.blit(pygame.transform.scale(player.get_current_sprite(),
                         (int(dunGen.TILE_SIZE * 0.9),
