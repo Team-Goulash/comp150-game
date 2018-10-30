@@ -36,6 +36,7 @@ def light_map_creation(light_values, light_position):
                                 ((x + 1) * Variables.tile_size, (y + 1) * Variables.tile_size),
                                 ((x + 1) * Variables.tile_size, y * Variables.tile_size))
                                 )
+            pygame.draw.rect(((x* Variables.tile_size))
 
 
 
