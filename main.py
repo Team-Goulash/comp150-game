@@ -1,5 +1,5 @@
 # DON'T FORGET TO COMMENT YOUR CODE PLEASE!!!
-import pygame, sys, library, random, UI, os, shutil
+import pygame, sys, library, random, UI, os, shutil, WIPLight
 from pygame.locals import *
 # import the Animator class
 from animator import Animator
@@ -18,7 +18,7 @@ WINDOW_WIDTH = 1334
 
 # create the window
 screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
-0
+
 import tileEditor as Editor
 
 dunGen = dungeonGenerator
@@ -534,6 +534,9 @@ def main():
             screen.blit(pygame.transform.scale(player.get_current_sprite(),
                         (int(dunGen.TILE_SIZE * 0.9), int(dunGen.TILE_SIZE * 0.9))), (player_x_pos, player_y_pos))
 
+
+        #WIPLight.check()
+        #screen.blit(WIPLight.Variables.light_surface)
         # update the display.
         pygame.display.flip()
         ticks_since_last_frame = t
