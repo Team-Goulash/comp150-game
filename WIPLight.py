@@ -1,44 +1,27 @@
-import main
+"""Creates blocky shadow """
 import pygame
-import sys
 import dungeonGenerator
 
 
 class Variables:
-    """
-
-    """
-
-    light = 60 #variable that activates lightning sequence
-    currentposx = dungeonGenerator.GameStore.playerX  #dungeonGenerator.GameStore.playerX    #characters position
-    currentposy = dungeonGenerator.GameStore.playerY  #dungeonGenerator.GameStore.playerY    #characters position
-    ctx = 1                    #x tile that character is on
-    cty = 1                     #y tile that character is on
-    previoustilex = 0                       #x tile that character was on 1 frame ago
-    previoustiley = 0                       #y tile that character was on 1 frame ago
-    MAP_WIDTH = dungeonGenerator.GameStore.MAP_WIDTH
-    MAP_HEIGHT = dungeonGenerator.GameStore.MAP_HEIGHT
+    light = 100
+    previous_tile_x = 0
+    previous_tile_y = 0
     light_surface = None
     tile_size = dungeonGenerator.TILE_SIZE
 
 
-"""PUTTING GRID INTO THE GAME"""
-
-
-def light_map_creation(light_values, light_position):
-
+def light_map_creation(light_values):
     for y in range(len(light_values[0])):
         for x in range(len(light_values)):
-            # surface, rect(x, y, width, height)
-            pygame.draw.polygon(Variables.light_surface, (0, 0, 0, 255 * light_values[x][y]),
-                                ((x * Variables.tile_size, y * Variables.tile_size),
-                                ((x + 1) * Variables.tile_size, y * Variables.tile_size),
-                                ((x + 1) * Variables.tile_size, (y + 1) * Variables.tile_size),
-                                ((x + 1) * Variables.tile_size, y * Variables.tile_size))
-                                )
-            pygame.draw.rect(((x* Variables.tile_size))
-
-
+            pygame.draw.rect(Variables.light_surface,
+                             (0, 0, 0, 255 * (1-light_values[x][y])),
+                             (x * Variables.tile_size,
+                              y * Variables.tile_size,
+                              Variables.tile_size,
+                              Variables.tile_size
+                              )
+                             )
 
 
 def translate_light_map(light_map, range_value):
@@ -52,15 +35,19 @@ def translate_light_map(light_map, range_value):
                 xa = xa * -1
             if ya < 0:
                 ya = ya * -1
-            xintens = (-1 * xa + 5) / 10 * Variables.light / 100
-            yintens = (-1 * ya + 5) / 10 * Variables.light / 100
-            lintens = (xintens + yintens)
-            lintens = round(lintens, 2)
-            temp_light.append(lintens)
+            x_intensity = (-1 * xa + 3) / 6
+            y_intensity = (-1 * ya + 3) / 6
+            if x_intensity < 0:
+                x_intensity = 0
+            if y_intensity < 0:
+                y_intensity = 0
+            total_intensity = (x_intensity + y_intensity)
+            total_intensity = round(total_intensity, 2)
+            temp_light.append(total_intensity)
 
         light_tiles_map.append(temp_light)
-    print(light_tiles_map, light_map)
-    #light_map_creation(light_tiles_map)
+    print(light_tiles_map)
+    light_map_creation(light_tiles_map)
 
 
 def create_light_map(range_value):
@@ -76,8 +63,6 @@ def create_light_map(range_value):
             temp_small_storage.append(int(-(range_value-1)/2 + x))
         temp_storage.append(temp_small_storage)
     light_map = temp_storage
-
-    print(light_map)
     translate_light_map(light_map, range_value)
 
 
@@ -95,41 +80,26 @@ def check_light_distance(light_intensity):
         range_value = 5
 
     light_surface_size = range_value * Variables.tile_size
-
-
     Variables.light_surface = pygame.Surface((light_surface_size, light_surface_size), pygame.SRCALPHA)
     create_light_map(range_value)
 
 
-
-def apply():
+# def position_check(current_position, current_tile, previous_tile, length):
+def position_check():
     """
 
-    :return:
-    """
-    Variables.previoustilex = Variables.ctx
-    Variables.previoustiley = Variables.cty
-    check_light_distance(Variables.light)
-
-
-def position_check(current_position, current_tile, previous_tile, length):
+    :return: true if the tile has changed
     """
 
-    :param current_position:
-    :param current_tile:
-    :param previous_tile:
-    :param length:
-    :return:
-    """
-    for i in range(length):
-        r = i * 90
-        t = current_position - r
-        if t < 0:
-            current_tile = i - 1
-        if current_tile is not previous_tile:
-            return True
-        if i == (length - 1):
-            return False
+    current_tile_x, current_tile_y = dungeonGenerator.get_coordiantes_from_position(dungeonGenerator.GameStore.playerX,
+                                                                                    dungeonGenerator.GameStore.playerY)
+
+    if current_tile_x != Variables.previous_tile_x or current_tile_y != Variables.previous_tile_y:
+        Variables.previous_tile_x = current_tile_x
+        Variables.previous_tile_y = current_tile_y
+        return True
+
+    return False
 
 
 def check():
@@ -137,10 +107,15 @@ def check():
 
     :return:
     """
-    change_in_x = position_check(Variables.currentposx, Variables.ctx,
-                                 Variables.previoustilex, Variables.MAP_WIDTH)
-    change_in_y = position_check(Variables.currentposy, Variables.cty,
-                                 Variables.previoustiley, Variables.MAP_HEIGHT)
+    if position_check():
+        check_light_distance(Variables.light)
 
-    if change_in_x or change_in_y:
-        apply()
+
+def draw_light(surface):
+
+    current_tile_x, current_tile_y = dungeonGenerator.get_coordiantes_from_position(dungeonGenerator.GameStore.playerX,
+                                                                                    dungeonGenerator.GameStore.playerY)
+    current_tile_x -= 3
+    current_tile_y -= 3
+    pos_x, pos_y = dungeonGenerator.get_positon_by_tile_coordinates(current_tile_x, current_tile_y)
+    surface.blit(Variables.light_surface, (pos_x, pos_y))
