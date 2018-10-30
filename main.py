@@ -1,5 +1,6 @@
 # DON'T FORGET TO COMMENT YOUR CODE PLEASE!!!
 import pygame, sys, library, random, UI, os, shutil
+from fuelMeter import *
 from pygame.locals import *
 # import the Animator class
 from animator import Animator
@@ -10,7 +11,7 @@ import dungeonGenerator
 import colorBlindFilter
 
 
-# initialize py game
+# initialize pygame
 pygame.init()
 # Set the window size
 WINDOW_HEIGHT = 750
@@ -54,10 +55,13 @@ FPS = 60
 # initialize the FPS clock
 fps_clock = pygame.time.Clock()
 
+fuel_meter = Torch()
+
 # text size
 title_text = pygame.font.Font("UI/AMS hand writing.ttf", 115)
 button_text = pygame.font.Font("UI/AMS hand writing.ttf", 55)
 button_text_60 = pygame.font.Font("UI/AMS hand writing.ttf", 60)
+
 
 # set player animations
 player_animation = ["", "", "", ""]
@@ -180,7 +184,6 @@ def event_inputs():
 def text_objects(text, font):
     text_surface = font.render(text, True, library.BLACK)
     return text_surface, text_surface.get_rect()
-
 
 def main_menu():
     if library.MAIN_MENU_CONTROLS is True: # if the controls are true it'll display the controls from the main menu
@@ -308,6 +311,8 @@ def pause_menu():
         screen.blit(options_surf, options_rect)
         screen.blit(text_surf, text_rect)
         screen.blit(resume_surf, resume_rect)
+
+
 
 
 def pausing_game():
@@ -501,7 +506,8 @@ def main():
 
             # update the avatars animation time
             player.update_time(delta_time)
-                
+            fuel_meter.update_fuel_timer(delta_time)
+
         else:
             display_pause_menu = True
 
@@ -533,6 +539,7 @@ def main():
             screen.blit(pygame.transform.scale(player.get_current_sprite(),
                         (int(dunGen.TILE_SIZE * 0.9), int(dunGen.TILE_SIZE * 0.9))), (player_x_pos, player_y_pos))
 
+            fuel_meter.display_fuel_meter(screen, (0, 0))
 
         # update the display.
         pygame.display.flip()
