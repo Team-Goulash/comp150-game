@@ -85,6 +85,10 @@ player_idle_animation[library.FORWARDS] = Animator("Characters/girl_backIdle_spr
 player_idle_animation[library.BACKWARDS] = Animator("Characters/girl_frontIdle_spriteSheet.png",
                                                     library.scaleNum, 3, 7, 1.5)
 
+ghost_animations = Animator("Well Escape Tiles/ghostTiles/ghost_0_face_3.png",
+                            library.scaleNum, 3, 7, 1.5)  # list()
+
+
 if not os.path.exists("Well Escape tiles/varieties"):
     os.makedirs("Well Escape tiles/varieties")
 else:
@@ -499,8 +503,9 @@ def main():
             else:
                 player = player_idle_animation[current_direction]
 
-            # update the avatars animation time
+            # update animation times
             player.update_time(delta_time)
+            ghost_animations.update_time(delta_time)
                 
         else:
             display_pause_menu = True
@@ -526,12 +531,36 @@ def main():
                                                          dunGen.GameStore.offsetY))
 
             # update player's position
-            player_x_pos = dunGen.GameStore.x + dunGen.GameStore.playerX - dunGen.GameStore.offsetX
-            player_y_pos = dunGen.GameStore.y + dunGen.GameStore.playerY - dunGen.GameStore.offsetY
+            player_x_pos, player_y_pos = dunGen.get_position_with_offset(
+                dunGen.GameStore.playerX, dunGen.GameStore.playerY
+            )
+
             # detect_collision(player_x_pos, player_y_pos)
             # draw the player
             screen.blit(pygame.transform.scale(player.get_current_sprite(),
                         (int(dunGen.TILE_SIZE * 0.9), int(dunGen.TILE_SIZE * 0.9))), (player_x_pos, player_y_pos))
+
+
+            # todo: move to its own function
+            ghost_start_position = dunGen.get_positon_by_tile_coordinates(3, 3)
+            ghost_end_position = dunGen.get_positon_by_tile_coordinates(6, 3)
+
+            if dunGen.GameStore.temp_lerp_timer < 3 and not dunGen.GameStore.temp_rev_lerp:
+                dunGen.GameStore.temp_lerp_timer += delta_time
+                if dunGen.GameStore.temp_lerp_timer >= 3:
+                    dunGen.GameStore.temp_rev_lerp = True
+                    dunGen.GameStore.temp_lerp_timer = 3
+
+            elif dunGen.GameStore.temp_lerp_timer > 0 and dunGen.GameStore.temp_rev_lerp:
+                dunGen.GameStore.temp_lerp_timer -= delta_time
+                if dunGen.GameStore.temp_lerp_timer <= 0:
+                    dunGen.GameStore.temp_rev_lerp = False
+                    dunGen.GameStore.temp_lerp_timer = 0
+
+
+            ghost_pos_x, ghost_pos_y = library.lerp_vector2(ghost_start_position, ghost_end_position, (dunGen.GameStore.temp_lerp_timer / 3))
+
+            screen.blit(ghost_animations.get_current_sprite(), (ghost_pos_x, ghost_pos_y))
 
 
         # update the display.
