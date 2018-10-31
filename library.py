@@ -15,7 +15,10 @@ BACKWARDS = 3
 # boolean values for key pressed states
 KEY_PRESSED = {"left": False, "right": False, "forwards": False, "backwards": False, "mouse": False}
 PAUSED = False
+MAIN_MENU = False
 OPTIONS = False
+PAUSE_MENU = False
+GAME_OVER = False
 CONTROLS = False
 SETTINGS = False
 MAIN_MENU_CONTROLS = False
@@ -66,6 +69,11 @@ def clamp(min, max, value):
         value = max
 
     return value
+
+
+def text_objects(text, font):
+    text_surface = font.render(text, True, BLACK)
+    return text_surface, text_surface.get_rect()
 
 
 def lerp(start_value, end_value, percentage):
