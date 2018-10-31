@@ -68,3 +68,30 @@ def clamp(min, max, value):
         value = max
 
     return value
+
+
+def lerp(start_value, end_value, percentage):
+    """
+    lerps a value from start to end
+    :param start_value:         start value ->int/float
+    :param end_value:           end value ->int/float
+    :param percentage:          time percentage (clamped 0-1)
+    :return:                    lerped value -> float
+    """
+    percentage = clamp(0, 1, percentage)
+    return start_value + ((end_value - start_value) * percentage)
+
+
+def lerp_vector2(start_position, end_position, percentage):
+    """
+        lerps a value from start to end
+        :param start_position:          start value ->(x, y)
+        :param end_position:            end value ->(x, y)
+        :param percentage:              time percentage  (clamped 0-1)
+        :return:                        lerped value -> (x, y)
+        """
+    pos_x = lerp(start_position[0], end_position[0], percentage)
+    pos_y = lerp(start_position[1], end_position[1], percentage)
+
+    return pos_x, pos_y
+

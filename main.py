@@ -6,6 +6,7 @@ import random
 import UI
 import os
 import shutil
+from fuelMeter import *
 from pygame.locals import *
 from animator import Animator
 import tileEditor as Editor
@@ -14,7 +15,7 @@ import colorBlindFilter
 import CollisionDetection as colDetect
 
 
-# initialize py game
+# initialize pygame
 pygame.init()
 # Set the window size
 WINDOW_HEIGHT = 750
@@ -85,10 +86,13 @@ FPS = 60
 # initialize the FPS clock
 fps_clock = pygame.time.Clock()
 
+fuel_meter = Torch()
+
 # text size
 title_text = pygame.font.Font("UI/AMS hand writing.ttf", 115)
 button_text = pygame.font.Font("UI/AMS hand writing.ttf", 55)
 button_text_60 = pygame.font.Font("UI/AMS hand writing.ttf", 60)
+
 
 # set player animations
 player_animation = ["", "", "", ""]
@@ -129,6 +133,10 @@ player_idle_animation[library.BACKWARDS] = Animator("Characters/girl_frontIdle"
                                                     library.scaleNum,
                                                     3, 7, 1.5)
 
+ghost_animations = Animator("Well Escape Tiles/ghostTiles/ghost_0_face_3.png",
+                            library.scaleNum, 3, 7, 1.5)  # list()
+
+
 if not os.path.exists("Well Escape tiles/varieties"):
     os.makedirs("Well Escape tiles/varieties")
 else:
@@ -163,6 +171,7 @@ def event_inputs():
 
             elif event.key == K_p:
                 colorBlindFilter.color_blind_filter()
+                colorBlindFilter.loop_image()
                 print("taking color blind screenshot")
             elif event.key == K_SPACE:
                 library.KEY_PRESSED["space"] = event.type == KEYDOWN
@@ -275,7 +284,6 @@ def text_objects(text, font):
     """Render the font."""
     text_surface = font.render(text, True, library.BLACK)
     return text_surface, text_surface.get_rect()
-
 
 def main_menu():
     """Display the main menu."""
@@ -476,6 +484,8 @@ def pause_menu():
         screen.blit(options_surf, options_rect)
         screen.blit(text_surf, text_rect)
         screen.blit(resume_surf, resume_rect)
+
+
 
 
 def pausing_game():
@@ -743,10 +753,12 @@ def main():
             else:
                 player = player_idle_animation[current_direction]
 
-            # update the avatars animation time
+            # update animation times
             player.update_time(delta_time)
-
-        elif library.PAUSED:
+            ghost_animations.update_time(delta_time)
+            fuel_meter.update_fuel_timer(delta_time)
+                
+        else:
             display_pause_menu = True
 
         library.RESET = False
@@ -779,12 +791,35 @@ def main():
                 dunGen.GameStore.offsetY
 
             colDetect.detect_collision()
-            dunGen.draw_chest()
             # draw the player
             screen.blit(pygame.transform.scale(player.get_current_sprite(),
                         (int(dunGen.TILE_SIZE * 0.9),
                          int(dunGen.TILE_SIZE * 0.9))),
                         (player_x_pos, player_y_pos))
+
+            fuel_meter.display_fuel_meter(screen, (0, 0))
+
+            # todo: move to its own function
+            ghost_start_position = dunGen.get_positon_by_tile_coordinates(3, 3)
+            ghost_end_position = dunGen.get_positon_by_tile_coordinates(6, 3)
+
+            if dunGen.GameStore.temp_lerp_timer < 3 and not dunGen.GameStore.temp_rev_lerp:
+                dunGen.GameStore.temp_lerp_timer += delta_time
+                if dunGen.GameStore.temp_lerp_timer >= 3:
+                    dunGen.GameStore.temp_rev_lerp = True
+                    dunGen.GameStore.temp_lerp_timer = 3
+
+            elif dunGen.GameStore.temp_lerp_timer > 0 and dunGen.GameStore.temp_rev_lerp:
+                dunGen.GameStore.temp_lerp_timer -= delta_time
+                if dunGen.GameStore.temp_lerp_timer <= 0:
+                    dunGen.GameStore.temp_rev_lerp = False
+                    dunGen.GameStore.temp_lerp_timer = 0
+
+
+            ghost_pos_x, ghost_pos_y = library.lerp_vector2(ghost_start_position, ghost_end_position, (dunGen.GameStore.temp_lerp_timer / 3))
+
+            screen.blit(ghost_animations.get_current_sprite(), (ghost_pos_x, ghost_pos_y))
+
 
         # update the display.
         pygame.display.flip()
