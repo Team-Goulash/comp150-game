@@ -34,6 +34,8 @@ def detect_collision():
 
     current_tile_index = find_current_tile(0, 0)
     current_tile_pos = dunGen.allTilePositions[current_tile_index]
+    current_tile_type = dunGen.allTiles[current_tile_index]
+    current_tile_material = dunGen.allTileMaterials[current_tile_index]
 
     current_tile_index2 = find_current_tile(dunGen.GameStore.prediction_X,
                                             dunGen.GameStore.prediction_Y)
@@ -71,6 +73,14 @@ def detect_collision():
                                   + current_tile_pos3[1]
                                   - dunGen.GameStore.offsetY,
                                   dunGen.TILE_SIZE, dunGen.TILE_SIZE)
+        if current_tile_type == 2:
+            if current_tile_material == 1:
+                if library.KEY_PRESSED["space"]:
+                    main.start()
+                if current_tile_pos[1] < dunGen.GameStore.playerY:
+                    dunGen.GameStore.bottom_col = True
+                else:
+                    dunGen.GameStore.bottom_col = False
 
         pygame.draw.rect(main.screen, Color("red"), current_tile_rect3, 3)
         pygame.draw.rect(main.screen, Color("orange"), current_tile_rect2, 3)
@@ -87,6 +97,7 @@ def detect_collision():
             dunGen.GameStore.previousPlayerY = dunGen.GameStore.playerY
 
         difference = dunGen.GameStore.last_tile - current_tile_index2
+
         if difference > 1:
             dunGen.GameStore.top_col = True
             if len(true_collisions) < 1:
@@ -103,9 +114,9 @@ def detect_collision():
             dunGen.GameStore.right_col = True
             if len(true_collisions) < 1:
                 dunGen.GameStore.secondary_prediction_Y = 0
-
     else:
         dunGen.GameStore.top_col = False
-        dunGen.GameStore.bottom_col = False
+        if not current_tile_type2 == 2:
+            dunGen.GameStore.bottom_col = False
         dunGen.GameStore.left_col = False
         dunGen.GameStore.right_col = False

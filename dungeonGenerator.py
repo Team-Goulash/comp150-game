@@ -15,6 +15,7 @@ doorTiles = []
 
 allTilePositions = []
 allTiles = []
+allTileMaterials = []
 
 TILE_SIZE = tile_class.floorImg.get_rect().width
 materials = tile_class.tileTypes
@@ -57,7 +58,7 @@ class GameStore:
     prediction_Y = 0
     secondary_prediction_X = 0
     secondary_prediction_Y = 0
-    set_position = True
+    well_room = True
 
 
 for num in range(GameStore.levelCount):
@@ -216,6 +217,7 @@ def initialize_level(surface_id):
                     tileTypes[column][row], tileMats[column][row])
 
             allTiles.append(tiles[column][row])
+            allTileMaterials.append(tileTypes[column][row])
             allTilePositions.append([x_pos +
                                     GameStore.starting_point_x[surface_id],
                                     y_pos +

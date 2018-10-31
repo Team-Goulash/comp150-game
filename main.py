@@ -164,11 +164,11 @@ def event_inputs():
             elif event.key == K_p:
                 colorBlindFilter.color_blind_filter()
                 print("taking color blind screenshot")
+            elif event.key == K_SPACE:
+                library.KEY_PRESSED["space"] = event.type == KEYDOWN
 
         if event.type == KEYUP:
-            if event.key == K_r:
-                start()     # resets the level
-            elif event.key == library.PAUSE:    # Pauses the game
+            if event.key == library.PAUSE:    # Pauses the game
                 library.PAUSED = not library.PAUSED
                 library.CONTROLS = False
                 library.OPTIONS = False
@@ -501,11 +501,11 @@ def exit_game():
 # creates a new level and positions everything accordingly in that level
 def start():
     """Initialise the game."""
+    library.RESET = True
     # reset all lists
     dunGen.floorTiles.clear()
     dunGen.wallTiles.clear()
     dunGen.doorTiles.clear()
-
     dunGen.create_dungeon()
 
     # create movement variables
@@ -635,13 +635,14 @@ def main():
             # if the game is paused or has not started yet!
             movement_speed = 0
 
-        if not library.PAUSED:
+        if not library.PAUSED and not library.RESET:
             # Key press actions
             if library.KEY_PRESSED["forwards"] and \
                     not library.KEY_PRESSED["backwards"]:
 
                 if not dunGen.GameStore.top_col:
                     # forwards key action
+                    dunGen.GameStore.previousY = dunGen.GameStore.y
                     dunGen.GameStore.playerY -= movement_speed
                     dunGen.GameStore.y += movement_speed
                     dunGen.GameStore.prediction_Y = -10
@@ -650,6 +651,9 @@ def main():
                         dunGen.GameStore.secondary_prediction_Y = -10
                 else:
                     dunGen.GameStore.prediction_Y = 0
+                    if not dunGen.GameStore.previousY == dunGen.GameStore.y:
+                        dunGen.GameStore.y -= movement_speed
+                        dunGen.GameStore.previousY = dunGen.GameStore.y
                     dunGen.GameStore.playerY = dunGen.GameStore.previousPlayerY
             else:
                 if dunGen.GameStore.left_col or \
@@ -661,6 +665,7 @@ def main():
 
                 if not dunGen.GameStore.bottom_col:
                     # backwards key action
+                    dunGen.GameStore.previousY = dunGen.GameStore.y
                     dunGen.GameStore.playerY += movement_speed
                     dunGen.GameStore.y -= movement_speed
                     dunGen.GameStore.prediction_Y = 10
@@ -669,6 +674,9 @@ def main():
                         dunGen.GameStore.secondary_prediction_Y = 10
                 else:
                     dunGen.GameStore.prediction_Y = 0
+                    if not dunGen.GameStore.previousY == dunGen.GameStore.y:
+                        dunGen.GameStore.y += movement_speed
+                        dunGen.GameStore.previousY = dunGen.GameStore.y
                     dunGen.GameStore.playerY = dunGen.GameStore.previousPlayerY
             else:
                 if dunGen.GameStore.left_col or \
@@ -680,6 +688,7 @@ def main():
 
                 if not dunGen.GameStore.left_col:
                     # left key action
+                    dunGen.GameStore.previousX = dunGen.GameStore.x
                     dunGen.GameStore.playerX -= movement_speed
                     dunGen.GameStore.x += movement_speed
                     dunGen.GameStore.prediction_X = -20
@@ -688,6 +697,9 @@ def main():
                         dunGen.GameStore.secondary_prediction_X = -20
                 else:
                     dunGen.GameStore.prediction_X = 0
+                    if not dunGen.GameStore.previousX == dunGen.GameStore.x:
+                        dunGen.GameStore.x -= movement_speed
+                        dunGen.GameStore.previousX = dunGen.GameStore.x
                     dunGen.GameStore.playerX = dunGen.GameStore.previousPlayerX
             else:
                 if dunGen.GameStore.bottom_col or \
@@ -698,6 +710,7 @@ def main():
                     not library.KEY_PRESSED["left"]:
                 if not dunGen.GameStore.right_col:
                     # right key action
+                    dunGen.GameStore.previousX = dunGen.GameStore.x
                     dunGen.GameStore.playerX += movement_speed
                     dunGen.GameStore.x -= movement_speed
                     dunGen.GameStore.prediction_X = 15
@@ -706,6 +719,9 @@ def main():
                         dunGen.GameStore.secondary_prediction_X = 15
                 else:
                     dunGen.GameStore.prediction_X = 0
+                    if not dunGen.GameStore.previousX == dunGen.GameStore.x:
+                        dunGen.GameStore.x += movement_speed
+                        dunGen.GameStore.previousX = dunGen.GameStore.x
                     dunGen.GameStore.playerX = dunGen.GameStore.previousPlayerX
             else:
                 if dunGen.GameStore.bottom_col or \
@@ -721,8 +737,10 @@ def main():
             # update the avatars animation time
             player.update_time(delta_time)
 
-        else:
+        elif library.PAUSED:
             display_pause_menu = True
+
+        library.RESET = False
 
         # wait for the frame to end
         fps_clock.tick(FPS)
