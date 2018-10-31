@@ -514,6 +514,7 @@ def main():
             player.update_time(delta_time)
             ghost_animations.update_time(delta_time)
             fuel_meter.update_fuel_timer(delta_time)
+
                 
         else:
             display_pause_menu = True
@@ -571,8 +572,10 @@ def main():
 
             screen.blit(ghost_animations.get_current_sprite(), (ghost_pos_x, ghost_pos_y))
 
-            WIPLight.check()
-            WIPLight.draw_light(screen)
+            WIPLight.update_light(fuel_meter.get_fuel_percentage())
+            WIPLight.initialise_lightning(dungeonGenerator.TILE_SIZE)
+            WIPLight.draw_light(screen, dungeonGenerator)
+            WIPLight.overlay(screen)
 
 
 

@@ -148,8 +148,8 @@ def get_coordiantes_from_position(x_position, y_position):
     :return:                (X coords, Y Coords)
     """
 
-    x_coords = x_position / TILE_SIZE
-    y_coords = y_position / TILE_SIZE
+    x_coords = x_position / TILE_SIZE + 0.5
+    y_coords = y_position / TILE_SIZE + 0.85
 
     return int(x_coords), int(y_coords)
 
