@@ -27,6 +27,8 @@ class GameStore:
     playerY = 0
     previousPlayerX = 0
     previousPlayerY = 0
+    previousX = 0
+    previousY = 0
     offsetX = 0
     offsetY = 0
     x = 0
@@ -41,6 +43,7 @@ class GameStore:
     bottom_col = False
     left_col = False
     right_col = False
+    collisions = [top_col, bottom_col, left_col, right_col]
     start_x = 0
     start_y = 0
     levelCount = 2
@@ -54,6 +57,7 @@ class GameStore:
     prediction_Y = 0
     secondary_prediction_X = 0
     secondary_prediction_Y = 0
+    set_position = True
 
 
 for num in range(GameStore.levelCount):

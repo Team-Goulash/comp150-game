@@ -637,49 +637,80 @@ def main():
 
         if not library.PAUSED:
             # Key press actions
-            if library.KEY_PRESSED["forwards"] and not library.KEY_PRESSED["backwards"]:
+            if library.KEY_PRESSED["forwards"] and \
+                    not library.KEY_PRESSED["backwards"]:
+
                 if not dunGen.GameStore.top_col:
                     # forwards key action
                     dunGen.GameStore.playerY -= movement_speed
                     dunGen.GameStore.y += movement_speed
                     dunGen.GameStore.prediction_Y = -10
-                    dunGen.GameStore.secondary_prediction_Y = -10
+                    if not dunGen.GameStore.left_col and \
+                            not dunGen.GameStore.right_col:
+                        dunGen.GameStore.secondary_prediction_Y = -10
                 else:
                     dunGen.GameStore.prediction_Y = 0
                     dunGen.GameStore.playerY = dunGen.GameStore.previousPlayerY
+            else:
+                if dunGen.GameStore.left_col or \
+                        dunGen.GameStore.right_col:
+                    dunGen.GameStore.top_col = False
 
-            if library.KEY_PRESSED["backwards"] and not library.KEY_PRESSED["forwards"]:
+            if library.KEY_PRESSED["backwards"] and \
+                    not library.KEY_PRESSED["forwards"]:
+
                 if not dunGen.GameStore.bottom_col:
                     # backwards key action
                     dunGen.GameStore.playerY += movement_speed
                     dunGen.GameStore.y -= movement_speed
                     dunGen.GameStore.prediction_Y = 10
-                    dunGen.GameStore.secondary_prediction_Y = 10
+                    if not dunGen.GameStore.left_col and \
+                            not dunGen.GameStore.right_col:
+                        dunGen.GameStore.secondary_prediction_Y = 10
                 else:
                     dunGen.GameStore.prediction_Y = 0
                     dunGen.GameStore.playerY = dunGen.GameStore.previousPlayerY
+            else:
+                if dunGen.GameStore.left_col or \
+                        dunGen.GameStore.right_col:
+                    dunGen.GameStore.bottom_col = False
 
-            if library.KEY_PRESSED["left"] and not library.KEY_PRESSED["right"]:
+            if library.KEY_PRESSED["left"] and \
+                    not library.KEY_PRESSED["right"]:
+
                 if not dunGen.GameStore.left_col:
                     # left key action
                     dunGen.GameStore.playerX -= movement_speed
                     dunGen.GameStore.x += movement_speed
                     dunGen.GameStore.prediction_X = -20
-                    dunGen.GameStore.secondary_prediction_X = -20
+                    if not dunGen.GameStore.bottom_col and \
+                            not dunGen.GameStore.top_col:
+                        dunGen.GameStore.secondary_prediction_X = -20
                 else:
                     dunGen.GameStore.prediction_X = 0
                     dunGen.GameStore.playerX = dunGen.GameStore.previousPlayerX
+            else:
+                if dunGen.GameStore.bottom_col or \
+                         dunGen.GameStore.top_col:
+                    dunGen.GameStore.left_col = False
 
-            if library.KEY_PRESSED["right"] and not library.KEY_PRESSED["left"]:
+            if library.KEY_PRESSED["right"] and \
+                    not library.KEY_PRESSED["left"]:
                 if not dunGen.GameStore.right_col:
                     # right key action
                     dunGen.GameStore.playerX += movement_speed
                     dunGen.GameStore.x -= movement_speed
                     dunGen.GameStore.prediction_X = 15
-                    dunGen.GameStore.secondary_prediction_X = 15
+                    if not dunGen.GameStore.bottom_col and \
+                            not dunGen.GameStore.top_col:
+                        dunGen.GameStore.secondary_prediction_X = 15
                 else:
                     dunGen.GameStore.prediction_X = 0
                     dunGen.GameStore.playerX = dunGen.GameStore.previousPlayerX
+            else:
+                if dunGen.GameStore.bottom_col or \
+                        dunGen.GameStore.top_col:
+                    dunGen.GameStore.right_col = False
 
             # switch between active and idle
             if not player_idle:
@@ -687,8 +718,6 @@ def main():
             else:
                 player = player_idle_animation[current_direction]
 
-            dunGen.GameStore.previousPlayerY = dunGen.GameStore.playerY
-            dunGen.GameStore.previousPlayerX = dunGen.GameStore.playerX
             # update the avatars animation time
             player.update_time(delta_time)
 
@@ -724,7 +753,6 @@ def main():
 
             colDetect.detect_collision()
 
-            # colDetect.detect_collision(player_x_pos, player_y_pos)
             # draw the player
             screen.blit(pygame.transform.scale(player.get_current_sprite(),
                         (int(dunGen.TILE_SIZE * 0.9),
