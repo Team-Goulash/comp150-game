@@ -35,20 +35,28 @@ class Tiles:
     doorImg = pygame.transform.scale(
         pygame.image.load("Well Escape tiles/DoorTile.png"),
         (scaleNum, scaleNum))
-
     exitDoorImg = pygame.transform.scale(
         pygame.image.load("Well Escape tiles/ExitDoorTile.png"),
         (scaleNum, scaleNum))
-
     interactive = [doorImg, exitDoorImg]
+
+    chestClosedImg = pygame.transform.scale(
+        pygame.image.load("Well Escape tiles/Chest/cheast_closed_000.png"),
+        (scaleNum, scaleNum))
+    chestOpenImg = pygame.transform.scale(
+        pygame.image.load("Well Escape tiles/Chest/cheast_open_000.png"),
+        (scaleNum, scaleNum))
+    chests = [chestClosedImg, chestOpenImg]
 
     # set materials
     FLOOR = 0
     WALL = 1
     DOOR = 2
+    CHEST = 3
 
     # set colors to materials
-    tileTypes = {FLOOR: floorImages, WALL: wallImages, DOOR: interactive}
+    tileTypes = {FLOOR: floorImages, WALL: wallImages, DOOR: interactive,
+                 CHEST: chests}
 
     @staticmethod
     def mud(texture):

@@ -2,6 +2,7 @@
 import pygame
 import random
 import tileGenerator
+import main
 from random import choices
 
 tile_class = tileGenerator.Tiles()
@@ -38,6 +39,7 @@ class GameStore:
     mud_variations = 15
     moss_variations = 15
     pixel_map = pygame.Surface
+    chest_map = pygame.Surface
     MAP_WIDTH = 0
     MAP_HEIGHT = 0
     top_col = False
@@ -49,6 +51,7 @@ class GameStore:
     start_y = 0
     levelCount = 2
     levels = []
+    chests = []
     starting_point_x = []
     starting_point_y = []
     current_tile = 0
@@ -82,6 +85,31 @@ def create_dungeon():
 
         # create the room
         initialize_level(i)
+        gen_chest_map()
+
+
+def gen_chest_map():
+    map_width = GameStore.chest_map.get_width()
+    map_height = GameStore.chest_map.get_height()
+    for y in range(map_height):
+        for x in range(map_width):
+            pixel = GameStore.chest_map.get_at((x, y))
+            pixel_tone = (pixel.r + pixel.g + pixel.b) / 3  # pixel brightness
+            if 0 < pixel_tone < 255:
+                chest = [x * TILE_SIZE, y * TILE_SIZE]
+                GameStore.chests.append(chest)
+    print(GameStore.chests)
+    return GameStore.chests
+
+
+def draw_chest():
+    for chest in range(len(GameStore.chests)):
+        current_chest = GameStore.chests[chest]
+        x_pos = GameStore.x + current_chest[0] - GameStore.offsetX
+        y_pos = GameStore.y + current_chest[1] - GameStore.offsetY
+        main.screen.blit(tile_class.tileTypes[3][0], (x_pos,
+                                                      y_pos,
+                                                      TILE_SIZE, TILE_SIZE))
 
 
 def gen_rand_map_tiles(instance):
@@ -92,9 +120,13 @@ def gen_rand_map_tiles(instance):
     """
     # choose a random pixel map and generate a surface for the tiles
     if instance == 0:
-        GameStore.pixel_map = get_dungeon_room(True)
+        dungeon_room = get_dungeon_room(True)
+        GameStore.pixel_map = dungeon_room[0]
+        GameStore.chest_map = dungeon_room[1]
     else:
-        GameStore.pixel_map = get_dungeon_room(False)
+        dungeon_room = get_dungeon_room(False)
+        GameStore.pixel_map = dungeon_room[0]
+        GameStore.chest_map = dungeon_room[1]
     GameStore.MAP_WIDTH = GameStore.pixel_map.get_width()
     GameStore.MAP_HEIGHT = GameStore.pixel_map.get_height()
 
@@ -216,6 +248,11 @@ def initialize_level(surface_id):
                     tile_class, tiles[column][row],
                     tileTypes[column][row], tileMats[column][row])
 
+            elif tiles[column][row] == 3:
+                material = assign_material(
+                    tile_class, tiles[column][row],
+                    tileTypes[column][row], tileMats[column][row])
+
             allTiles.append(tiles[column][row])
             allTileMaterials.append(tileTypes[column][row])
             allTilePositions.append([x_pos +
@@ -275,16 +312,28 @@ def get_dungeon_room(first):
     """
     # load up the pixel maps
     pixel_map = "pixelLevels/"
+    chest_map = "pixelLevels/chestMaps/"
     small_room = pygame.image.load(pixel_map + "smallRoom_000.png")
+    small_room_chest = pygame.image.load(chest_map + "smallRoom_000.png")
+
     hallway = pygame.image.load(pixel_map + "hall_000.png")
+    hallway_chest = pygame.image.load(chest_map + "hall_000.png")
+
     mid_room = pygame.image.load(pixel_map + "MidRoom_000.png")
+    mid_room_chest = pygame.image.load(chest_map + "MidRoom_000.png")
+
+    chests = [hallway_chest, small_room_chest, mid_room_chest]
     rooms = [hallway, small_room, mid_room]
+    indexes = [0, 1, 2]
     room_weights = [0.5, 0.75, 0.25]
     if first:
         # load up and choose the starting room pixel map
         current_module = pygame.image.load(pixel_map + "start.png")
+        current_chest = pygame.image.load(chest_map + "start.png")
     else:
         # choose a random pixel map
-        current_module = random.choices(rooms, room_weights)[0]
+        current_index = random.choices(indexes, room_weights)[0]
+        current_module = rooms[current_index]
+        current_chest = chests[current_index]
 
-    return current_module
+    return current_module, current_chest

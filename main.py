@@ -639,9 +639,9 @@ def main():
             # Key press actions
             if library.KEY_PRESSED["forwards"] and \
                     not library.KEY_PRESSED["backwards"]:
-
+                dunGen.GameStore.bottom_col = False
                 if not dunGen.GameStore.top_col:
-                    # forwards key action
+                    # move the player and assign prediction values
                     dunGen.GameStore.previousY = dunGen.GameStore.y
                     dunGen.GameStore.playerY -= movement_speed
                     dunGen.GameStore.y += movement_speed
@@ -650,21 +650,23 @@ def main():
                             not dunGen.GameStore.right_col:
                         dunGen.GameStore.secondary_prediction_Y = -10
                 else:
+                    # block the player movement
                     dunGen.GameStore.prediction_Y = 0
                     if not dunGen.GameStore.previousY == dunGen.GameStore.y:
                         dunGen.GameStore.y -= movement_speed
                         dunGen.GameStore.previousY = dunGen.GameStore.y
                     dunGen.GameStore.playerY = dunGen.GameStore.previousPlayerY
             else:
+                # turn off this direction's collision
                 if dunGen.GameStore.left_col or \
                         dunGen.GameStore.right_col:
                     dunGen.GameStore.top_col = False
 
             if library.KEY_PRESSED["backwards"] and \
                     not library.KEY_PRESSED["forwards"]:
-
+                dunGen.GameStore.top_col = False
                 if not dunGen.GameStore.bottom_col:
-                    # backwards key action
+                    # move the player and assign prediction values
                     dunGen.GameStore.previousY = dunGen.GameStore.y
                     dunGen.GameStore.playerY += movement_speed
                     dunGen.GameStore.y -= movement_speed
@@ -673,21 +675,23 @@ def main():
                             not dunGen.GameStore.right_col:
                         dunGen.GameStore.secondary_prediction_Y = 10
                 else:
+                    # block the player movement
                     dunGen.GameStore.prediction_Y = 0
                     if not dunGen.GameStore.previousY == dunGen.GameStore.y:
                         dunGen.GameStore.y += movement_speed
                         dunGen.GameStore.previousY = dunGen.GameStore.y
                     dunGen.GameStore.playerY = dunGen.GameStore.previousPlayerY
             else:
+                # turn off this direction's collision
                 if dunGen.GameStore.left_col or \
                         dunGen.GameStore.right_col:
                     dunGen.GameStore.bottom_col = False
 
             if library.KEY_PRESSED["left"] and \
                     not library.KEY_PRESSED["right"]:
-
+                dunGen.GameStore.right_col = False
                 if not dunGen.GameStore.left_col:
-                    # left key action
+                    # move the player and assign prediction values
                     dunGen.GameStore.previousX = dunGen.GameStore.x
                     dunGen.GameStore.playerX -= movement_speed
                     dunGen.GameStore.x += movement_speed
@@ -696,20 +700,23 @@ def main():
                             not dunGen.GameStore.top_col:
                         dunGen.GameStore.secondary_prediction_X = -20
                 else:
+                    # block the player movement
                     dunGen.GameStore.prediction_X = 0
                     if not dunGen.GameStore.previousX == dunGen.GameStore.x:
                         dunGen.GameStore.x -= movement_speed
                         dunGen.GameStore.previousX = dunGen.GameStore.x
                     dunGen.GameStore.playerX = dunGen.GameStore.previousPlayerX
             else:
+                # turn off this direction's collision
                 if dunGen.GameStore.bottom_col or \
                          dunGen.GameStore.top_col:
                     dunGen.GameStore.left_col = False
 
             if library.KEY_PRESSED["right"] and \
                     not library.KEY_PRESSED["left"]:
+                dunGen.GameStore.left_col = False
                 if not dunGen.GameStore.right_col:
-                    # right key action
+                    # move the player and assign prediction values
                     dunGen.GameStore.previousX = dunGen.GameStore.x
                     dunGen.GameStore.playerX += movement_speed
                     dunGen.GameStore.x -= movement_speed
@@ -718,14 +725,16 @@ def main():
                             not dunGen.GameStore.top_col:
                         dunGen.GameStore.secondary_prediction_X = 15
                 else:
+                    # block the player movement
                     dunGen.GameStore.prediction_X = 0
                     if not dunGen.GameStore.previousX == dunGen.GameStore.x:
                         dunGen.GameStore.x += movement_speed
                         dunGen.GameStore.previousX = dunGen.GameStore.x
                     dunGen.GameStore.playerX = dunGen.GameStore.previousPlayerX
             else:
+                # turn off this direction's collision
                 if dunGen.GameStore.bottom_col or \
-                        dunGen.GameStore.top_col:
+                         dunGen.GameStore.top_col:
                     dunGen.GameStore.right_col = False
 
             # switch between active and idle
@@ -770,7 +779,7 @@ def main():
                 dunGen.GameStore.offsetY
 
             colDetect.detect_collision()
-
+            dunGen.draw_chest()
             # draw the player
             screen.blit(pygame.transform.scale(player.get_current_sprite(),
                         (int(dunGen.TILE_SIZE * 0.9),
