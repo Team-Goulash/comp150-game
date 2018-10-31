@@ -43,7 +43,7 @@ class GameStore:
     right_col = False
     start_x = 0
     start_y = 0
-    levelCount = 5
+    levelCount = 2
     levels = []
     starting_point_x = []
     starting_point_y = []
