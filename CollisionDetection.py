@@ -106,9 +106,9 @@ def detect_collision():
                 if library.KEY_PRESSED["space"]:
                     return
 
-        pygame.draw.rect(main.screen, Color("red"), current_tile_rect3, 3)
-        pygame.draw.rect(main.screen, Color("orange"), current_tile_rect2, 3)
-        pygame.draw.rect(main.screen, Color("green"), current_tile_rect, 3)
+        # pygame.draw.rect(main.screen, Color("red"), current_tile_rect3, 3)
+        # pygame.draw.rect(main.screen, Color("orange"), current_tile_rect2, 3)
+        # pygame.draw.rect(main.screen, Color("green"), current_tile_rect, 3)
 
     # if the secondary predicted tile is a wall tile
     if current_tile_type3 == 1:

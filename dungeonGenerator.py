@@ -85,7 +85,6 @@ def create_dungeon():
 
         # create the room
         initialize_level(i)
-        gen_chest_map()
 
 
 def gen_chest_map():
