@@ -91,9 +91,11 @@ def create_dungeon():
 
         # create the room
         initialize_level(i)
-    print("starting_points", GameStore.starting_point_x, GameStore.starting_point_y)
+
     main.aiAnimationPaths.apply_position_offset_to_room_path(GameStore.starting_point_x, GameStore.starting_point_y)
-    main.aiAnimationPaths.print_data()
+    # todo remove commented code below once we are all happy thats it working correctly.
+    # print("starting_points", GameStore.starting_point_x, GameStore.starting_point_y)
+    # main.aiAnimationPaths.print_data()
 
 
 
