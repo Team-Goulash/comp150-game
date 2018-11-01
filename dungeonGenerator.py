@@ -140,7 +140,7 @@ def get_positon_by_tile_coordinates(x_cord, y_cord):
 
     return x_pos, y_pos
 
-def get_coordiantes_from_position(x_position, y_position):
+def get_coordiantes_from_position(x_position, y_position, offset=(0, 0)):
     """
     Driver: ashley
     :param x_position:      x position to get coords for
@@ -148,8 +148,8 @@ def get_coordiantes_from_position(x_position, y_position):
     :return:                (X coords, Y Coords)
     """
 
-    x_coords = x_position / TILE_SIZE + 0.5
-    y_coords = y_position / TILE_SIZE + 0.85
+    x_coords = x_position / TILE_SIZE + offset[0]
+    y_coords = y_position / TILE_SIZE + offset[1]
 
     return int(x_coords), int(y_coords)
 
