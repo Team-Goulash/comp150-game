@@ -6,6 +6,7 @@ import random
 import UI
 import os
 import shutil
+import math
 from fuelMeter import *
 from pygame.locals import *
 from animator import Animator
@@ -516,10 +517,14 @@ def start():
 
     if dunGen.GameStore.well_room:
         # find a random floor tile and get it's position coordinates
-        dunGen.GameStore.playerSpawnPoint = dunGen.floorTiles[
-            random.randint(0, len(dunGen.floorTiles)-1)]
+        spawn_x = (math.ceil(len(dunGen.floorTilesX) * 0.5)
+                   + random.randint(-2, 2)) * dunGen.TILE_SIZE
+        spawn_y = (math.ceil(len(dunGen.floorTilesY) * 0.5)
+                   + random.randint(-1, 1)) * dunGen.TILE_SIZE
+        dunGen.GameStore.playerSpawnPoint = [spawn_x, spawn_y]
         dunGen.GameStore.well_room = False
     else:
+        print(dunGen.GameStore.well_room)
         door_pos = dunGen.allTilePositions[dunGen.allTiles.index(2)]
         dunGen.GameStore.playerSpawnPoint = [door_pos[0], door_pos[1]
                                              + (dunGen.TILE_SIZE * 0.5)]
@@ -675,11 +680,6 @@ def main():
                             dunGen.GameStore.y -= movement_speed
                             dunGen.GameStore.previousY = dunGen.GameStore.y
                         dunGen.GameStore.playerY = dunGen.GameStore.previousPlayerY
-                else:
-                    # turn off this direction's collision
-                    if dunGen.GameStore.left_col or \
-                            dunGen.GameStore.right_col:
-                        dunGen.GameStore.top_col = False
 
                 if library.KEY_PRESSED["backwards"] and \
                         not library.KEY_PRESSED["forwards"]:
@@ -706,11 +706,6 @@ def main():
                             dunGen.GameStore.y += movement_speed
                             dunGen.GameStore.previousY = dunGen.GameStore.y
                         dunGen.GameStore.playerY = dunGen.GameStore.previousPlayerY
-                else:
-                    # turn off this direction's collision
-                    if dunGen.GameStore.left_col or \
-                            dunGen.GameStore.right_col:
-                        dunGen.GameStore.bottom_col = False
 
                 if library.KEY_PRESSED["left"] and \
                         not library.KEY_PRESSED["right"]:
@@ -737,11 +732,6 @@ def main():
                             dunGen.GameStore.x -= movement_speed
                             dunGen.GameStore.previousX = dunGen.GameStore.x
                         dunGen.GameStore.playerX = dunGen.GameStore.previousPlayerX
-                else:
-                    # turn off this direction's collision
-                    if dunGen.GameStore.bottom_col or \
-                             dunGen.GameStore.top_col:
-                        dunGen.GameStore.left_col = False
 
                 if library.KEY_PRESSED["right"] and \
                         not library.KEY_PRESSED["left"]:
@@ -768,11 +758,6 @@ def main():
                             dunGen.GameStore.x += movement_speed
                             dunGen.GameStore.previousX = dunGen.GameStore.x
                         dunGen.GameStore.playerX = dunGen.GameStore.previousPlayerX
-                else:
-                    # turn off this direction's collision
-                    if dunGen.GameStore.bottom_col or \
-                             dunGen.GameStore.top_col:
-                        dunGen.GameStore.right_col = False
 
                 # switch between active and idle
                 if not player_idle:
@@ -815,7 +800,8 @@ def main():
                 player_y_pos = dunGen.GameStore.y + dunGen.GameStore.playerY - \
                     dunGen.GameStore.offsetY
 
-                colDetect.draw_collision()
+                # colDetect.draw_collision()
+                dunGen.draw_chest()
 
                 # draw the player
                 screen.blit(pygame.transform.scale(player.get_current_sprite(),

@@ -162,7 +162,8 @@ def detect_collision():
 
         # block the movement in corresponding directions
         # depending on the current and predicted tiles' types
-        if TileStore.current_tile_type == 1:
+        if TileStore.current_tile_type == 1 and \
+                not TileStore.current_tile_type3 == 0:
             if TileStore.previous_inputs[0]:
                 dunGen.GameStore.top_col = True
             if TileStore.previous_inputs[1]:

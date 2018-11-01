@@ -11,7 +11,8 @@ tile_class = tileGenerator.Tiles()
 tiles = []
 tileTypes = []
 tileMats = []
-floorTiles = []
+floorTilesX = []
+floorTilesY = []
 wallTiles = []
 doorTiles = []
 
@@ -50,7 +51,7 @@ class GameStore:
     collisions = [top_col, bottom_col, left_col, right_col]
     start_x = 0
     start_y = 0
-    levelCount = 1
+    levelCount = 3
     levels = []
     chests = []
     starting_point_x = []
@@ -77,7 +78,8 @@ for num in range(GameStore.levelCount):
 
 def reset():
     """reset all the tile variables and create a new dungeon."""
-    floorTiles.clear()
+    floorTilesX.clear()
+    floorTilesY.clear()
     wallTiles.clear()
     doorTiles.clear()
     allTilePositions.clear()
@@ -104,9 +106,11 @@ def create_dungeon():
 
         # create the room
         initialize_level(i)
+        gen_chest_map(i)
+    main.start()
 
 
-def gen_chest_map():
+def gen_chest_map(level_id):
     map_width = GameStore.chest_map.get_width()
     map_height = GameStore.chest_map.get_height()
     for y in range(map_height):
@@ -114,7 +118,9 @@ def gen_chest_map():
             pixel = GameStore.chest_map.get_at((x, y))
             pixel_tone = (pixel.r + pixel.g + pixel.b) / 3  # pixel brightness
             if 0 < pixel_tone < 255:
-                chest = [x * TILE_SIZE, y * TILE_SIZE]
+                pos_x = x * TILE_SIZE + GameStore.starting_point_x[level_id]
+                pos_y = y * TILE_SIZE + GameStore.starting_point_y[level_id]
+                chest = [pos_x, pos_y]
                 GameStore.chests.append(chest)
     print(GameStore.chests)
     return GameStore.chests
@@ -248,10 +254,16 @@ def initialize_level(surface_id):
             material = pygame.Surface
             if tiles[column][row] == 0:
                 if surface_id == 0:
-                    floorTiles.append([x_pos +
-                                       GameStore.starting_point_x[surface_id],
-                                       y_pos +
-                                       GameStore.starting_point_y[surface_id]])
+                    if column == 1:
+                        floorTilesX.append([x_pos +
+                                           GameStore.starting_point_x[surface_id],
+                                           y_pos +
+                                           GameStore.starting_point_y[surface_id]])
+                    if row == 1:
+                        floorTilesY.append([x_pos +
+                                           GameStore.starting_point_x[surface_id],
+                                           y_pos +
+                                           GameStore.starting_point_y[surface_id]])
 
                 material = assign_material(tile_class, tiles[column][row],
                                            tileTypes[column][row],
@@ -282,6 +294,7 @@ def initialize_level(surface_id):
                     tile_class, tiles[column][row],
                     tileTypes[column][row], tileMats[column][row])
 
+            # todo make the allTiles list a 2d array (append only the columns)
             allTiles.append(tiles[column][row])
             allTileMaterials.append(tileTypes[column][row])
             allTilePositions.append([x_pos +
@@ -290,8 +303,6 @@ def initialize_level(surface_id):
                                     GameStore.starting_point_y[surface_id]])
             GameStore.levels[surface_id].blit(material, (x_pos, y_pos,
                                                          TILE_SIZE, TILE_SIZE))
-
-    main.start()
 
 
 def assign_material(self, image_id, type_id, material_id):
