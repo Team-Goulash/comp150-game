@@ -7,7 +7,7 @@ import library
 from animator import Animator
 import random
 import loadSave
-from dungeonGenerator import get_position_with_offset
+import dungeonGenerator # import get_position_with_offset
 
 class AiAnimation:
 
@@ -216,7 +216,7 @@ class AiAnimation:
                 animation_percentage
             )
 
-            surface.blit(animation[0].get_current_sprite(), get_position_with_offset(current_position[0], current_position[1]))
+            surface.blit(animation[0].get_current_sprite(), dungeonGenerator.get_position_with_offset(current_position[0], current_position[1]))
 
             animation[6] = current_position
 
@@ -241,7 +241,7 @@ class AiAnimation:
         for animation in self.ghost_sprite_animations:
 
             # get the bounds of the ghost
-            ghost_top_left = get_position_with_offset(animation[6][0], animation[6][1])
+            ghost_top_left = dungeonGenerator.get_position_with_offset(animation[6][0], animation[6][1])
             ghost_bottom_right = (ghost_top_left[0] + library.scaleNum), (ghost_top_left[1] + library.scaleNum)
 
             # todo remove temp shiz!!
