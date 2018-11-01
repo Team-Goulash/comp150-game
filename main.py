@@ -800,7 +800,7 @@ def main():
                          int(dunGen.TILE_SIZE * 0.9))),
                         (player_x_pos, player_y_pos))
 
-            fuel_meter.display_fuel_meter(screen, (0, 0))
+
 
             # todo: move to its own function
             ghost_start_position = dunGen.get_positon_by_tile_coordinates(3, 3)
@@ -827,6 +827,8 @@ def main():
             playerLight.initialise_lightning(dunGen.TILE_SIZE)
             playerLight.draw_light(screen, dunGen)
             playerLight.overlay(screen)
+
+            fuel_meter.display_fuel_meter(screen, (0, 0))
 
 
 
