@@ -19,9 +19,9 @@ class Torch: # Change name later
 
     def display_fuel_meter(self, surface, position):
         surface.blit(self.bar_holder, position)
-        bar_width, bar_height = self.fuel_bar.get_size()
-        temp_bar = pygame.transform.scale(self.fuel_bar, (int(bar_width * self.get_fuel_percentage()), bar_height))
-        surface.blit(temp_bar, position)
+        # todo bar_width, bar_height = self.fuel_bar.get_size()
+        # todo temp_bar = pygame.transform.scale(self.fuel_bar, (int(bar_width * self.get_fuel_percentage()), bar_height))
+        # todo surface.blit(temp_bar, position)
 
     def get_fuel_percentage(self):
         return self.torch_time / self.MAX_TORCH_TIME

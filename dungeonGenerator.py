@@ -3,6 +3,7 @@ import pygame
 import random
 import tileGenerator
 import main
+import library
 from random import choices
 
 tile_class = tileGenerator.Tiles()
@@ -49,7 +50,7 @@ class GameStore:
     collisions = [top_col, bottom_col, left_col, right_col]
     start_x = 0
     start_y = 0
-    levelCount = 2
+    levelCount = 1
     levels = []
     chests = []
     starting_point_x = []
@@ -74,8 +75,22 @@ for num in range(GameStore.levelCount):
     GameStore.starting_point_y.append(0)
 
 
+def reset():
+    """reset all the tile variables and create a new dungeon."""
+    floorTiles.clear()
+    wallTiles.clear()
+    doorTiles.clear()
+    allTilePositions.clear()
+    allTiles.clear()
+    allTileMaterials.clear()
+    GameStore.current_tile = 0
+    create_dungeon()
+
+
 def create_dungeon():
     """Generate the dungeon."""
+    # reset all lists
+    library.RESET = True
     for i in range(len(GameStore.levels)):
         if i > 0:
             # set the starting point for the next room
@@ -123,7 +138,7 @@ def gen_rand_map_tiles(instance):
     """
     # choose a random pixel map and generate a surface for the tiles
     if instance == 0:
-        dungeon_room = get_dungeon_room(True)
+        dungeon_room = get_dungeon_room(GameStore.well_room)
         GameStore.pixel_map = dungeon_room[0]
         GameStore.chest_map = dungeon_room[1]
     else:
@@ -133,11 +148,6 @@ def gen_rand_map_tiles(instance):
     GameStore.MAP_WIDTH = GameStore.pixel_map.get_width()
     GameStore.MAP_HEIGHT = GameStore.pixel_map.get_height()
 
-    # reset all lists
-    tiles.clear()
-    tileTypes.clear()
-    tileMats.clear()
-
     # set variables for random material variation
     material_types = [0, 1, 2]
     material_weights = [0.9, 0.6, 0.3]
@@ -146,12 +156,13 @@ def gen_rand_map_tiles(instance):
     floor = random.randrange(len(tile_class.tileTypes[0]))
     wall = random.randrange(len(tile_class.tileTypes[1]))
 
-    '''
-    Scroll through each pixel in a map and assign according tiles depending
-     on the pixel brightness.
+    tiles.clear()
+    tileTypes.clear()
+    tileMats.clear()
 
-    Assign a randomly chosen material type value to each tile.
-    '''
+    # Scroll through each pixel in a map and assign according tiles depending
+    # on the pixel brightness.
+    # Assign a randomly chosen material type value to each tile.
     for y in range(GameStore.MAP_HEIGHT):
         tile_row = []
         type_row = []
@@ -279,6 +290,8 @@ def initialize_level(surface_id):
                                     GameStore.starting_point_y[surface_id]])
             GameStore.levels[surface_id].blit(material, (x_pos, y_pos,
                                                          TILE_SIZE, TILE_SIZE))
+
+    main.start()
 
 
 def assign_material(self, image_id, type_id, material_id):
