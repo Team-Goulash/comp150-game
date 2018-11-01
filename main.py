@@ -780,10 +780,6 @@ def main():
             ghost_animations.update_time(delta_time)
             fuel_meter.update_fuel_timer(delta_time)
 
-                
-        else:
-            display_pause_menu = True
-
             # Display main menu if the game has not started
             if not library.HAS_STARTED:
                 main_menu()
@@ -818,24 +814,6 @@ def main():
                             (player_x_pos, player_y_pos))
 
                 fuel_meter.display_fuel_meter(screen, (0, 0))
-
-
-
-            # todo: move to its own function
-            ghost_start_position = dunGen.get_positon_by_tile_coordinates(3, 3)
-            ghost_end_position = dunGen.get_positon_by_tile_coordinates(6, 3)
-
-                elif dunGen.GameStore.temp_lerp_timer > 0 and dunGen.GameStore.temp_rev_lerp:
-                    dunGen.GameStore.temp_lerp_timer -= delta_time
-                    if dunGen.GameStore.temp_lerp_timer <= 0:
-                        dunGen.GameStore.temp_rev_lerp = False
-                        dunGen.GameStore.temp_lerp_timer = 0
-
-
-                ghost_pos_x, ghost_pos_y = library.lerp_vector2(ghost_start_position, ghost_end_position, (dunGen.GameStore.temp_lerp_timer / 3))
-
-                screen.blit(ghost_animations.get_current_sprite(), (ghost_pos_x, ghost_pos_y))
-
 
             playerLight.update_light(fuel_meter.get_fuel_percentage())
             playerLight.initialise_lightning(dunGen.TILE_SIZE)
