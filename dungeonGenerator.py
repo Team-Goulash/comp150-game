@@ -51,7 +51,7 @@ class GameStore:
     collisions = [top_col, bottom_col, left_col, right_col]
     start_x = 0
     start_y = 0
-    levelCount = 4
+    levelCount = 10
     levels = []
     chests = []
     starting_point_x = []

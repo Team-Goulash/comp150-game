@@ -40,6 +40,7 @@ class AiAnimation:
 
             if start_position is not None:
                 path.append(start_position)
+                print("start pos", start_position, "(", room_image_src)
                 next_move = start_position
                 block_direction = None
 
@@ -69,7 +70,6 @@ class AiAnimation:
                 # print(self.ghost_paths[r][p])
                 pass
 
-
     def get_start_point(self, image, last_x, last_y):
 
         img_width, img_height = image.get_size()
@@ -78,7 +78,7 @@ class AiAnimation:
             for y in range(img_height):
                 if x < last_x or x == last_x and y <= last_y:
                     continue
-                if image.get_at((x, y))[0] == 70:
+                if self.get_color_channel(image, x, y) == 70:
                     return x, y
 
         return None
@@ -106,7 +106,7 @@ class AiAnimation:
     def get_color_channel(self, image, x, y):
         """returns the first color channel (red) gets set to 0 is there is no alpha"""
         color = image.get_at((x, y))
-        if color[3] < 255:
+        if color[3] < 75:
             return 0
         else:
             return color[0]
