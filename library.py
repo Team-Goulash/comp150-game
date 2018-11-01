@@ -13,7 +13,8 @@ FORWARDS = 2
 BACKWARDS = 3
 
 # boolean values for key pressed states
-KEY_PRESSED = {"left": False, "right": False, "forwards": False, "backwards": False, "mouse": False}
+KEY_PRESSED = {"left": False, "right": False, "forwards": False,
+               "backwards": False, "mouse": False, "space": False}
 PAUSED = False
 MAIN_MENU = False
 OPTIONS = False
@@ -24,6 +25,7 @@ SETTINGS = False
 MAIN_MENU_CONTROLS = False
 HAS_STARTED = False
 EDITOR = False
+RESET = False
 
 
 # set Colors (r, g, b, a)
@@ -101,3 +103,9 @@ def lerp_vector2(start_position, end_position, percentage):
 
     return pos_x, pos_y
 
+def abs(value):
+    """force number to positive"""
+    if value < 0:
+        return -value
+    else:
+        return value

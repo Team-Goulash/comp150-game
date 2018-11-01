@@ -1,14 +1,19 @@
-# DON'T FORGET TO COMMENT YOUR CODE PLEASE!!!
-import pygame, sys, library, random, UI, os, shutil
+"""MAIN CODEBASE."""
+import pygame
+import sys
+import library
+import random
+import UI
+import os
+import shutil
+import playerLight
 from fuelMeter import *
 from pygame.locals import *
-# import the Animator class
 from animator import Animator
-# import the tile editor as editor
 
-import tileEditor as Editor
-import dungeonGenerator
+import dungeonGenerator as dunGen
 import colorBlindFilter
+import CollisionDetection as colDetect
 
 
 # initialize pygame
@@ -20,7 +25,10 @@ WINDOW_WIDTH = 1334
 # create the window
 screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
 
-dunGen = dungeonGenerator
+import tileEditor as Editor
+# UI Buttons
+main_menu_buttons = {"new game": None, "continue": None, "options": None,
+                     "controls": None, "quit game": None, "back": None}
 
 # UI Buttons
 game_over_buttons = {"restart": None, "exit to menu": None, "quit game": None}
@@ -48,13 +56,21 @@ main_menu_buttons["back"] = UI.UIButtons("UI/Button_000_hover.png", "UI/Button_0
 option_buttons = {"resume": None, "options": None, "controls": None, "exit": None, "back": None, "restart": None}
 option_buttons["resume"] = UI.UIButtons("UI/Button_000_hover.png", "UI/Button_000_normal.png", "UI/button_000_pressed.png",
                                         (460, 85))
-option_buttons["options"] = UI.UIButtons("UI/Button_000_hover.png", "UI/Button_000_normal.png", "UI/button_000_pressed.png",
+option_buttons["options"] = UI.UIButtons("UI/Button_000_hover.png",
+                                         "UI/Button_000_normal.png",
+                                         "UI/button_000_pressed.png",
                                          (460, 85))
-option_buttons["controls"] = UI.UIButtons("UI/Button_000_hover.png", "UI/Button_000_normal.png", "UI/button_000_pressed.png",
+option_buttons["controls"] = UI.UIButtons("UI/Button_000_hover.png",
+                                          "UI/Button_000_normal.png",
+                                          "UI/button_000_pressed.png",
                                           (460, 85))
-option_buttons["exit"] = UI.UIButtons("UI/Button_000_hover.png", "UI/Button_000_normal.png", "UI/button_000_pressed.png",
+option_buttons["exit"] = UI.UIButtons("UI/Button_000_hover.png",
+                                      "UI/Button_000_normal.png",
+                                      "UI/button_000_pressed.png",
                                       (460, 85))
-option_buttons["back"] = UI.UIButtons("UI/Button_000_hover.png", "UI/Button_000_normal.png", "UI/button_000_pressed.png",
+option_buttons["back"] = UI.UIButtons("UI/Button_000_hover.png",
+                                      "UI/Button_000_normal.png",
+                                      "UI/button_000_pressed.png",
                                       (160, 110))
 option_buttons["restart"] = UI.UIButtons("UI/Button_000_hover.png", "UI/Button_000_normal.png", "UI/button_000_pressed.png",
                                          (460, 85))
@@ -77,28 +93,41 @@ button_text_60 = pygame.font.Font("UI/AMS hand writing.ttf", 60)
 # set player animations
 player_animation = ["", "", "", ""]
 # set left animation
-player_animation[library.LEFT] = Animator("Characters/girl_sideLeft_spriteSheet.png", library.scaleNum, 3, 7, 0.75)
+player_animation[library.LEFT] = Animator("Characters/"
+                                          "girl_sideLeft_spriteSheet.png",
+                                          library.scaleNum, 3, 7, 0.75)
 # set right animation
-player_animation[library.RIGHT] = Animator("Characters/girl_sideRight_spriteSheet.png", library.scaleNum, 3, 7, 0.75)
+player_animation[library.RIGHT] = Animator("Characters/"
+                                           "girl_sideRight_spriteSheet.png",
+                                           library.scaleNum, 3, 7, 0.75)
 # set forwards animation
-player_animation[library.FORWARDS] = Animator("Characters/girl_back_spriteSheet.png", library.scaleNum, 3, 7, 0.75)
+player_animation[library.FORWARDS] = Animator("Characters/"
+                                              "girl_back_spriteSheet.png",
+                                              library.scaleNum, 3, 7, 0.75)
 # set backwards animation
-player_animation[library.BACKWARDS] = Animator("Characters/girl_front_spriteSheet.png", library.scaleNum, 3, 7, 0.75)
+player_animation[library.BACKWARDS] = Animator("Characters/"
+                                               "girl_front_spriteSheet.png",
+                                               library.scaleNum, 3, 7, 0.75)
 
 # set player idle animations
 player_idle_animation = ["", "", "", ""]
 # set left idle animation
-player_idle_animation[library.LEFT] = Animator("Characters/girl_sideLeftIdle_spriteSheet.png",
+player_idle_animation[library.LEFT] = Animator("Characters/girl_sideLeftIdle"
+                                               "_spriteSheet.png",
                                                library.scaleNum, 3, 7, 1.5)
 # set right idle animation
-player_idle_animation[library.RIGHT] = Animator("Characters/girl_sideRightIdle_spriteSheet.png",
+player_idle_animation[library.RIGHT] = Animator("Characters/girl_sideRightIdle"
+                                                "_spriteSheet.png",
                                                 library.scaleNum, 3, 7, 1.5)
 # set forwards idle animation
-player_idle_animation[library.FORWARDS] = Animator("Characters/girl_backIdle_spriteSheet.png",
+player_idle_animation[library.FORWARDS] = Animator("Characters/girl_backIdle"
+                                                   "_spriteSheet.png",
                                                    library.scaleNum, 3, 7, 1.5)
 # set backwards idle animation
-player_idle_animation[library.BACKWARDS] = Animator("Characters/girl_frontIdle_spriteSheet.png",
-                                                    library.scaleNum, 3, 7, 1.5)
+player_idle_animation[library.BACKWARDS] = Animator("Characters/girl_frontIdle"
+                                                    "_spriteSheet.png",
+                                                    library.scaleNum,
+                                                    3, 7, 1.5)
 
 ghost_animations = Animator("Well Escape Tiles/ghostTiles/ghost_0_face_3.png",
                             library.scaleNum, 3, 7, 1.5)  # list()
@@ -112,32 +141,45 @@ else:
 
 
 def event_inputs():
-    """Gets the inputs and sets the key presses."""
+    """Get the inputs and set the key presses."""
     for event in pygame.event.get():
         # event: exit game! (via window X or alt-F4)
         if event.type == QUIT:
             exit_game()
         # change the key pressed state
         elif event.type == KEYDOWN or event.type == KEYUP:
-            if event.key == library.MOVE["left"]:                # set left key pressed (A)
+
+            # set left key pressed (A)
+            if event.key == library.MOVE["left"]:
                 library.KEY_PRESSED["left"] = event.type == KEYDOWN
-            elif event.key == library.MOVE["right"]:             # set right key pressed (D)
+
+                # set right key pressed (D)
+            elif event.key == library.MOVE["right"]:
                 library.KEY_PRESSED["right"] = event.type == KEYDOWN
-            elif event.key == library.MOVE["forwards"]:          # set forwards key pressed (W)
+
+                # set forwards key pressed (W)
+            elif event.key == library.MOVE["forwards"]:
                 library.KEY_PRESSED["forwards"] = event.type == KEYDOWN
-            elif event.key == library.MOVE["backwards"]:         # set backwards key pressed (S)
+
+                # set backwards key pressed (S)
+            elif event.key == library.MOVE["backwards"]:
                 library.KEY_PRESSED["backwards"] = event.type == KEYDOWN
+
             elif event.key == K_p:
                 colorBlindFilter.color_blind_filter()
                 colorBlindFilter.loop_image()
                 print("taking color blind screenshot")
+            elif event.key == K_SPACE:
+                library.KEY_PRESSED["space"] = event.type == KEYDOWN
 
         if event.type == KEYUP:
             if event.key == library.PAUSE and library.MAIN_MENU is False: # Pauses the game
                 library.PAUSED = not library.PAUSED
                 library.CONTROLS = False
                 library.OPTIONS = False
-        elif event.type == MOUSEBUTTONDOWN:                     # has a mouse button just been pressed?
+
+        # has a mouse button just been pressed?
+        elif event.type == MOUSEBUTTONDOWN:
             library.KEY_PRESSED["mouse"] = True
             print("This is mouse down")
 
@@ -173,9 +215,13 @@ def event_inputs():
                                                                                    library.KEY_PRESSED["mouse"]):
                 # Checks to see if you're in settings before going back to the main menu
                 library.SETTINGS = False
-            elif library.MAIN_MENU_CONTROLS is True and main_menu_buttons["back"].is_pressed(pygame.mouse.get_pos(),
-                                                                        (51, 613),library.KEY_PRESSED["mouse"]):
-                # Checks to see if you're in controls before going back to the main menu
+
+            elif library.MAIN_MENU_CONTROLS is True and \
+                    main_menu_buttons["back"].\
+                    is_pressed(pygame.mouse.get_pos(),
+                               (51, 613), library.KEY_PRESSED["mouse"]):
+                # Checks to see if you're in controls
+                # before going back to the main menu
                 library.MAIN_MENU_CONTROLS = False
             if option_buttons["resume"].is_pressed(pygame.mouse.get_pos(), (460, 188), library.KEY_PRESSED["mouse"])\
                     and library.PAUSE_MENU is True:
@@ -201,13 +247,17 @@ def event_inputs():
                 print("menu test")
                 main_menu()
                 library.HAS_STARTED = False
-            elif library.CONTROLS is True and option_buttons["back"].is_pressed(pygame.mouse.get_pos(), (51, 613),
-                                                                                library.KEY_PRESSED["mouse"]):
+
+            elif library.CONTROLS is True and option_buttons["back"].\
+                    is_pressed(pygame.mouse.get_pos(), (51, 613),
+                               library.KEY_PRESSED["mouse"]):
                 #   A check to make sure you're in controls when clicking back
                 library.CONTROLS = False
-            elif library.OPTIONS is True and option_buttons["back"].is_pressed(pygame.mouse.get_pos(), (51, 613),
-                                                                               library.KEY_PRESSED["mouse"]):
-                #    this is a check to see if you're in options when clicking back
+            elif library.OPTIONS is True and option_buttons["back"].\
+                    is_pressed(pygame.mouse.get_pos(), (51, 613),
+                               library.KEY_PRESSED["mouse"]):
+                #  this is a check to see if you're in options
+                #  when clicking back
                 library.OPTIONS = False
             elif game_over_buttons["restart"].is_pressed(pygame.mouse.get_pos(), (460, 168), library.KEY_PRESSED["mouse"]
                                                          and library.GAME_OVER is True):
@@ -264,51 +314,72 @@ def main_menu():
         text_rect.center = ((WINDOW_WIDTH / 2), (WINDOW_HEIGHT / 8))
         back_surf, back_rect = library.text_objects("Back", button_text_60)
         back_rect.center = (134, 664)
-        screen.blit(main_menu_buttons["back"].draw_button(pygame.mouse.get_pos(), library.KEY_PRESSED["mouse"], (60, 640)),
-                    (51, 613))
+
+        screen.blit(main_menu_buttons["back"].
+                    draw_button(pygame.mouse.get_pos(),
+                                library.KEY_PRESSED["mouse"],
+                                (60, 640)), (51, 613))
+
         screen.blit(text_surf, text_rect)
         screen.blit(back_surf, back_rect)
         screen.blit(controls, (250, 130))
         pygame.display.flip()
     elif library.SETTINGS is True: # if the settings are true it'll display the settings interface from the main menu
         library.MAIN_MENU = False
+
+
         screen.fill(library.WHITE)
         text_surf, text_rect = library.text_objects("Settings", title_text)
         text_rect.center = ((WINDOW_WIDTH / 2), (WINDOW_HEIGHT / 7))
         back_surf, back_rect = library.text_objects("Back", button_text_60)
         back_rect.center = (134, 664)
-        screen.blit(main_menu_buttons["back"].draw_button(pygame.mouse.get_pos(), library.KEY_PRESSED["mouse"], (60, 640)),
-                    (51, 613))
+
+        screen.blit(main_menu_buttons["back"].
+                    draw_button(pygame.mouse.get_pos(),
+                                library.KEY_PRESSED["mouse"],
+                                (60, 640)), (51, 613))
+
         screen.blit(text_surf, text_rect)
         screen.blit(back_surf, back_rect)
-    else: # if neither are true it'll display the main menu
+
+    # if neither are true it'll display the main menu
+    else:
         library.MAIN_MENU = True
         controls_text = pygame.font.Font("UI/AMS hand writing.ttf", 175)
         screen.fill(library.WHITE)
+
         # title
         text_surf, text_rect = library.text_objects("Well Escape", controls_text)
         text_rect.center = ((WINDOW_WIDTH / 2), (WINDOW_HEIGHT / 8))
+
         # New Game button
         new_game_surf, new_game_rect = library.text_objects("New Game", button_text_60)
         new_game_rect.center = (690, 204)
+
         # Load Game Button
         continue_game_surf, continue_game_rect = library.text_objects("Load Game", button_text_60)
         continue_game_rect.center = (690, 306)
+
         # Settings button
         options_surf, options_rect = library.text_objects("Settings", button_text_60)
         options_rect.center = (690, 403)
+
         # Controls button
         controls_surf, controls_rect = library.text_objects("Controls", button_text_60)
         controls_rect.center = (690, 504)
+
         # Quit Game button
         quit_surf, quit_rect = library.text_objects("Quit Game", button_text_60)
         quit_rect.center = (690, 704)
         # Tile Editor button
         tile_editor_surf, tile_editor_rect = library.text_objects("Tile Editor", button_text_60)
         tile_editor_rect.center = (690, 604)
+
         # blits the buttons
         screen.blit(text_surf, text_rect)
+
         # button positioning
+        # blits
         screen.blit(main_menu_buttons["new game"].draw_button(pygame.mouse.get_pos(), library.KEY_PRESSED["mouse"],
                                                               (460, 168)), (460, 168))
         screen.blit(main_menu_buttons["continue"].draw_button(pygame.mouse.get_pos(), library.KEY_PRESSED["mouse"],
@@ -321,7 +392,7 @@ def main_menu():
                                                               (460, 668)), (460, 668))
         screen.blit(main_menu_buttons["tile editor"].draw_button(pygame.mouse.get_pos(), library.KEY_PRESSED["mouse"],
                                                                (460, 568)), (460, 568))
-        # blits
+
         screen.blit(new_game_surf, new_game_rect)
         screen.blit(tile_editor_surf, tile_editor_rect)
         screen.blit(continue_game_surf, continue_game_rect)
@@ -331,31 +402,47 @@ def main_menu():
 
 
 def pause_menu():
-    if library.CONTROLS is True: # checks if the library.conrols is true before displaying the controls interface
-        controls = pygame.transform.scale(pygame.image.load("UI/Controls.png"), (800,600))
+    """Display the pause menu."""
+    # checks if the library.conrols is true
+    # before displaying the controls interface
+    if library.CONTROLS is True:
+        controls = pygame.transform.scale(
+            pygame.image.load("UI/Controls.png"), (800, 600))
+
         screen.fill(library.WHITE)
         text_surf, text_rect = library.text_objects("Controls", title_text)
         text_rect.center = ((WINDOW_WIDTH / 2), (WINDOW_HEIGHT / 8))
         back_surf, back_rect = library.text_objects("Back", button_text_60)
         back_rect.center = (134, 664)
-        screen.blit(option_buttons["back"].draw_button(pygame.mouse.get_pos(), library.KEY_PRESSED["mouse"], (60, 640)),
-                    (51, 613))
+
+        screen.blit(option_buttons["back"].
+                    draw_button(pygame.mouse.get_pos(),
+                                library.KEY_PRESSED["mouse"],
+                                (60, 640)), (51, 613))
+
         screen.blit(text_surf, text_rect)
         screen.blit(back_surf, back_rect)
         screen.blit(controls, (250, 130))
         pygame.display.flip()
-    elif library.OPTIONS is True:   # this checks if library.options is true before displaying the options interface
+
+    # this checks if library.options is true
+    # before displaying the options interface
+    elif library.OPTIONS is True:
         screen.fill(library.WHITE)
         text_surf, text_rect = library.text_objects("Options", title_text)
         text_rect.center = ((WINDOW_WIDTH / 2), (WINDOW_HEIGHT / 7))
         back_surf, back_rect = library.text_objects("Back", button_text_60)
         back_rect.center = (134, 664)
-        screen.blit(option_buttons["back"].draw_button(pygame.mouse.get_pos(), library.KEY_PRESSED["mouse"], (60, 640)),
-                    (51, 613))
+
+        screen.blit(option_buttons["back"].
+                    draw_button(pygame.mouse.get_pos(),
+                                library.KEY_PRESSED["mouse"],
+                                (60, 640)), (51, 613))
+
         screen.blit(text_surf, text_rect)
         screen.blit(back_surf, back_rect)
 
-    else: # if neither are true it'll display the pause screen
+    else:  # if neither are true it'll display the pause screen
         library.PAUSED = True
         library.PAUSE_MENU = True
         button_text2 = pygame.font.Font("UI/AMS hand writing.ttf", 50)
@@ -364,8 +451,11 @@ def pause_menu():
         text_surf, text_rect = library.text_objects("Paused", title_text)
         text_rect.center = ((WINDOW_WIDTH / 2), (WINDOW_HEIGHT / 7))
         # Resume button
-        screen.blit(option_buttons["resume"].draw_button(pygame.mouse.get_pos(), library.KEY_PRESSED["mouse"], (460, 188)),
-                    (460, 188))
+        screen.blit(option_buttons["resume"].
+                    draw_button(pygame.mouse.get_pos(),
+                                library.KEY_PRESSED["mouse"],
+                                (460, 208)), (460, 188))
+
         # Options button
         screen.blit(option_buttons["options"].draw_button(pygame.mouse.get_pos(), library.KEY_PRESSED["mouse"], (460, 288)),
                     (460, 288))
@@ -374,8 +464,11 @@ def pause_menu():
             option_buttons["restart"].draw_button(pygame.mouse.get_pos(), library.KEY_PRESSED["mouse"], (460, 388)),
             (460, 388))
         # Controls button
-        screen.blit(option_buttons["controls"].draw_button(pygame.mouse.get_pos(), library.KEY_PRESSED["mouse"], (460, 488)),
-                    (460, 488))
+        screen.blit(option_buttons["controls"].
+                    draw_button(pygame.mouse.get_pos(),
+                                library.KEY_PRESSED["mouse"],
+                                (460, 508)), (460, 488))
+
         # Exit button
         screen.blit(option_buttons["exit"].draw_button(pygame.mouse.get_pos(), library.KEY_PRESSED["mouse"], (460, 588)),
                     (460, 588))
@@ -389,7 +482,7 @@ def pause_menu():
         controls_rect.center = (690, 528)
         quit_surf, quit_rect = library.text_objects("Exit to Main Menu", button_text2)
         quit_rect.center = (690, 628)
-        # Blits
+
         screen.blit(quit_surf, quit_rect)
         screen.blit(controls_surf, controls_rect)
         screen.blit(options_surf, options_rect)
@@ -401,6 +494,7 @@ def pause_menu():
 
 
 def pausing_game():
+    """Pause the game."""
     for event in pygame.event.get():
         if paused is False:
             if event.type == library.PAUSE:
@@ -413,7 +507,7 @@ def pausing_game():
 
 
 def exit_game():
-    """Exits the game to desktop"""
+    """Exit the game to desktop."""
     shutil.rmtree("Well Escape tiles/varieties")
     pygame.quit()
     sys.exit()
@@ -421,24 +515,22 @@ def exit_game():
 
 # creates a new level and positions everything accordingly in that level
 def start():
+    """Initialise the game."""
+    library.RESET = True
     # reset all lists
     dunGen.floorTiles.clear()
     dunGen.wallTiles.clear()
     dunGen.doorTiles.clear()
-    # generate the dungeon
-    for i in range(len(dunGen.GameStore.levels)):
-        if i > 0:
-            # set the starting point for the next room
-            dunGen.GameStore.starting_point_x[i] = dunGen.GameStore.starting_point_x[i-1] + dunGen.GameStore.start_x * dunGen.TILE_SIZE - dunGen.TILE_SIZE
-            dunGen.GameStore.starting_point_y[i] = dunGen.GameStore.starting_point_y[i-1] + dunGen.GameStore.start_y * dunGen.TILE_SIZE
-        # create the room
-        dunGen.initialize_level(i)
+    dunGen.create_dungeon()
+
     # create movement variables
     screen_rect = screen.get_rect()
     level_rect = dunGen.GameStore.levels[0].get_rect()
 
     # find a random floor tile and get it's position coordinates
-    dunGen.GameStore.playerSpawnPoint = dunGen.floorTiles[random.randint(0, len(dunGen.floorTiles)-1)]
+    dunGen.GameStore.playerSpawnPoint = dunGen.floorTiles[
+        random.randint(0, len(dunGen.floorTiles)-1)]
+
     dunGen.GameStore.playerX = dunGen.GameStore.playerSpawnPoint[0]
     dunGen.GameStore.playerY = dunGen.GameStore.playerSpawnPoint[1]
 
@@ -446,14 +538,18 @@ def start():
     dunGen.GameStore.x = screen_rect.centerx - level_rect.centerx
     dunGen.GameStore.y = screen_rect.centery - level_rect.centery
 
-    # variables for offsetting everything so the starting tile is always at the center
-    dunGen.GameStore.offsetX = -level_rect.centerx + dunGen.GameStore.playerSpawnPoint[0]
-    dunGen.GameStore.offsetY = -level_rect.centery + dunGen.GameStore.playerSpawnPoint[1]
+    # variables for offsetting everything
+    # so the starting tile is always at the center
+    dunGen.GameStore.offsetX = -level_rect.centerx +\
+        dunGen.GameStore.playerSpawnPoint[0]
+    dunGen.GameStore.offsetY = -level_rect.centery +\
+        dunGen.GameStore.playerSpawnPoint[1]
 
 
 def change_direction(last_dir, current_dir):
     """
-    Reset the players animator if the direction changes
+    Reset the players animator if the direction changes.
+
     :param last_dir:        players direction from last frame
     :param current_dir:     players direction this frame
     :return:                current direction
@@ -465,19 +561,23 @@ def change_direction(last_dir, current_dir):
 
 def animation_direction(last_direction):
     """
-    Gets the next animation direction.
+    Get the next animation direction.
+
     this prevents it from resetting if two keys are pressed at the same time!
     :return: (Direction, idle)
     """
     # find if any keys are pressed and set it to idle
-    idle = not library.KEY_PRESSED["left"] and not library.KEY_PRESSED["right"] \
-        and not library.KEY_PRESSED["forwards"] and not library.KEY_PRESSED["backwards"]
+    idle = not library.KEY_PRESSED["left"] and not \
+        library.KEY_PRESSED["right"] and not \
+        library.KEY_PRESSED["forwards"] and not \
+        library.KEY_PRESSED["backwards"]
 
     # if there's no keys pressed return early as there's nothing to test
     if idle:
         return last_direction, idle
 
-    # set direction to last direction encase there is opposite keys being pressed
+    # set direction to last direction
+    # in case there is opposite keys being pressed
     direction = last_direction
 
     # set to idle if both left and right keys are pressed
@@ -488,11 +588,13 @@ def animation_direction(last_direction):
     elif library.KEY_PRESSED["right"]:      # set right direction
         direction = library.RIGHT
 
-    # do forwards and backwards in separate if as the animation trumps left and right
+    # do forwards and backwards in separate if
+    # as the animation trumps left and right
     # set to idle if both forwards and backwards keys are pressed
     if library.KEY_PRESSED["forwards"] and library.KEY_PRESSED["backwards"]:
         # set to idle if neither left or right is pressed
-        idle = not library.KEY_PRESSED["left"] and not library.KEY_PRESSED["right"]
+        idle = not library.KEY_PRESSED["left"] and not\
+            library.KEY_PRESSED["right"]
     elif library.KEY_PRESSED["forwards"]:
         direction = library.FORWARDS        # set forwards direction
         idle = False
@@ -503,24 +605,8 @@ def animation_direction(last_direction):
     return direction, idle
 
 
-def detect_collision(player_pos_x, player_pos_y):
-
-    # create and draw the player col
-    player_col = Rect(player_pos_x + 14, player_pos_y + (dunGen.TILE_SIZE * 0.6), dunGen.TILE_SIZE * 0.6, dunGen.TILE_SIZE * 0.3)
-    pygame.draw.rect(screen, Color("white"), player_col, 2)
-
-    # create and draw tile cols
-    for tile in range(len(dunGen.wallTiles)):
-        x = dunGen.GameStore.x + dunGen.wallTiles[tile][0] - dunGen.GameStore.offsetX
-        y = dunGen.GameStore.y + dunGen.wallTiles[tile][1] - dunGen.GameStore.offsetY
-        tile_col = Rect(x, y, dunGen.TILE_SIZE, dunGen.TILE_SIZE)
-        pygame.draw.rect(screen, Color("white"), tile_col, 2)
-
-    return dunGen.GameStore.top_col, dunGen.GameStore.bottom_col, dunGen.GameStore.left_col, dunGen.GameStore.right_col
-
-
 def main():
-    level_init = False
+    """Main game loop."""
     start()
     ticks_since_last_frame = 0
 
@@ -545,44 +631,127 @@ def main():
         display_pause_menu = False
 
         # set the players animation direction and idle for the animation
-        next_animation_direction, player_idle = animation_direction(current_direction)
+        next_animation_direction, player_idle = \
+            animation_direction(current_direction)
         # set the current direction
-        current_direction = change_direction(current_direction, next_animation_direction)
+        current_direction = change_direction(current_direction,
+                                             next_animation_direction)
 
-        # multiply the movement by delta_time to ensure constant speed no matter the FPS
         if not library.PAUSED and library.HAS_STARTED:
-            # multiply the movement by delta_time to ensure constant speed no matter the FPS
+            # multiply the movement by delta_time to ensure constant speed
+            # no matter the FPS
             movement_speed = 75 * delta_time
-            
+
         # switch between active and idle
         if not player_idle:
             player = player_animation[current_direction]
         else:
-            # prevent the player moving if the game is paused or has not started yet!
+            # prevent the player moving
+            # if the game is paused or has not started yet!
             movement_speed = 0
 
-        if not library.PAUSED:
+        if not library.PAUSED and not library.RESET:
             # Key press actions
-            if library.KEY_PRESSED["forwards"]:
-                # forwards key action
-                dunGen.GameStore.playerY -= movement_speed
-                dunGen.GameStore.y += movement_speed
+            if library.KEY_PRESSED["forwards"] and \
+                    not library.KEY_PRESSED["backwards"]:
+                dunGen.GameStore.bottom_col = False
+                if not dunGen.GameStore.top_col:
+                    # move the player and assign prediction values
+                    dunGen.GameStore.previousY = dunGen.GameStore.y
+                    dunGen.GameStore.playerY -= movement_speed
+                    dunGen.GameStore.y += movement_speed
+                    dunGen.GameStore.prediction_Y = -10
+                    if not dunGen.GameStore.left_col and \
+                            not dunGen.GameStore.right_col:
+                        dunGen.GameStore.secondary_prediction_Y = -10
+                else:
+                    # block the player movement
+                    dunGen.GameStore.prediction_Y = 0
+                    if not dunGen.GameStore.previousY == dunGen.GameStore.y:
+                        dunGen.GameStore.y -= movement_speed
+                        dunGen.GameStore.previousY = dunGen.GameStore.y
+                    dunGen.GameStore.playerY = dunGen.GameStore.previousPlayerY
+            else:
+                # turn off this direction's collision
+                if dunGen.GameStore.left_col or \
+                        dunGen.GameStore.right_col:
+                    dunGen.GameStore.top_col = False
 
-            if library.KEY_PRESSED["backwards"]:
-                # backwards key action
-                dunGen.GameStore.playerY += movement_speed
-                dunGen.GameStore.y -= movement_speed
+            if library.KEY_PRESSED["backwards"] and \
+                    not library.KEY_PRESSED["forwards"]:
+                dunGen.GameStore.top_col = False
+                if not dunGen.GameStore.bottom_col:
+                    # move the player and assign prediction values
+                    dunGen.GameStore.previousY = dunGen.GameStore.y
+                    dunGen.GameStore.playerY += movement_speed
+                    dunGen.GameStore.y -= movement_speed
+                    dunGen.GameStore.prediction_Y = 10
+                    if not dunGen.GameStore.left_col and \
+                            not dunGen.GameStore.right_col:
+                        dunGen.GameStore.secondary_prediction_Y = 10
+                else:
+                    # block the player movement
+                    dunGen.GameStore.prediction_Y = 0
+                    if not dunGen.GameStore.previousY == dunGen.GameStore.y:
+                        dunGen.GameStore.y += movement_speed
+                        dunGen.GameStore.previousY = dunGen.GameStore.y
+                    dunGen.GameStore.playerY = dunGen.GameStore.previousPlayerY
+            else:
+                # turn off this direction's collision
+                if dunGen.GameStore.left_col or \
+                        dunGen.GameStore.right_col:
+                    dunGen.GameStore.bottom_col = False
 
-            if library.KEY_PRESSED["left"]:
-                # left key action
-                dunGen.GameStore.playerX -= movement_speed
-                dunGen.GameStore.x += movement_speed
+            if library.KEY_PRESSED["left"] and \
+                    not library.KEY_PRESSED["right"]:
+                dunGen.GameStore.right_col = False
+                if not dunGen.GameStore.left_col:
+                    # move the player and assign prediction values
+                    dunGen.GameStore.previousX = dunGen.GameStore.x
+                    dunGen.GameStore.playerX -= movement_speed
+                    dunGen.GameStore.x += movement_speed
+                    dunGen.GameStore.prediction_X = -20
+                    if not dunGen.GameStore.bottom_col and \
+                            not dunGen.GameStore.top_col:
+                        dunGen.GameStore.secondary_prediction_X = -20
+                else:
+                    # block the player movement
+                    dunGen.GameStore.prediction_X = 0
+                    if not dunGen.GameStore.previousX == dunGen.GameStore.x:
+                        dunGen.GameStore.x -= movement_speed
+                        dunGen.GameStore.previousX = dunGen.GameStore.x
+                    dunGen.GameStore.playerX = dunGen.GameStore.previousPlayerX
+            else:
+                # turn off this direction's collision
+                if dunGen.GameStore.bottom_col or \
+                         dunGen.GameStore.top_col:
+                    dunGen.GameStore.left_col = False
 
-            if library.KEY_PRESSED["right"]:
-                # right key action
-                dunGen.GameStore.playerX += movement_speed
-                dunGen.GameStore.x -= movement_speed
-                
+            if library.KEY_PRESSED["right"] and \
+                    not library.KEY_PRESSED["left"]:
+                dunGen.GameStore.left_col = False
+                if not dunGen.GameStore.right_col:
+                    # move the player and assign prediction values
+                    dunGen.GameStore.previousX = dunGen.GameStore.x
+                    dunGen.GameStore.playerX += movement_speed
+                    dunGen.GameStore.x -= movement_speed
+                    dunGen.GameStore.prediction_X = 15
+                    if not dunGen.GameStore.bottom_col and \
+                            not dunGen.GameStore.top_col:
+                        dunGen.GameStore.secondary_prediction_X = 15
+                else:
+                    # block the player movement
+                    dunGen.GameStore.prediction_X = 0
+                    if not dunGen.GameStore.previousX == dunGen.GameStore.x:
+                        dunGen.GameStore.x += movement_speed
+                        dunGen.GameStore.previousX = dunGen.GameStore.x
+                    dunGen.GameStore.playerX = dunGen.GameStore.previousPlayerX
+            else:
+                # turn off this direction's collision
+                if dunGen.GameStore.bottom_col or \
+                         dunGen.GameStore.top_col:
+                    dunGen.GameStore.right_col = False
+
             # switch between active and idle
             if not player_idle:
                 player = player_animation[current_direction]
@@ -593,9 +762,12 @@ def main():
             player.update_time(delta_time)
             ghost_animations.update_time(delta_time)
             fuel_meter.update_fuel_timer(delta_time)
+
                 
         else:
             display_pause_menu = True
+
+        library.RESET = False
 
         # wait for the frame to end
         fps_clock.tick(FPS)
@@ -611,23 +783,28 @@ def main():
             screen.fill(library.BLACK)
             # render the level on screen
             for i in range(len(dunGen.GameStore.levels) - 1, -1, -1):
-                screen.blit(dunGen.GameStore.levels[i], (dunGen.GameStore.x +
-                                                         dunGen.GameStore.starting_point_x[i] -
-                                                         dunGen.GameStore.offsetX, dunGen.GameStore.y +
-                                                         dunGen.GameStore.starting_point_y[i] -
-                                                         dunGen.GameStore.offsetY))
+                screen.blit(dunGen.GameStore.levels[i],
+                            (dunGen.GameStore.x +
+                             dunGen.GameStore.starting_point_x[i] -
+                             dunGen.GameStore.offsetX, dunGen.GameStore.y +
+                             dunGen.GameStore.starting_point_y[i] -
+                             dunGen.GameStore.offsetY))
 
             # update player's position
-            player_x_pos, player_y_pos = dunGen.get_position_with_offset(
-                dunGen.GameStore.playerX, dunGen.GameStore.playerY
-            )
+            player_x_pos = dunGen.GameStore.x + dunGen.GameStore.playerX - \
+                dunGen.GameStore.offsetX
+            player_y_pos = dunGen.GameStore.y + dunGen.GameStore.playerY - \
+                dunGen.GameStore.offsetY
 
-            # detect_collision(player_x_pos, player_y_pos)
+            colDetect.detect_collision()
             # draw the player
             screen.blit(pygame.transform.scale(player.get_current_sprite(),
-                        (int(dunGen.TILE_SIZE * 0.9), int(dunGen.TILE_SIZE * 0.9))), (player_x_pos, player_y_pos))
+                        (int(dunGen.TILE_SIZE * 0.9),
+                         int(dunGen.TILE_SIZE * 0.9))),
+                        (player_x_pos, player_y_pos))
 
             fuel_meter.display_fuel_meter(screen, (667, 24))
+
 
             # todo: move to its own function
             ghost_start_position = dunGen.get_positon_by_tile_coordinates(3, 3)
@@ -650,6 +827,14 @@ def main():
 
             screen.blit(ghost_animations.get_current_sprite(), (ghost_pos_x, ghost_pos_y))
 
+            playerLight.update_light(fuel_meter.get_fuel_percentage())
+            playerLight.initialise_lightning(dunGen.TILE_SIZE)
+            playerLight.draw_light(screen, dunGen)
+            playerLight.overlay(screen)
+
+            fuel_meter.display_fuel_meter(screen, (0, 0))
+
+
 
         # update the display.
         pygame.display.flip()
@@ -659,4 +844,3 @@ def main():
 if __name__ == "__main__":
     colorBlindFilter.initialization()
     main()
-
