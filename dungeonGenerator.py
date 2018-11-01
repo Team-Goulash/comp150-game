@@ -3,6 +3,8 @@ import pygame
 import random
 import tileGenerator
 import main
+import loadSave
+import os
 from random import choices
 
 tile_class = tileGenerator.Tiles()
@@ -49,7 +51,7 @@ class GameStore:
     collisions = [top_col, bottom_col, left_col, right_col]
     start_x = 0
     start_y = 0
-    levelCount = 2
+    levelCount = 4
     levels = []
     chests = []
     starting_point_x = []
@@ -89,6 +91,10 @@ def create_dungeon():
 
         # create the room
         initialize_level(i)
+    print("starting_points", GameStore.starting_point_x, GameStore.starting_point_y)
+    main.aiAnimationPaths.apply_position_offset_to_room_path(GameStore.starting_point_x, GameStore.starting_point_y)
+    main.aiAnimationPaths.print_data()
+
 
 
 def gen_chest_map():
@@ -329,29 +335,44 @@ def get_dungeon_room(first):
     :return:    a randomly chosen pixel map
     """
     # load up the pixel maps
+    start_map = "pixelLevels/startMap/"     # the start map need to come from its own folder so it is not included in the main room maps
     pixel_map = "pixelLevels/"
     chest_map = "pixelLevels/chestMaps/"
-    small_room = pygame.image.load(pixel_map + "smallRoom_000.png")
-    small_room_chest = pygame.image.load(chest_map + "smallRoom_000.png")
+    ai_map = "pixelLevels/aiOverlays/"
 
-    hallway = pygame.image.load(pixel_map + "hall_000.png")
-    hallway_chest = pygame.image.load(chest_map + "hall_000.png")
+    # we only need to store the file names with out the path.
+    # as there **MUST** be a corresponding image in both
+    # chestMaps and aiOverlays with the same name.
 
-    mid_room = pygame.image.load(pixel_map + "MidRoom_000.png")
-    mid_room_chest = pygame.image.load(chest_map + "MidRoom_000.png")
+    rooms = loadSave.get_file_names_in_directory(pixel_map, ".png") # [hallway, small_room, mid_room]
 
-    chests = [hallway_chest, small_room_chest, mid_room_chest]
-    rooms = [hallway, small_room, mid_room]
-    indexes = [0, 1, 2]
-    room_weights = [0.5, 0.75, 0.25]
+    indexes = list(range(len(rooms)))
+    room_weights = get_random_room_weights(len(indexes))  # [0.5, 0.75, 0.25]
+
+    print(rooms, "weights", room_weights)
+
     if first:
         # load up and choose the starting room pixel map
-        current_module = pygame.image.load(pixel_map + "start.png")
-        current_chest = pygame.image.load(chest_map + "start.png")
+        current_module = pygame.image.load(start_map + "start.png")
+        current_chest = pygame.image.load(start_map + "start_chest.png")
     else:
         # choose a random pixel map
         current_index = random.choices(indexes, room_weights)[0]
-        current_module = rooms[current_index]
-        current_chest = chests[current_index]
+        current_module = pygame.image.load(pixel_map + rooms[current_index])
+        current_chest = pygame.image.load(chest_map + rooms[current_index])
+        main.aiAnimationPaths.load_paths(ai_map + rooms[current_index])
 
     return current_module, current_chest
+
+
+def get_random_room_weights(count):
+    """Get a random list of weights
+    :param count:   Amount of weights to generate
+    :return:        weights list
+    """
+    weights = []
+
+    for i in range(count):
+        weights.append(random.random())
+
+    return weights

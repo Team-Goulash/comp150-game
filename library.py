@@ -94,4 +94,3 @@ def lerp_vector2(start_position, end_position, percentage):
     pos_y = lerp(start_position[1], end_position[1], percentage)
 
     return pos_x, pos_y
-

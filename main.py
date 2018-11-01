@@ -6,6 +6,7 @@ import random
 import UI
 import os
 import shutil
+
 from fuelMeter import *
 from pygame.locals import *
 from animator import Animator
@@ -13,7 +14,7 @@ import tileEditor as Editor
 import dungeonGenerator as dunGen
 import colorBlindFilter
 import CollisionDetection as colDetect
-
+import aiAnimations
 
 # initialize pygame
 pygame.init()
@@ -96,6 +97,7 @@ button_text_60 = pygame.font.Font("UI/AMS hand writing.ttf", 60)
 
 # set player animations
 player_animation = ["", "", "", ""]
+# Todo turn magic numbers in animations into constants
 # set left animation
 player_animation[library.LEFT] = Animator("Characters/"
                                           "girl_sideLeft_spriteSheet.png",
@@ -136,6 +138,7 @@ player_idle_animation[library.BACKWARDS] = Animator("Characters/girl_frontIdle"
 ghost_animations = Animator("Well Escape Tiles/ghostTiles/ghost_0_face_3.png",
                             library.scaleNum, 3, 7, 1.5)  # list()
 
+aiAnimationPaths = aiAnimations.AiAnimation()
 
 if not os.path.exists("Well Escape tiles/varieties"):
     os.makedirs("Well Escape tiles/varieties")
@@ -185,7 +188,6 @@ def event_inputs():
         # has a mouse button just been pressed?
         elif event.type == MOUSEBUTTONDOWN:
             library.KEY_PRESSED["mouse"] = True
-            print("This is mouse down")
 
         # has a mouse button just been released?
         elif event.type == MOUSEBUTTONUP:
@@ -277,7 +279,6 @@ def event_inputs():
                 #  when clicking back
                 library.OPTIONS = False
             library.KEY_PRESSED["mouse"] = False
-            print("This is mouse up", pygame.mouse.get_pos())
 
 
 def text_objects(text, font):
@@ -756,7 +757,8 @@ def main():
             # update animation times
             player.update_time(delta_time)
             ghost_animations.update_time(delta_time)
-            fuel_meter.update_fuel_timer(delta_time)
+            # Todo. uncomment the line below
+            # fuel_meter.update_fuel_timer(delta_time)
                 
         else:
             display_pause_menu = True
@@ -800,6 +802,7 @@ def main():
             fuel_meter.display_fuel_meter(screen, (0, 0))
 
             # todo: move to its own function
+            '''
             ghost_start_position = dunGen.get_positon_by_tile_coordinates(3, 3)
             ghost_end_position = dunGen.get_positon_by_tile_coordinates(6, 3)
 
@@ -815,11 +818,12 @@ def main():
                     dunGen.GameStore.temp_rev_lerp = False
                     dunGen.GameStore.temp_lerp_timer = 0
 
-
             ghost_pos_x, ghost_pos_y = library.lerp_vector2(ghost_start_position, ghost_end_position, (dunGen.GameStore.temp_lerp_timer / 3))
 
             screen.blit(ghost_animations.get_current_sprite(), (ghost_pos_x, ghost_pos_y))
+            '''
 
+            aiAnimationPaths.update_animations(delta_time, screen)
 
         # update the display.
         pygame.display.flip()
