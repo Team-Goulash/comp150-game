@@ -15,14 +15,17 @@ class AiAnimation:
     ghost_paths = []
     room_size = []
     ghost_sprite_animations = []  # list of tuples (animator, room_id, path_id, (current position))
-    cell_move_timer_lenght = 0.75 # sec
+    cell_move_timer_lenght = 0.9 # sec
     current_move_time = 0
+    first_scene = True
 
     def reset_animator(self):
-        self.ghost_paths = []
-        self.room_size = []
-        self.ghost_sprite_animations = []
+        self.ghost_paths.clear()
+        self.room_size.clear()
+        self.ghost_sprite_animations.clear()
         self.current_move_time = 0
+        # todo this needs to be set when we go to the next scene
+        self.first_scene = False
 
     def load_paths(self, room_image_src):
 
@@ -125,7 +128,10 @@ class AiAnimation:
         for room in range(len(room_offsets_x)):
             # take one off room id as we dont include the start room.
             # thee will never be any ai in there
-            room_id = room - 1
+            room_id = room
+
+            if self.first_scene:
+                room_id -= 1
 
             if room_id == -1:
                 continue
