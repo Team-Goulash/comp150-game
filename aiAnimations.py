@@ -222,3 +222,52 @@ class AiAnimation:
 
     def flip_values(self, value_a, value_b):
         return value_b, value_a
+
+    def ghost_in_position(self, pos_x, pos_y, surface):
+
+        i = 0
+
+        obj_top_left = pos_x, pos_y
+        obj_bottom_right = obj_top_left[0] + (library.scaleNum - 20), obj_top_left[1] + (library.scaleNum - 10)
+
+
+        # todo remove temp shiz!!
+        temp_rect = (obj_top_left[0], obj_top_left[1], library.scaleNum-20, library.scaleNum-10)
+        pygame.draw.rect(surface, library.RED, temp_rect, 3)
+
+        pos_x += library.scaleNum//2
+        pos_y += library.scaleNum//2
+
+        for animation in self.ghost_sprite_animations:
+
+            # get the bounds of the ghost
+            ghost_top_left = get_position_with_offset(animation[6][0], animation[6][1])
+            ghost_bottom_right = (ghost_top_left[0] + library.scaleNum), (ghost_top_left[1] + library.scaleNum)
+
+            # todo remove temp shiz!!
+            temp_rect = (ghost_top_left[0], ghost_top_left[1], library.scaleNum, library.scaleNum)
+            pygame.draw.rect(surface, library.RED, temp_rect, 3)
+
+            in_x, in_y = False, False
+
+            i += 1
+            '''
+            if obj_top_left[0] < ghost_bottom_right[0] and obj_top_left[0] > ghost_top_left[0] and obj_bottom_right[0] > ghost_top_left[0] and obj_bottom_right[1] < ghost_bottom_right[0]:
+                print("In Y")
+                in_y = True
+
+            if obj_top_left[1] < ghost_bottom_right[1] and obj_top_left[1] > ghost_top_left[1] or obj_bottom_right[1] > ghost_top_left[1] and obj_bottom_right[1] < ghost_bottom_right[1]:
+                print("In X")
+                in_x = True
+            '''
+
+            if pos_x > ghost_top_left[0] and pos_x < ghost_bottom_right[0] and pos_y > ghost_top_left[1] and pos_y < ghost_bottom_right[1]:
+                    in_x, in_y = True, True
+
+            if in_x and in_y:
+                print("Contact")
+                return True
+
+
+        return False
+

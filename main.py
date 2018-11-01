@@ -787,10 +787,17 @@ def main():
                              dunGen.GameStore.offsetY))
 
             # update player's position
-            player_x_pos = dunGen.GameStore.x + dunGen.GameStore.playerX - \
-                dunGen.GameStore.offsetX
-            player_y_pos = dunGen.GameStore.y + dunGen.GameStore.playerY - \
-                dunGen.GameStore.offsetY
+            player_x_pos, player_y_pos = dunGen.get_position_with_offset(dunGen.GameStore.playerX, dunGen.GameStore.playerY)
+
+            if aiAnimationPaths.ghost_in_position(player_x_pos, player_y_pos, screen):
+                # add GameOver here
+                pass
+
+            # todo remove commented out code below!!
+            #player_x_pos = dunGen.GameStore.x + dunGen.GameStore.playerX - \
+            #    dunGen.GameStore.offsetX
+            #player_y_pos = dunGen.GameStore.y + dunGen.GameStore.playerY - \
+            #    dunGen.GameStore.offsetY
 
             colDetect.detect_collision()
             # draw the player
