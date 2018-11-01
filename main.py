@@ -6,11 +6,12 @@ import random
 import UI
 import os
 import shutil
+import playerLight
 import math
 from fuelMeter import *
 from pygame.locals import *
 from animator import Animator
-import tileEditor as Editor
+
 import dungeonGenerator as dunGen
 import colorBlindFilter
 import CollisionDetection as colDetect
@@ -25,6 +26,7 @@ WINDOW_WIDTH = 1334
 # create the window
 screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
 
+import tileEditor as Editor
 # UI Buttons
 main_menu_buttons = {"new game": None, "continue": None, "options": None,
                      "controls": None, "quit game": None, "back": None}
@@ -773,8 +775,14 @@ def main():
             else:
                 display_pause_menu = True
 
-            # wait for the frame to end
-            fps_clock.tick(FPS)
+            # update animation times
+            player.update_time(delta_time)
+            ghost_animations.update_time(delta_time)
+            fuel_meter.update_fuel_timer(delta_time)
+
+                
+        else:
+            display_pause_menu = True
 
             # Display main menu if the game has not started
             if not library.HAS_STARTED:
@@ -811,15 +819,11 @@ def main():
 
                 fuel_meter.display_fuel_meter(screen, (0, 0))
 
-                # todo: move to its own function
-                ghost_start_position = dunGen.get_positon_by_tile_coordinates(3, 3)
-                ghost_end_position = dunGen.get_positon_by_tile_coordinates(6, 3)
 
-                if dunGen.GameStore.temp_lerp_timer < 3 and not dunGen.GameStore.temp_rev_lerp:
-                    dunGen.GameStore.temp_lerp_timer += delta_time
-                    if dunGen.GameStore.temp_lerp_timer >= 3:
-                        dunGen.GameStore.temp_rev_lerp = True
-                        dunGen.GameStore.temp_lerp_timer = 3
+
+            # todo: move to its own function
+            ghost_start_position = dunGen.get_positon_by_tile_coordinates(3, 3)
+            ghost_end_position = dunGen.get_positon_by_tile_coordinates(6, 3)
 
                 elif dunGen.GameStore.temp_lerp_timer > 0 and dunGen.GameStore.temp_rev_lerp:
                     dunGen.GameStore.temp_lerp_timer -= delta_time
@@ -831,6 +835,15 @@ def main():
                 ghost_pos_x, ghost_pos_y = library.lerp_vector2(ghost_start_position, ghost_end_position, (dunGen.GameStore.temp_lerp_timer / 3))
 
                 screen.blit(ghost_animations.get_current_sprite(), (ghost_pos_x, ghost_pos_y))
+
+
+            playerLight.update_light(fuel_meter.get_fuel_percentage())
+            playerLight.initialise_lightning(dunGen.TILE_SIZE)
+            playerLight.draw_light(screen, dunGen)
+            playerLight.overlay(screen)
+
+            fuel_meter.display_fuel_meter(screen, (0, 0))
+
 
 
         # update the display.
