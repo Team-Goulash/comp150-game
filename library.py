@@ -13,7 +13,8 @@ FORWARDS = 2
 BACKWARDS = 3
 
 # boolean values for key pressed states
-KEY_PRESSED = {"left": False, "right": False, "forwards": False, "backwards": False, "mouse": False}
+KEY_PRESSED = {"left": False, "right": False, "forwards": False,
+               "backwards": False, "mouse": False, "space": False}
 PAUSED = False
 OPTIONS = False
 CONTROLS = False
@@ -21,6 +22,7 @@ SETTINGS = False
 MAIN_MENU_CONTROLS = False
 HAS_STARTED = False
 EDITOR = False
+RESET = False
 
 
 # set Colors (r, g, b, a)
