@@ -95,3 +95,9 @@ def lerp_vector2(start_position, end_position, percentage):
 
     return pos_x, pos_y
 
+def abs(value):
+    """force number to positive"""
+    if value < 0:
+        return -value
+    else:
+        return value
