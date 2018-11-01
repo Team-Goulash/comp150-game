@@ -87,8 +87,11 @@ def reset():
     allTilePositions.clear()
     allTiles.clear()
     allTileMaterials.clear()
+    # Todo check that the animation are being reset once the doors are not geting spwaned on next level!
+    main.aiAnimationPaths.reset_animator()
     GameStore.current_tile = 0
     create_dungeon()
+
 
 
 def create_dungeon():
@@ -116,18 +119,22 @@ def create_dungeon():
     # main.aiAnimationPaths.print_data()
 
 def gen_chest_map(level_id):
+
     map_width = GameStore.chest_map.get_width()
     map_height = GameStore.chest_map.get_height()
+
     for y in range(map_height):
         for x in range(map_width):
+
             pixel = GameStore.chest_map.get_at((x, y))
             pixel_tone = (pixel.r + pixel.g + pixel.b) / 3  # pixel brightness
-            if 0 < pixel_tone < 255:
+
+            if pixel.r == 125 and pixel.a > 100: # 0 < pixel_tone < 255:
                 pos_x = x * TILE_SIZE + GameStore.starting_point_x[level_id]
                 pos_y = y * TILE_SIZE + GameStore.starting_point_y[level_id]
                 chest = [pos_x, pos_y]
                 GameStore.chests.append(chest)
-    print(GameStore.chests)
+    print("----------------------", GameStore.chests)
     return GameStore.chests
 
 
