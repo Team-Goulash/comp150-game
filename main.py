@@ -1,5 +1,5 @@
 # DON'T FORGET TO COMMENT YOUR CODE PLEASE!!!
-import pygame, sys, library, random, UI, os, shutil, WIPLight
+import pygame, sys, library, random, UI, os, shutil, playerLight
 from fuelMeter import *
 from pygame.locals import *
 # import the Animator class
@@ -572,10 +572,10 @@ def main():
 
             screen.blit(ghost_animations.get_current_sprite(), (ghost_pos_x, ghost_pos_y))
 
-            WIPLight.update_light(fuel_meter.get_fuel_percentage())
-            WIPLight.initialise_lightning(dungeonGenerator.TILE_SIZE)
-            WIPLight.draw_light(screen, dungeonGenerator)
-            WIPLight.overlay(screen)
+            playerLight.update_light(fuel_meter.get_fuel_percentage())
+            playerLight.initialise_lightning(dungeonGenerator.TILE_SIZE)
+            playerLight.draw_light(screen, dungeonGenerator)
+            playerLight.overlay(screen)
 
 
 

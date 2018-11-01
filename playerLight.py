@@ -32,8 +32,9 @@ def draw_light(surface, other_script):
     """
     current_tile_x, current_tile_y = other_script.\
         get_coordiantes_from_position(other_script.GameStore.playerX,
-                                      other_script.GameStore.playerY
-                                      )
+                                      other_script.GameStore.playerY,
+                                      (0.5, 0.85))
+
     current_tile_x -= ((Variables.light_range - 1) // 2)
     current_tile_y -= ((Variables.light_range - 1) // 2)
 
@@ -104,7 +105,7 @@ def create_light_map(range_value, tile_size, light_intensity, light_surface):
             temp_light.append(total_intensity)
 
         light_tiles_map.append(temp_light)
-    print(light_tiles_map)
+
     light_map_creation(light_tiles_map, tile_size, light_surface, range_value)
 
 
