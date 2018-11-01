@@ -13,7 +13,7 @@ class Variables:
 
 def overlay(surface):
     """
-    Overlay overlay_image on screen.
+    Overlay overlay_image on a surface.
 
     :param surface: Surface that image will be blit to.
     :return:        No return.
@@ -44,37 +44,9 @@ def draw_light(surface, other_script):
     surface.blit(Variables.light_surface, (pos_x, pos_y))
 
 
-def light_map_creation(light_tiles_map, tile_size, light_surface, range_value):
-    """
-    Function draws a shadow squares on a light_surface.
-
-    :param light_tiles_map: Values are used to set light_surface's squares
-                            alpha.
-    :param tile_size:       Value used to determine position of a shadow
-                            square.
-    :param light_surface:   Surface that shadow squares are gonna be drew on.
-    :param range_value:     Range of a lightning
-    :return:                No return.
-    """
-    for y in range(range_value):
-        for x in range(range_value):
-            pygame.draw.rect(light_surface,
-                             (0, 0, 0, 255 * (1 - light_tiles_map[x][y])),
-                             (x * tile_size,
-                              y * tile_size,
-                              tile_size,
-                              tile_size
-                              )
-                             )
-
-
 def create_light_map(range_value, tile_size, light_intensity, light_surface):
     """
-    Function applies linear function to modify light_map.
-
-    Function changes and replaces light_map values to a number between 0 and 1
-    making them appropriate to modify alpha value of shadows in the next
-    function.
+    Function applies linear function to modify alpha channel of a shadow.
 
     :param range_value:     Value is used to calculate new light_map
     :param tile_size:       Variable used in further functions.
@@ -83,18 +55,16 @@ def create_light_map(range_value, tile_size, light_intensity, light_surface):
     :param light_surface:   Variable used in further functions.
     :return:                No return.
     """
-    light_tiles_map = []
-    for yy in range(range_value):
-        temp_light = []
-        for xx in range(range_value):
-            xa = -(range_value - 1) / 2 + xx
-            ya = -(range_value - 1) / 2 + yy
-            if xa < 0:
-                xa = xa * -1
-            if ya < 0:
-                ya = ya * -1
-            x_intensity = (-1 * xa + 3) / 6 * light_intensity
-            y_intensity = (-1 * ya + 3) / 6 * light_intensity
+    for y_range in range(range_value):
+        for x_range in range(range_value):
+            x_light_value = -(range_value - 1) / 2 + x_range
+            y_light_value = -(range_value - 1) / 2 + y_range
+            if x_light_value < 0:
+                x_light_value = x_light_value * -1
+            if y_light_value < 0:
+                y_light_value = y_light_value * -1
+            x_intensity = (-1 * x_light_value + 3) / 6 * light_intensity
+            y_intensity = (-1 * y_light_value + 3) / 6 * light_intensity
             if x_intensity < 0:
                 x_intensity = 0
             if y_intensity < 0:
@@ -102,11 +72,15 @@ def create_light_map(range_value, tile_size, light_intensity, light_surface):
 
             total_intensity = (x_intensity + y_intensity)
             total_intensity = round(total_intensity, 2)
-            temp_light.append(total_intensity)
 
-        light_tiles_map.append(temp_light)
-
-    light_map_creation(light_tiles_map, tile_size, light_surface, range_value)
+            pygame.draw.rect(light_surface,
+                             (0, 0, 0, 255 * (1 - total_intensity)),
+                             (x_range * tile_size,
+                              y_range * tile_size,
+                              tile_size,
+                              tile_size
+                              )
+                             )
 
 
 def initialisation_of_light_surface(range_value, tile_size,
