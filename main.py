@@ -812,10 +812,10 @@ def main():
 
                 aiAnimationPaths.update_animations(delta_time, screen)
 
-                playerLight.update_light(fuel_meter.get_fuel_percentage())
-                playerLight.initialise_lightning(dunGen.TILE_SIZE)
-                playerLight.draw_light(screen, dunGen)
-                playerLight.overlay(screen)
+                #playerLight.update_light(fuel_meter.get_fuel_percentage())
+                #playerLight.initialise_lightning(dunGen.TILE_SIZE)
+                #playerLight.draw_light(screen, dunGen)
+                #playerLight.overlay(screen)
 
                 fuel_meter.display_fuel_meter(screen, (630, 50))
 

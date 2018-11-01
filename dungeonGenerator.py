@@ -67,10 +67,6 @@ class GameStore:
     secondary_prediction_Y = 0
     well_room = True
 
-    # Todo remove temp animation variable
-    temp_lerp_timer = 0
-    temp_rev_lerp = False
-
 
 for num in range(GameStore.levelCount):
     GameStore.levels.append(pygame.Surface)
@@ -87,6 +83,7 @@ def reset():
     allTilePositions.clear()
     allTiles.clear()
     allTileMaterials.clear()
+    GameStore.chests.clear()
     # Todo check that the animation are being reset once the doors are not geting spwaned on next level!
     main.aiAnimationPaths.reset_animator()
     GameStore.current_tile = 0
@@ -112,8 +109,10 @@ def create_dungeon():
         # create the room
         initialize_level(i)
         gen_chest_map(i)
-    main.start()
+
     main.aiAnimationPaths.apply_position_offset_to_room_path(GameStore.starting_point_x, GameStore.starting_point_y)
+    main.start()
+
     # todo remove commented code below once we are all happy thats it working correctly.
     # print("starting_points", GameStore.starting_point_x, GameStore.starting_point_y)
     # main.aiAnimationPaths.print_data()
