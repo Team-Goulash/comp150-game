@@ -824,8 +824,8 @@ def main():
             screen.blit(ghost_animations.get_current_sprite(), (ghost_pos_x, ghost_pos_y))
 
             playerLight.update_light(fuel_meter.get_fuel_percentage())
-            playerLight.initialise_lightning(dungeonGenerator.TILE_SIZE)
-            playerLight.draw_light(screen, dungeonGenerator)
+            playerLight.initialise_lightning(dunGen.TILE_SIZE)
+            playerLight.draw_light(screen, dunGen)
             playerLight.overlay(screen)
 
 
