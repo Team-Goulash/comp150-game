@@ -11,15 +11,18 @@ from dungeonGenerator import get_position_with_offset
 
 class AiAnimation:
 
-    #[room id][path id][path positiom]
+    # [room id][path id][path positiom]
     ghost_paths = []
     room_size = []
     ghost_sprite_animations = []  # list of tuples (animator, room_id, path_id, (current position))
-    cell_move_lenght = 0.75 # sec
-    current_move_position = 0
+    cell_move_timer_lenght = 0.75 # sec
+    current_move_time = 0
 
-    def new_paths(self):
+    def reset_animator(self):
         self.ghost_paths = []
+        self.room_size = []
+        self.ghost_sprite_animations = []
+        self.current_move_time = 0
 
     def load_paths(self, room_image_src):
 
@@ -62,13 +65,13 @@ class AiAnimation:
 
     def print_data(self):
 
-    # [room id][path id][path positiom]
+     # [room id][path id][path positiom]
         for r in range(len(self.ghost_paths)):
-            # print("room id", r)
+            print("room id", r)
             for p in range(len(self.ghost_paths[r])):
-                # print("path", p)
-                # print(self.ghost_paths[r][p])
-                pass
+                print("path", p)
+                print(self.ghost_paths[r][p])
+
 
     def get_start_point(self, image, last_x, last_y):
 
@@ -124,6 +127,9 @@ class AiAnimation:
             # thee will never be any ai in there
             room_id = room - 1
 
+            if room_id == -1:
+                continue
+
             paths = self.ghost_paths[room_id]
             print(room_id, paths, self.ghost_paths[-1])
 
@@ -167,11 +173,11 @@ class AiAnimation:
     def update_animations(self, delta_time, surface):
         """update the animation and draw the ghost to surface"""
 
-        self.current_move_position += delta_time
+        self.current_move_time += delta_time
         next_id = False
 
-        if self.current_move_position > self.cell_move_lenght:
-            self.current_move_position -= self.cell_move_lenght
+        if self.current_move_time > self.cell_move_timer_lenght:
+            self.current_move_time -= self.cell_move_timer_lenght
             next_id = True
 
         # Todo skip any that are not in view
@@ -202,7 +208,7 @@ class AiAnimation:
 
             animation[0].update_time(delta_time)
 
-            animation_percentage = self.current_move_position / self.cell_move_lenght
+            animation_percentage = self.current_move_time / self.cell_move_timer_lenght
 
             current_position = library.lerp_vector2(
                 self.ghost_paths[animation[1]][animation[2]][start_position],

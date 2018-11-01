@@ -51,7 +51,7 @@ class GameStore:
     collisions = [top_col, bottom_col, left_col, right_col]
     start_x = 0
     start_y = 0
-    levelCount = 10
+    levelCount = 4
     levels = []
     chests = []
     starting_point_x = []
@@ -338,7 +338,7 @@ def get_dungeon_room(first):
     start_map = "pixelLevels/startMap/"     # the start map need to come from its own folder so it is not included in the main room maps
     pixel_map = "pixelLevels/"
     chest_map = "pixelLevels/chestMaps/"
-    ai_map = "pixelLevels/aiOverlays/"
+    ai_map =    "pixelLevels/aiOverlays/"
 
     # we only need to store the file names with out the path.
     # as there **MUST** be a corresponding image in both
@@ -347,6 +347,7 @@ def get_dungeon_room(first):
     rooms = loadSave.get_file_names_in_directory(pixel_map, ".png") # [hallway, small_room, mid_room]
 
     indexes = list(range(len(rooms)))
+    # Todo this needs to be set at the start so it does not change each time we select a room.
     room_weights = get_random_room_weights(len(indexes))  # [0.5, 0.75, 0.25]
 
     print(rooms, "weights", room_weights)
