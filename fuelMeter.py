@@ -10,8 +10,13 @@ class Torch: # Change name later
     bar_holder = pygame.image.load("./UI/fuel_bar_holder.png")
     fuel_bar = pygame.image.load("./UI/fuel_bar.png")
 
+    def reset_fuel(self):
+        self.torch_time = 0
+        self.add_fuel()
+
     def add_fuel(self):
-        fuel_reward = random.randint(20, 30)
+        # Todo put fule range back to 20, 30
+        fuel_reward = random.randint(60, 80)
         self.torch_time += fuel_reward
         print("added ", fuel_reward, "to your torch")
 

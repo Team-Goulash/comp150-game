@@ -15,7 +15,7 @@ from animator import Animator
 import dungeonGenerator as dunGen
 import colorBlindFilter
 import CollisionDetection as colDetect
-
+import aiAnimations
 
 # initialize pygame
 pygame.init()
@@ -93,6 +93,7 @@ button_text_60 = pygame.font.Font("UI/AMS hand writing.ttf", 60)
 
 # set player animations
 player_animation = ["", "", "", ""]
+# Todo turn magic numbers in animations into constants
 # set left animation
 player_animation[library.LEFT] = Animator("Characters/"
                                           "girl_sideLeft_spriteSheet.png",
@@ -133,6 +134,7 @@ player_idle_animation[library.BACKWARDS] = Animator("Characters/girl_frontIdle"
 ghost_animations = Animator("Well Escape Tiles/ghostTiles/ghost_0_face_3.png",
                             library.scaleNum, 3, 7, 1.5)  # list()
 
+aiAnimationPaths = aiAnimations.AiAnimation()
 
 if not os.path.exists("Well Escape tiles/varieties"):
     os.makedirs("Well Escape tiles/varieties")
@@ -182,14 +184,19 @@ def event_inputs():
         # has a mouse button just been pressed?
         elif event.type == MOUSEBUTTONDOWN:
             library.KEY_PRESSED["mouse"] = True
-            print("This is mouse down")
 
         elif event.type == MOUSEBUTTONUP:                       # has a mouse button just been released?
             if main_menu_buttons["new game"].is_pressed(pygame.mouse.get_pos(), (460, 168),
                                                         library.KEY_PRESSED["mouse"]) and library.MAIN_MENU is True:
+                if library.HAD_FIRST_RUN:
+                    dunGen.reset(True)
+
+                library.HAD_FIRST_RUN = True
+
                 # Starts a new game
                 library.HAS_STARTED = True
                 library.MAIN_MENU = False
+                library.PAUSED = False
             elif main_menu_buttons["continue"].is_pressed(pygame.mouse.get_pos(), (460, 268),
                                                           library.KEY_PRESSED["mouse"]) and library.MAIN_MENU is True:
                 #   just starts a new game for now will be changed to a load game function
@@ -236,7 +243,8 @@ def event_inputs():
                     and library.PAUSE_MENU is True:
                 #  Restarts the game
                 library.PAUSED = False
-                start()
+                # Todo this needs to just reset the current room insted of makeing a new one.
+                dunGen.reset(dunGen.GameStore.current_dungeon == 0)
             elif option_buttons["controls"].is_pressed(pygame.mouse.get_pos(), (460, 488), library.KEY_PRESSED["mouse"])\
                     and library.PAUSE_MENU is True:
                 # Opens the controls interface
@@ -260,23 +268,27 @@ def event_inputs():
                 #  this is a check to see if you're in options
                 #  when clicking back
                 library.OPTIONS = False
-            elif game_over_buttons["restart"].is_pressed(pygame.mouse.get_pos(), (460, 168), library.KEY_PRESSED["mouse"]
+
+            if game_over_buttons["restart"].is_pressed(pygame.mouse.get_pos(), (460, 168), library.KEY_PRESSED["mouse"]
                                                          and library.GAME_OVER is True):
-                start()
                 library.GAME_OVER = False
+                library.RESET = True
+                dunGen.reset(True)
+
             elif game_over_buttons["exit to menu"].is_pressed(pygame.mouse.get_pos(), (460, 318),
                                                             library.KEY_PRESSED["mouse"] and library.GAME_OVER is True):
                 main_menu()
                 library.GAME_OVER = False
-            elif game_over_buttons["quit game"].is_pressed(pygame.mouse.get_pos(), (460, 168),
+                library.HAS_STARTED = False
+            elif game_over_buttons["quit game"].is_pressed(pygame.mouse.get_pos(), (460, 468),
                                                            library.KEY_PRESSED["mouse"] and library.GAME_OVER is True):
                 exit_game()
+
             library.KEY_PRESSED["mouse"] = False
-            print("This is mouse up", pygame.mouse.get_pos())
 
 
 def game_over():
-    library.GAME_OVER = True
+
     controls_text = pygame.font.Font("UI/AMS hand writing.ttf", 175)
     screen.fill(library.WHITE)
     # title
@@ -618,6 +630,8 @@ def main():
 
     # main game loop
     while True:
+        movement_speed = 0
+
         t = pygame.time.get_ticks()
         # amount of time that passed since the last frame in seconds
         delta_time = (t - ticks_since_last_frame) / 1000.0
@@ -647,15 +661,12 @@ def main():
         # switch between active and idle
         if not player_idle:
             player = player_animation[current_direction]
-        else:
-            # prevent the player moving
-            # if the game is paused or has not started yet!
-            movement_speed = 0
 
         # prevent the player from moving if the game has not finished resetting
-        if library.RESET:
+        if library.RESET or library.PAUSED or library.GAME_OVER or not library.HAS_STARTED:
             movement_speed = 0
-        else:
+
+        if not library.RESET:
             if not library.PAUSED:
                 colDetect.detect_collision()
                 # Key press actions
@@ -770,10 +781,10 @@ def main():
                     player = player_idle_animation[current_direction]
 
                 # update animation times
-                player.update_time(delta_time)
-                ghost_animations.update_time(delta_time)
-                fuel_meter.update_fuel_timer(delta_time)
-
+                if not library.GAME_OVER and library.HAS_STARTED:
+                    player.update_time(delta_time)
+                    ghost_animations.update_time(delta_time)
+                    fuel_meter.update_fuel_timer(delta_time)
             else:
                 display_pause_menu = True
 
@@ -781,6 +792,8 @@ def main():
             # Display main menu if the game has not started
             if not library.HAS_STARTED:
                 main_menu()
+            elif library.GAME_OVER:
+                game_over()
             # display the pause menu if the game paused
             elif display_pause_menu is True:
                 pause_menu()
@@ -797,10 +810,9 @@ def main():
                                  dunGen.GameStore.offsetY))
 
                 # update player's position
-                player_x_pos = dunGen.GameStore.x + dunGen.GameStore.playerX - \
-                    dunGen.GameStore.offsetX
-                player_y_pos = dunGen.GameStore.y + dunGen.GameStore.playerY - \
-                    dunGen.GameStore.offsetY
+                player_x_pos, player_y_pos = dunGen.get_position_with_offset(
+                    dunGen.GameStore.playerX, dunGen.GameStore.playerY
+                )
 
                 # colDetect.draw_collision()
                 dunGen.draw_chest()
@@ -810,6 +822,12 @@ def main():
                             (int(dunGen.TILE_SIZE * 0.9),
                              int(dunGen.TILE_SIZE * 0.9))),
                             (player_x_pos, player_y_pos))
+
+                aiAnimationPaths.update_animations(delta_time, screen)
+
+                if aiAnimationPaths.ghost_in_position(player_x_pos, player_y_pos, screen):
+                    library.GAME_OVER = True
+
 
                 playerLight.update_light(fuel_meter.get_fuel_percentage())
                 playerLight.initialise_lightning(dunGen.TILE_SIZE)

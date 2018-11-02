@@ -4,6 +4,8 @@ import random
 import tileGenerator
 import main
 import library
+import loadSave
+import os
 from random import choices
 
 tile_class = tileGenerator.Tiles()
@@ -51,7 +53,10 @@ class GameStore:
     collisions = [top_col, bottom_col, left_col, right_col]
     start_x = 0
     start_y = 0
+    # todo rename level count to room count
+    START_LEVEL_COUNT = 3
     levelCount = 3
+    current_dungeon = 0
     levels = []
     chests = []
     starting_point_x = []
@@ -63,11 +68,8 @@ class GameStore:
     prediction_Y = 0
     secondary_prediction_X = 0
     secondary_prediction_Y = 0
+    # should the first room be the well room?
     well_room = True
-
-    # Todo remove temp animation variable
-    temp_lerp_timer = 0
-    temp_rev_lerp = False
 
 
 for num in range(GameStore.levelCount):
@@ -76,8 +78,18 @@ for num in range(GameStore.levelCount):
     GameStore.starting_point_y.append(0)
 
 
-def reset():
+def reset(first_scene = False):
     """reset all the tile variables and create a new dungeon."""
+
+    if not first_scene:
+        GameStore.current_dungeon += 1
+    else:
+        GameStore.current_dungeon = 0
+
+    GameStore.well_room = first_scene
+    main.fuel_meter.reset_fuel()
+    GameStore.levelCount = GameStore.START_LEVEL_COUNT + GameStore.current_dungeon
+    GameStore.playerX, GameStore.playerY = 0, 0
     floorTilesX.clear()
     floorTilesY.clear()
     wallTiles.clear()
@@ -85,8 +97,12 @@ def reset():
     allTilePositions.clear()
     allTiles.clear()
     allTileMaterials.clear()
+    GameStore.chests.clear()
+    # Todo check that the animation are being reset once the doors are not geting spwaned on next level!
+    main.aiAnimationPaths.reset_animator(first_scene)
     GameStore.current_tile = 0
     create_dungeon()
+
 
 
 def create_dungeon():
@@ -107,22 +123,31 @@ def create_dungeon():
         # create the room
         initialize_level(i)
         gen_chest_map(i)
+
+    main.aiAnimationPaths.apply_position_offset_to_room_path(GameStore.starting_point_x, GameStore.starting_point_y)
     main.start()
 
+    # todo remove commented code below once we are all happy thats it working correctly.
+    # print("starting_points", GameStore.starting_point_x, GameStore.starting_point_y)
+    # main.aiAnimationPaths.print_data()
 
 def gen_chest_map(level_id):
+
     map_width = GameStore.chest_map.get_width()
     map_height = GameStore.chest_map.get_height()
+
     for y in range(map_height):
         for x in range(map_width):
+
             pixel = GameStore.chest_map.get_at((x, y))
             pixel_tone = (pixel.r + pixel.g + pixel.b) / 3  # pixel brightness
-            if 0 < pixel_tone < 255:
+
+            if pixel.r == 125 and pixel.a > 100: # 0 < pixel_tone < 255:
                 pos_x = x * TILE_SIZE + GameStore.starting_point_x[level_id]
                 pos_y = y * TILE_SIZE + GameStore.starting_point_y[level_id]
                 chest = [pos_x, pos_y]
                 GameStore.chests.append(chest)
-    print(GameStore.chests)
+    print("----------------------", GameStore.chests)
     return GameStore.chests
 
 
@@ -366,29 +391,45 @@ def get_dungeon_room(first):
     :return:    a randomly chosen pixel map
     """
     # load up the pixel maps
+    start_map = "pixelLevels/startMap/"     # the start map need to come from its own folder so it is not included in the main room maps
     pixel_map = "pixelLevels/"
     chest_map = "pixelLevels/chestMaps/"
-    small_room = pygame.image.load(pixel_map + "smallRoom_000.png")
-    small_room_chest = pygame.image.load(chest_map + "smallRoom_000.png")
+    ai_map =    "pixelLevels/aiOverlays/"
 
-    hallway = pygame.image.load(pixel_map + "hall_000.png")
-    hallway_chest = pygame.image.load(chest_map + "hall_000.png")
+    # we only need to store the file names with out the path.
+    # as there **MUST** be a corresponding image in both
+    # chestMaps and aiOverlays with the same name.
 
-    mid_room = pygame.image.load(pixel_map + "MidRoom_000.png")
-    mid_room_chest = pygame.image.load(chest_map + "MidRoom_000.png")
+    rooms = loadSave.get_file_names_in_directory(pixel_map, ".png") # [hallway, small_room, mid_room]
 
-    chests = [hallway_chest, small_room_chest, mid_room_chest]
-    rooms = [hallway, small_room, mid_room]
-    indexes = [0, 1, 2]
-    room_weights = [0.5, 0.75, 0.25]
+    indexes = list(range(len(rooms)))
+    # Todo this needs to be set at the start so it does not change each time we select a room.
+    room_weights = get_random_room_weights(len(indexes))  # [0.5, 0.75, 0.25]
+
+    print(rooms, "weights", room_weights)
+
     if first:
         # load up and choose the starting room pixel map
-        current_module = pygame.image.load(pixel_map + "start.png")
-        current_chest = pygame.image.load(chest_map + "start.png")
+        current_module = pygame.image.load(start_map + "start.png")
+        current_chest = pygame.image.load(start_map + "start_chest.png")
     else:
         # choose a random pixel map
         current_index = random.choices(indexes, room_weights)[0]
-        current_module = rooms[current_index]
-        current_chest = chests[current_index]
+        current_module = pygame.image.load(pixel_map + rooms[current_index])
+        current_chest = pygame.image.load(chest_map + rooms[current_index])
+        main.aiAnimationPaths.load_paths(ai_map + rooms[current_index])
 
     return current_module, current_chest
+
+
+def get_random_room_weights(count):
+    """Get a random list of weights
+    :param count:   Amount of weights to generate
+    :return:        weights list
+    """
+    weights = []
+
+    for i in range(count):
+        weights.append(random.random())
+
+    return weights

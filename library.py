@@ -27,6 +27,7 @@ HAS_STARTED = False
 EDITOR = False
 RESET = False
 
+HAD_FIRST_RUN = False
 
 # set Colors (r, g, b, a)
 BLUE = (0, 0, 255, 255)
