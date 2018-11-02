@@ -71,6 +71,7 @@ class GameStore:
     # should the first room be the well room?
     well_room = True
     reset_fuel = False
+    add_fuel = False
 
 
 for num in range(GameStore.levelCount):

@@ -837,6 +837,9 @@ def main():
         if dunGen.GameStore.reset_fuel:
             fuel_meter.reset_fuel()
             dunGen.GameStore.reset_fuel = False
+        elif dunGen.GameStore.add_fuel:
+            fuel_meter.add_fuel()
+            dunGen.GameStore.add_fuel = False
 
         # update the display.
         fps_clock.tick(FPS)

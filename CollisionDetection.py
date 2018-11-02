@@ -150,7 +150,7 @@ def detect_collision():
 
         if TileStore.current_chest_index > -1:
             if library.KEY_PRESSED["space"]:
-                fuelMeter.Torch.add_fuel(fuelMeter.Torch)
+                dunGen.GameStore.add_fuel = True
                 dunGen.GameStore.chests.pop(TileStore.current_chest_index)
 
     # if the secondary predicted tile is a wall tile
