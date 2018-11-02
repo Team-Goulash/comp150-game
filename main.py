@@ -276,7 +276,7 @@ def event_inputs():
 
 
 def game_over():
-    library.GAME_OVER = True
+
     controls_text = pygame.font.Font("UI/AMS hand writing.ttf", 175)
     screen.fill(library.WHITE)
     # title
@@ -618,6 +618,11 @@ def main():
 
     # main game loop
     while True:
+
+        print("GO:", library.GAME_OVER)
+
+        movement_speed = 0
+
         t = pygame.time.get_ticks()
         # amount of time that passed since the last frame in seconds
         delta_time = (t - ticks_since_last_frame) / 1000.0
@@ -647,15 +652,12 @@ def main():
         # switch between active and idle
         if not player_idle:
             player = player_animation[current_direction]
-        else:
-            # prevent the player moving
-            # if the game is paused or has not started yet!
-            movement_speed = 0
 
         # prevent the player from moving if the game has not finished resetting
-        if library.RESET:
+        if library.RESET or library.PAUSED or library.GAME_OVER or not library.HAS_STARTED:
             movement_speed = 0
-        else:
+
+        if not library.RESET:
             if not library.PAUSED:
                 colDetect.detect_collision()
                 # Key press actions
@@ -780,6 +782,8 @@ def main():
             # Display main menu if the game has not started
             if not library.HAS_STARTED:
                 main_menu()
+            elif library.GAME_OVER:
+                game_over()
             # display the pause menu if the game paused
             elif display_pause_menu is True:
                 pause_menu()
@@ -796,10 +800,9 @@ def main():
                                  dunGen.GameStore.offsetY))
 
                 # update player's position
-                player_x_pos = dunGen.GameStore.x + dunGen.GameStore.playerX - \
-                    dunGen.GameStore.offsetX
-                player_y_pos = dunGen.GameStore.y + dunGen.GameStore.playerY - \
-                    dunGen.GameStore.offsetY
+                player_x_pos, player_y_pos = dunGen.get_position_with_offset(
+                    dunGen.GameStore.playerX, dunGen.GameStore.playerY
+                )
 
                 # colDetect.draw_collision()
                 dunGen.draw_chest()
@@ -811,6 +814,10 @@ def main():
                             (player_x_pos, player_y_pos))
 
                 aiAnimationPaths.update_animations(delta_time, screen)
+
+                if aiAnimationPaths.ghost_in_position(player_x_pos, player_y_pos, screen):
+                    library.GAME_OVER = True
+
 
                 #playerLight.update_light(fuel_meter.get_fuel_percentage())
                 #playerLight.initialise_lightning(dunGen.TILE_SIZE)

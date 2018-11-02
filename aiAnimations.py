@@ -274,6 +274,5 @@ class AiAnimation:
                 print("Contact")
                 return True
 
-
         return False
 
