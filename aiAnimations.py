@@ -46,7 +46,6 @@ class AiAnimation:
 
             if start_position is not None:
                 path.append(start_position)
-                print("start pos", start_position, "(", room_image_src)
                 next_move = start_position
                 block_direction = None
 
@@ -54,7 +53,6 @@ class AiAnimation:
                     next_move, block_direction = self.get_next_point(pixel_img, next_move[0], next_move[1], block_direction)
                     if next_move is not None:
                         path.append(next_move)
-                        # print(next_move)
                 # prevents single points being entered as paths
                 if len(path) > 1:
                     paths.append(path)
@@ -65,7 +63,6 @@ class AiAnimation:
         self.ghost_paths.append(paths)
         self.room_size.append(pixel_img.get_size())
 
-
     def print_data(self):
 
      # [room id][path id][path positiom]
@@ -74,7 +71,6 @@ class AiAnimation:
             for p in range(len(self.ghost_paths[r])):
                 print("path", p)
                 print(self.ghost_paths[r][p])
-
 
     def get_start_point(self, image, last_x, last_y):
 
@@ -137,24 +133,17 @@ class AiAnimation:
                 continue
 
             paths = self.ghost_paths[room_id]
-            print(room_id, paths, self.ghost_paths[-1])
 
             offset = room_offsets_x[room], room_offsets_y[room]
 
             for path_id in range(len(paths)):
                 for cell_id in range(len(self.ghost_paths[room_id][path_id])):
                     # work out the new position and apply it
-                    #new_position_x, new_position_y = offset
-                    #print("aaaaa", new_position_y, self.ghost_paths[room_id][path_id][cell_id][1], ((self.ghost_paths[room_id][path_id][cell_id][1]) * library.scaleNum), (((self.ghost_paths[room_id][path_id][cell_id][1]) * library.scaleNum) + new_position_y))
-                    # todo find out why the cell id is out by (2, -1)
-                    # new_position_x = (offset[0] + self.room_size[room+1][0]) + ((self.ghost_paths[room_id][path_id][cell_id][0] + 3) * library.scaleNum)
-                    # new_position_y = (offset[1] + self.room_size[room+1][1]) + ((self.ghost_paths[room_id][path_id][cell_id][1] + 6) * library.scaleNum)
                     new_position_x = offset[0] + (self.ghost_paths[room_id][path_id][cell_id][0] * library.scaleNum)
                     new_position_y = offset[1] + (self.ghost_paths[room_id][path_id][cell_id][1] * library.scaleNum)
                     self.ghost_paths[room_id][path_id][cell_id] = (new_position_x, new_position_y)
                     # set up the ghost animation
                 self.add_random_ghost_animation(room_id, path_id, self.ghost_paths[room_id][path_id][0])
-                #print(offset)
 
 
     def add_random_ghost_animation(self, room_id, path_id, start_position):
@@ -257,15 +246,6 @@ class AiAnimation:
             in_x, in_y = False, False
 
             i += 1
-            '''
-            if obj_top_left[0] < ghost_bottom_right[0] and obj_top_left[0] > ghost_top_left[0] and obj_bottom_right[0] > ghost_top_left[0] and obj_bottom_right[1] < ghost_bottom_right[0]:
-                print("In Y")
-                in_y = True
-
-            if obj_top_left[1] < ghost_bottom_right[1] and obj_top_left[1] > ghost_top_left[1] or obj_bottom_right[1] > ghost_top_left[1] and obj_bottom_right[1] < ghost_bottom_right[1]:
-                print("In X")
-                in_x = True
-            '''
 
             if pos_x > ghost_top_left[0] and pos_x < ghost_bottom_right[0] and pos_y > ghost_top_left[1] and pos_y < ghost_bottom_right[1]:
                     in_x, in_y = True, True
