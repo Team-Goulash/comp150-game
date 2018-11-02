@@ -53,7 +53,10 @@ class GameStore:
     collisions = [top_col, bottom_col, left_col, right_col]
     start_x = 0
     start_y = 0
+    # todo rename level count to room count
+    START_LEVEL_COUNT = 3
     levelCount = 3
+    current_dungeon = 0
     levels = []
     chests = []
     starting_point_x = []
@@ -65,6 +68,7 @@ class GameStore:
     prediction_Y = 0
     secondary_prediction_X = 0
     secondary_prediction_Y = 0
+    # should the first room be the well room?
     well_room = True
 
 
@@ -74,8 +78,18 @@ for num in range(GameStore.levelCount):
     GameStore.starting_point_y.append(0)
 
 
-def reset():
+def reset(first_scene = False):
     """reset all the tile variables and create a new dungeon."""
+
+    if not first_scene:
+        GameStore.current_dungeon += 1
+    else:
+        GameStore.current_dungeon = 0
+
+    GameStore.well_room = first_scene
+    main.fuel_meter.reset_fuel()
+    GameStore.levelCount = GameStore.START_LEVEL_COUNT + GameStore.current_dungeon
+    GameStore.playerX, GameStore.playerY = 0, 0
     floorTilesX.clear()
     floorTilesY.clear()
     wallTiles.clear()
@@ -85,7 +99,7 @@ def reset():
     allTileMaterials.clear()
     GameStore.chests.clear()
     # Todo check that the animation are being reset once the doors are not geting spwaned on next level!
-    main.aiAnimationPaths.reset_animator()
+    main.aiAnimationPaths.reset_animator(first_scene)
     GameStore.current_tile = 0
     create_dungeon()
 

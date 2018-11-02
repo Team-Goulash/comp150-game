@@ -19,13 +19,13 @@ class AiAnimation:
     current_move_time = 0
     first_scene = True
 
-    def reset_animator(self):
+    def reset_animator(self, first_scene):
         self.ghost_paths.clear()
         self.room_size.clear()
         self.ghost_sprite_animations.clear()
         self.current_move_time = 0
         # todo this needs to be set when we go to the next scene
-        self.first_scene = False
+        self.first_scene = first_scene
 
     def load_paths(self, room_image_src):
 
