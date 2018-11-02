@@ -239,7 +239,7 @@ class AiAnimation:
 
         # todo remove temp shiz!!
         temp_rect = (obj_top_left[0], obj_top_left[1], library.scaleNum-20, library.scaleNum-10)
-        pygame.draw.rect(surface, library.RED, temp_rect, 3)
+        # pygame.draw.rect(surface, library.RED, temp_rect, 3)
 
         pos_x += library.scaleNum//2
         pos_y += library.scaleNum//2
@@ -252,7 +252,7 @@ class AiAnimation:
 
             # todo remove temp shiz!!
             temp_rect = (ghost_top_left[0], ghost_top_left[1], library.scaleNum, library.scaleNum)
-            pygame.draw.rect(surface, library.RED, temp_rect, 3)
+            # pygame.draw.rect(surface, library.RED, temp_rect, 3)
 
             in_x, in_y = False, False
 

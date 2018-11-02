@@ -15,7 +15,8 @@ class Torch: # Change name later
         self.add_fuel()
 
     def add_fuel(self):
-        fuel_reward = random.randint(20, 30)
+        # Todo put fule range back to 20, 30
+        fuel_reward = random.randint(60, 80)
         self.torch_time += fuel_reward
         print("added ", fuel_reward, "to your torch")
 
