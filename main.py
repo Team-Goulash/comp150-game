@@ -206,7 +206,6 @@ def event_inputs():
                                                          library.KEY_PRESSED["mouse"]) and library.MAIN_MENU is True:
                 #   Opens up settings from the main menu
                 library.SETTINGS = True
-                print("test")
             elif main_menu_buttons["controls"].is_pressed(pygame.mouse.get_pos(), (460, 468),
                                                           library.KEY_PRESSED["mouse"]) and library.MAIN_MENU is True:
                 # Opens up controls from the main menu
@@ -540,7 +539,6 @@ def start():
         dunGen.GameStore.playerSpawnPoint = [spawn_x, spawn_y]
         dunGen.GameStore.well_room = False
     else:
-        print(dunGen.GameStore.well_room)
         door_pos = dunGen.allTilePositions[dunGen.allTiles.index(2)]
         dunGen.GameStore.playerSpawnPoint = [door_pos[0], door_pos[1]
                                              + (dunGen.TILE_SIZE * 0.5)]
@@ -827,13 +825,18 @@ def main():
                 if aiAnimationPaths.ghost_in_position(player_x_pos, player_y_pos, screen):
                     library.GAME_OVER = True
 
-
                 playerLight.update_light(fuel_meter.get_fuel_percentage())
                 playerLight.initialise_lightning(dunGen.TILE_SIZE)
                 playerLight.draw_light(screen, dunGen)
                 playerLight.overlay(screen)
 
                 fuel_meter.display_fuel_meter(screen, (630, 50))
+
+        if fuel_meter.torch_time == 0:
+            library.GAME_OVER = True
+        if dunGen.GameStore.reset_fuel:
+            fuel_meter.reset_fuel()
+            dunGen.GameStore.reset_fuel = False
 
         # update the display.
         fps_clock.tick(FPS)

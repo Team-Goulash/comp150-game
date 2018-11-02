@@ -70,6 +70,7 @@ class GameStore:
     secondary_prediction_Y = 0
     # should the first room be the well room?
     well_room = True
+    reset_fuel = False
 
 
 for num in range(GameStore.levelCount):
@@ -88,7 +89,7 @@ def reset(first_scene=False, is_reset=False):
 
 
     GameStore.well_room = first_scene
-    main.fuel_meter.reset_fuel()
+    GameStore.reset_fuel = True # fuel_meter.add_fuel() # reset_fuel()
     GameStore.levelCount = GameStore.START_LEVEL_COUNT + GameStore.current_dungeon
     GameStore.playerX, GameStore.playerY = 0, 0
     floorTilesX.clear()
@@ -128,9 +129,6 @@ def create_dungeon():
     main.aiAnimationPaths.apply_position_offset_to_room_path(GameStore.starting_point_x, GameStore.starting_point_y)
     main.start()
 
-    # todo remove commented code below once we are all happy thats it working correctly.
-    # print("starting_points", GameStore.starting_point_x, GameStore.starting_point_y)
-    # main.aiAnimationPaths.print_data()
 
 def gen_chest_map(level_id):
 
@@ -148,7 +146,7 @@ def gen_chest_map(level_id):
                 pos_y = y * TILE_SIZE + GameStore.starting_point_y[level_id]
                 chest = [pos_x, pos_y]
                 GameStore.chests.append(chest)
-    print("----------------------", GameStore.chests)
+
     return GameStore.chests
 
 
@@ -406,8 +404,6 @@ def get_dungeon_room(first):
     indexes = list(range(len(rooms)))
     # Todo this needs to be set at the start so it does not change each time we select a room.
     room_weights = get_random_room_weights(len(indexes))  # [0.5, 0.75, 0.25]
-
-    print(rooms, "weights", room_weights)
 
     if first:
         # load up and choose the starting room pixel map
