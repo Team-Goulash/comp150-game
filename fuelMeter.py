@@ -5,7 +5,7 @@ class Torch: # Change name later
     # Maximum torch time
     MAX_TORCH_TIME = 80
     # Torch time upon spawning
-    torch_time = 50;
+    torch_time = 50
     # Bar images
     bar_holder = pygame.image.load("./UI/fuel_bar_holder.png")
     fuel_bar = pygame.image.load("./UI/fuel_bar.png")
@@ -16,7 +16,7 @@ class Torch: # Change name later
 
     def add_fuel(self):
         # Todo put fule range back to 20, 30
-        fuel_reward = random.randint(60, 80)
+        fuel_reward = random.randint(20, 30)
         self.torch_time += fuel_reward
         print("added ", fuel_reward, "to your torch")
 
