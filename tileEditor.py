@@ -8,7 +8,8 @@ import pygame
 import sys
 import library
 import UI
-import pathlib
+# import pathlib
+import loadSave
 import os
 import image_effects
 import main
@@ -42,7 +43,7 @@ class EditorStore:
     save_file_name_input = ""
 
 
-TILE_SIZE = 93
+TILE_SIZE = 93      # default preview tile size
 WINDOW_HEIGHT, WINDOW_WIDTH = 750, 1334
 WINDOW_MARGIN_X, WINDOW_MARGIN_Y = 50, 50
 # set screen to None to force into standalone mode
@@ -260,19 +261,12 @@ def get_files_in_directory(directory, file_type):
 
     :param directory:   the directory to search.
     :param file_type:   the extension so search for.
-    :return:            list of files in directory.
+    :return:            list of files in directory with extension.
     """
-    file_list = []
-    files = pathlib.Path(directory)
-
-    for f in files.iterdir():
-
-        if f.is_file() and os.path.splitext(f)[1] == file_type:
-            file_list.append(str(f.absolute()))
 
     EditorStore.update_image_directory = False
 
-    return file_list
+    return loadSave.load_files_form_directory(directory, file_type)
 
 
 def display_select_tile():
