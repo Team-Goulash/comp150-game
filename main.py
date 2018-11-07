@@ -17,6 +17,8 @@ import colorBlindFilter
 import CollisionDetection as colDetect
 import aiAnimations
 
+import mainMenu
+
 # initialize pygame
 pygame.init()
 # Set the window size
@@ -27,6 +29,10 @@ WINDOW_WIDTH = 1334
 screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
 
 import tileEditor as Editor
+
+menu = mainMenu.Menu()
+menus = None            # this is set just befor main is called at the end of the script
+
 # UI Buttons
 main_menu_buttons = {"new game": None, "continue": None, "options": None,
                      "controls": None, "quit game": None, "back": None}
@@ -626,6 +632,8 @@ def main():
     # players current direction
     current_direction = library.BACKWARDS
 
+
+
     # main game loop
     while True:
         movement_speed = 0
@@ -839,6 +847,11 @@ def main():
             fuel_meter.reset_fuel()
             dunGen.GameStore.reset_fuel = False
 
+        # New ui code!
+        # Todo this needs to use some sort of state controller.
+        menus.draw_buttons(screen, pygame.mouse.get_pos(), library.KEY_PRESSED["mouse"])
+        menus.is_button_pressed(pygame.mouse.get_pos(), library.KEY_PRESSED["mouse"])
+
         # update the display.
         fps_clock.tick(FPS)
         pygame.display.flip()
@@ -846,5 +859,8 @@ def main():
 
 
 if __name__ == "__main__":
+    menu.set_functions_by_name("exit", exit_game)
+    menus = menu.initialize_menu()
+
     colorBlindFilter.initialization()
     main()
