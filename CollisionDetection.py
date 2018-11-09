@@ -3,6 +3,7 @@ from pygame.locals import *
 import dungeonGenerator as dunGen
 import main
 import library
+import fuelMeter
 
 
 class TileStore:
@@ -20,6 +21,9 @@ class TileStore:
     current_tile_pos3 = [0, 0]
     current_tile_type3 = 0
     current_tile_material3 = 0
+
+    current_chest_index = 0
+    current_chest_pos = [0, 0]
 
     previous_inputs = [False, False, False, False]
 
@@ -91,6 +95,14 @@ def detect_collision():
     TileStore.current_tile_material3 = dunGen.allTileMaterials[
         TileStore.current_tile_index3]
 
+    if TileStore.current_tile_pos in dunGen.GameStore.chests:
+        TileStore.current_chest_index = dunGen.GameStore.chests.index(
+            TileStore.current_tile_pos)
+        TileStore.current_chest_pos = dunGen.GameStore.chests[
+            TileStore.current_chest_index]
+    else:
+        TileStore.current_chest_index = -1
+
     # if the secondary predicted tile is a floor or a door
     if (TileStore.current_tile_type2 == 0
         or TileStore.current_tile_type2 > 1) and \
@@ -129,7 +141,6 @@ def detect_collision():
         # and let the player press space to restart
         if TileStore.current_tile_type == 2 \
                 and TileStore.current_tile_material == 1:
-
                 if library.KEY_PRESSED["space"]:
                     dunGen.reset()
                 if TileStore.current_tile_pos[1] < dunGen.GameStore.playerY:
@@ -137,11 +148,10 @@ def detect_collision():
                 else:
                     dunGen.GameStore.bottom_col = False
 
-        if TileStore.current_tile_type == 3 \
-                and TileStore.current_tile_material == 0:
-
-                if library.KEY_PRESSED["space"]:
-                    return
+        if TileStore.current_chest_index > -1:
+            if library.KEY_PRESSED["space"]:
+                dunGen.GameStore.add_fuel = True
+                dunGen.GameStore.chests.pop(TileStore.current_chest_index)
 
     # if the secondary predicted tile is a wall tile
     if TileStore.current_tile_type3 == 1 or TileStore.current_tile_type2 == 1 \

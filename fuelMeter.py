@@ -1,5 +1,6 @@
 import pygame
 import random
+import library
 
 class Torch: # Change name later
     # Maximum torch time
@@ -17,8 +18,9 @@ class Torch: # Change name later
 
     def add_fuel(self):
         # Todo put fule range back to 20, 30
-        fuel_reward = random.randint(60, 80)
+        fuel_reward = random.randint(20, 30)
         self.torch_time += fuel_reward
+        self.torch_time = library.clamp(0, self.MAX_TORCH_TIME, self.torch_time)
         print("added ", fuel_reward, "to your torch")
 
     def torch_extinguishing(self):

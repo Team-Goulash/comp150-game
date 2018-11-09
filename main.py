@@ -249,7 +249,7 @@ def event_inputs():
                 #  Restarts the game
                 library.PAUSED = False
                 # Todo this needs to just reset the current room insted of makeing a new one.
-                dunGen.reset(dunGen.GameStore.current_dungeon == 0)
+                dunGen.reset(dunGen.GameStore.current_dungeon == 0, True)
             elif option_buttons["controls"].is_pressed(pygame.mouse.get_pos(), (460, 488), library.KEY_PRESSED["mouse"])\
                     and library.PAUSE_MENU is True:
                 # Opens the controls interface
@@ -820,7 +820,6 @@ def main():
                     dunGen.GameStore.playerX, dunGen.GameStore.playerY
                 )
 
-                # colDetect.draw_collision()
                 dunGen.draw_chest()
 
                 # draw the player
@@ -846,6 +845,9 @@ def main():
         if dunGen.GameStore.reset_fuel:
             fuel_meter.reset_fuel()
             dunGen.GameStore.reset_fuel = False
+        elif dunGen.GameStore.add_fuel:
+            fuel_meter.add_fuel()
+            dunGen.GameStore.add_fuel = False
 
         # New ui code!
         # Todo this needs to use some sort of state controller.

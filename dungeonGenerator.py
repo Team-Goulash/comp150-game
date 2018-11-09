@@ -71,6 +71,7 @@ class GameStore:
     # should the first room be the well room?
     well_room = True
     reset_fuel = False
+    add_fuel = False
 
 
 for num in range(GameStore.levelCount):
@@ -79,13 +80,14 @@ for num in range(GameStore.levelCount):
     GameStore.starting_point_y.append(0)
 
 
-def reset(first_scene = False):
+def reset(first_scene=False, is_reset=False):
     """reset all the tile variables and create a new dungeon."""
 
-    if not first_scene:
+    if not first_scene and not is_reset:
         GameStore.current_dungeon += 1
-    else:
+    elif first_scene:
         GameStore.current_dungeon = 0
+
 
     GameStore.well_room = first_scene
     GameStore.reset_fuel = True # fuel_meter.add_fuel() # reset_fuel()
