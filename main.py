@@ -629,7 +629,7 @@ def animation_direction(last_direction):
 
 def set_game_states(state):
 
-    state.add_state("main", "main")
+    state.add_state("main menu", "main menu")
     state.add_state("loading", "loading")
     state.add_state("game", "game")
     state.add_state("paused", "paused")
@@ -638,7 +638,7 @@ def set_game_states(state):
 
 def set_menu_states(state):
 
-    state.add_state("main", "Main Menu")
+    state.add_state("main menu", "Main Menu")
     state.add_state("options", "Options")
     state.add_state("contr", "Controls")
 
