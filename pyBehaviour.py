@@ -13,8 +13,8 @@ class PyBehaviour:
         if inputs["right"]:
             self.right()
 
-        if inputs["down"]:
-            self.down()
+        if inputs["backwards"]:
+            self.backwards()
 
         if inputs["left"]:
             self.left()
@@ -25,7 +25,7 @@ class PyBehaviour:
     def right(self):
         pass
 
-    def down(self):
+    def backwards(self):
         pass
 
     def left(self):
