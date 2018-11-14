@@ -2,7 +2,7 @@
 
 import pygame
 import timeManager
-import stateContr
+from stateContr import StateController
 
 import sys
 import library
@@ -627,6 +627,7 @@ def animation_direction(last_direction):
 
     return direction, idle
 
+
 def set_game_states(state):
 
     state.add_state("main menu", "main menu")
@@ -648,7 +649,7 @@ def set_menu_states(state):
     # set the state to the default main menu
     state.set_state("main menu")
 
-    
+
 def main():
     """Main game loop."""
     dunGen.create_dungeon()
@@ -658,10 +659,11 @@ def main():
     # players current direction
     current_direction = library.BACKWARDS
 
-    game_state = stateContr.StateController()
+    # setup the states for both game and menus
+    game_state = StateController()
     set_game_states(game_state)
 
-    menu_state = stateContr.StateController()
+    menu_state = StateController()
     set_menu_states(menu_state)
 
     # main game loop
@@ -884,13 +886,13 @@ def main():
             pass
         elif game_state.get_state() == "game":
             pass
-        elif game_state.get_state() == "main":
+        elif game_state.get_state() == "main menu":
             # New ui code!
             menus.draw_buttons(screen, pygame.mouse.get_pos(), library.KEY_PRESSED["mouse"])
             menus.is_button_pressed(pygame.mouse.get_pos(), library.KEY_PRESSED["mouse"])
         elif game_state.get_state() == "paused":
             pass
-        elif set_game_states() == "editor":
+        elif game_state.get_state() == "editor":
             pass
 
         # update the display.

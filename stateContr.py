@@ -5,6 +5,10 @@ class StateController:
 
     states = {}
 
+    def __init__(self):
+        self.current_state = None
+        self.states = {}
+
     def add_state(self, state_name, state_value):
         """Adds a state to the list of states"""
         self.states[state_name] = state_value
