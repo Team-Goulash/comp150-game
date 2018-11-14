@@ -1,4 +1,5 @@
 """MAIN CODEBASE."""
+
 import pygame
 import timeManager
 import stateContr
@@ -651,10 +652,11 @@ def main():
     # players current direction
     current_direction = library.BACKWARDS
 
-
     game_state = stateContr.StateController()
-    menu_state = stateContr.StateController()
+    set_game_states(game_state)
 
+    menu_state = stateContr.StateController()
+    set_menu_states(menu_state)
 
     # main game loop
     while True:
@@ -871,10 +873,19 @@ def main():
             fuel_meter.add_fuel()
             dunGen.GameStore.add_fuel = False
 
-        # New ui code!
-        # Todo this needs to use some sort of state controller.
-        menus.draw_buttons(screen, pygame.mouse.get_pos(), library.KEY_PRESSED["mouse"])
-        menus.is_button_pressed(pygame.mouse.get_pos(), library.KEY_PRESSED["mouse"])
+        # NEW MAIN CODE
+        if game_state.get_state() == "loading":
+            pass
+        elif game_state.get_state() == "game":
+            pass
+        elif game_state.get_state() == "main":
+            # New ui code!
+            menus.draw_buttons(screen, pygame.mouse.get_pos(), library.KEY_PRESSED["mouse"])
+            menus.is_button_pressed(pygame.mouse.get_pos(), library.KEY_PRESSED["mouse"])
+        elif game_state.get_state() == "paused":
+            pass
+        elif set_game_states() == "editor":
+            pass
 
         # update the display.
         fps_clock.tick(FPS)
