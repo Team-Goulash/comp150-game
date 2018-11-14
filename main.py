@@ -1,6 +1,8 @@
 """MAIN CODEBASE."""
 import pygame
 import timeManager
+import stateContr
+
 import sys
 import library
 import random
@@ -624,7 +626,22 @@ def animation_direction(last_direction):
 
     return direction, idle
 
+def set_game_states(state):
 
+    state.add_state("main", "main")
+    state.add_state("loading", "loading")
+    state.add_state("game", "game")
+    state.add_state("paused", "paused")
+    state.add_state("editor", "editor")
+
+
+def set_menu_states(state):
+
+    state.add_state("main", "Main Menu")
+    state.add_state("options", "Options")
+    state.add_state("contr", "Controls")
+
+    
 def main():
     """Main game loop."""
     dunGen.create_dungeon()
@@ -634,6 +651,9 @@ def main():
     # players current direction
     current_direction = library.BACKWARDS
 
+
+    game_state = stateContr.StateController()
+    menu_state = stateContr.StateController()
 
 
     # main game loop
