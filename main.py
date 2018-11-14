@@ -146,6 +146,10 @@ ghost_animations = Animator("Well Escape Tiles/ghostTiles/ghost_0_face_3.png",
 
 aiAnimationPaths = aiAnimations.AiAnimation()
 
+# Game and menu states
+game_state = StateController()
+menu_state = StateController()
+
 if not os.path.exists("Well Escape tiles/varieties"):
     os.makedirs("Well Escape tiles/varieties")
 else:
@@ -186,6 +190,11 @@ def event_inputs():
                 library.KEY_PRESSED["space"] = event.type == KEYDOWN
 
         if event.type == KEYUP:
+            if game_state.get_state() == "game":
+                game_state.set_state("paused")
+            elif game_state.get_state() == "paused":
+                game_state.set_state("game")
+            # Todo remove once new ui has been implemented
             if event.key == library.PAUSE and library.MAIN_MENU is False: # Pauses the game
                 library.PAUSED = not library.PAUSED
                 library.CONTROLS = False
@@ -204,6 +213,7 @@ def event_inputs():
                 library.HAD_FIRST_RUN = True
 
                 # Starts a new game
+                game_state.set_state("game")
                 library.HAS_STARTED = True
                 library.MAIN_MENU = False
                 library.PAUSED = False
@@ -244,6 +254,7 @@ def event_inputs():
                     and library.PAUSE_MENU is True:
                 #   Resumes the game
                 library.PAUSED = False
+                game_state.set_state("game")
             elif option_buttons["options"].is_pressed(pygame.mouse.get_pos(), (460, 288), library.KEY_PRESSED["mouse"])\
                     and library.PAUSE_MENU is True:
                 #   Opens the options interface
@@ -252,6 +263,7 @@ def event_inputs():
                     and library.PAUSE_MENU is True:
                 #  Restarts the game
                 library.PAUSED = False
+                game_state.set_state("game")
                 # Todo this needs to just reset the current room insted of makeing a new one.
                 dunGen.reset(dunGen.GameStore.current_dungeon == 0, True)
             elif option_buttons["controls"].is_pressed(pygame.mouse.get_pos(), (460, 488), library.KEY_PRESSED["mouse"])\
@@ -263,6 +275,7 @@ def event_inputs():
                     and library.PAUSE_MENU is True:
                 # Sends you to the main menu
                 print("menu test")
+                game_state.set_state("main menu")
                 main_menu()
                 library.HAS_STARTED = False
 
@@ -633,6 +646,7 @@ def set_game_states(state):
     state.add_state("main menu", "main menu")
     state.add_state("loading", "loading")
     state.add_state("game", "game")
+    state.add_state("game over", "game over")
     state.add_state("paused", "paused")
     state.add_state("editor", "editor")
 
@@ -660,10 +674,7 @@ def main():
     current_direction = library.BACKWARDS
 
     # setup the states for both game and menus
-    game_state = StateController()
     set_game_states(game_state)
-
-    menu_state = StateController()
     set_menu_states(menu_state)
 
     # main game loop
@@ -874,6 +885,7 @@ def main():
 
         if fuel_meter.torch_time == 0:
             library.GAME_OVER = True
+
         if dunGen.GameStore.reset_fuel:
             fuel_meter.reset_fuel()
             dunGen.GameStore.reset_fuel = False
@@ -885,7 +897,7 @@ def main():
         if game_state.get_state() == "loading":
             pass
         elif game_state.get_state() == "game":
-            pass
+            print("game face")
         elif game_state.get_state() == "main menu":
             # New ui code!
             menus.draw_buttons(screen, pygame.mouse.get_pos(), library.KEY_PRESSED["mouse"])
