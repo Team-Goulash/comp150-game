@@ -30,3 +30,10 @@ class PyBehaviour:
 
     def left(self):
         pass
+
+
+class Transform(PyBehaviour):
+
+    position = (0, 0)
+    rotation = 0
+    scale = (0, 0)
