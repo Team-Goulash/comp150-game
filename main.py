@@ -635,12 +635,18 @@ def set_game_states(state):
     state.add_state("paused", "paused")
     state.add_state("editor", "editor")
 
+    # set the state to the default main menu
+    state.set_state("main menu")
+
 
 def set_menu_states(state):
 
     state.add_state("main menu", "Main Menu")
     state.add_state("options", "Options")
     state.add_state("contr", "Controls")
+
+    # set the state to the default main menu
+    state.set_state("main menu")
 
     
 def main():
