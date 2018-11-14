@@ -1,5 +1,6 @@
 """MAIN CODEBASE."""
 import pygame
+import timeManager
 import sys
 import library
 import random
@@ -627,7 +628,8 @@ def animation_direction(last_direction):
 def main():
     """Main game loop."""
     dunGen.create_dungeon()
-    ticks_since_last_frame = 0
+
+    time = timeManager.TimeManager(pygame.time.get_ticks()/1000.0)
 
     # players current direction
     current_direction = library.BACKWARDS
@@ -638,13 +640,13 @@ def main():
     while True:
         movement_speed = 0
 
-        t = pygame.time.get_ticks()
+        time.update_time(pygame.time.get_ticks()/1000.0)
+
         # amount of time that passed since the last frame in seconds
-        delta_time = (t - ticks_since_last_frame) / 1000.0
+        delta_time = time.delta_time
 
         if library.EDITOR:
             Editor.display()
-            ticks_since_last_frame = t
             continue
 
         # Get inputs
@@ -857,7 +859,6 @@ def main():
         # update the display.
         fps_clock.tick(FPS)
         pygame.display.flip()
-        ticks_since_last_frame = t
 
 
 if __name__ == "__main__":
