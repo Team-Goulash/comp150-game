@@ -887,6 +887,8 @@ def main():
             fuel_meter.display_fuel_meter(screen, (630, 50))
 
             if fuel_meter.torch_time == 0:
+                game_state.set_state("game over")
+                # todo remove when ui is sorted
                 library.GAME_OVER = True
 
             if dunGen.GameStore.reset_fuel:
