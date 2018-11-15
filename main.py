@@ -869,31 +869,32 @@ def main():
                 if aiAnimationPaths.ghost_in_position(player_x_pos, player_y_pos, screen):
                     library.GAME_OVER = True
 
-                fuel_meter.display_fuel_meter(screen, (630, 50))
-
-        if fuel_meter.torch_time == 0:
-            library.GAME_OVER = True
-
-        if dunGen.GameStore.reset_fuel:
-            fuel_meter.reset_fuel()
-            dunGen.GameStore.reset_fuel = False
-        elif dunGen.GameStore.add_fuel:
-            fuel_meter.add_fuel()
-            dunGen.GameStore.add_fuel = False
-
         # NEW MAIN CODE
         if game_state.get_state() == "loading":
             pass
         elif game_state.get_state() == "game":
 
+            # Player
             player_object.block_move_direction(dunGen.GameStore.top_col, dunGen.GameStore.right_col, dunGen.GameStore.bottom_col, dunGen.GameStore.left_col)
             player_object.update(library.KEY_PRESSED)
             player_object.draw(dunGen.TILE_SIZE, screen)
-
+            # Light
             playerLight.update_light(fuel_meter.get_fuel_percentage())
             playerLight.initialise_lightning(dunGen.TILE_SIZE)
             playerLight.draw_light(screen, dunGen)
             playerLight.overlay(screen)
+            # Fuel Meta (UI)
+            fuel_meter.display_fuel_meter(screen, (630, 50))
+
+            if fuel_meter.torch_time == 0:
+                library.GAME_OVER = True
+
+            if dunGen.GameStore.reset_fuel:
+                fuel_meter.reset_fuel()
+                dunGen.GameStore.reset_fuel = False
+            elif dunGen.GameStore.add_fuel:
+                fuel_meter.add_fuel()
+                dunGen.GameStore.add_fuel = False
 
         elif game_state.get_state() == "game over":
             pass
