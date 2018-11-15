@@ -869,11 +869,6 @@ def main():
                 if aiAnimationPaths.ghost_in_position(player_x_pos, player_y_pos, screen):
                     library.GAME_OVER = True
 
-                playerLight.update_light(fuel_meter.get_fuel_percentage())
-                playerLight.initialise_lightning(dunGen.TILE_SIZE)
-                playerLight.draw_light(screen, dunGen)
-                playerLight.overlay(screen)
-
                 fuel_meter.display_fuel_meter(screen, (630, 50))
 
         if fuel_meter.torch_time == 0:
@@ -894,6 +889,11 @@ def main():
             player_object.block_move_direction(dunGen.GameStore.top_col, dunGen.GameStore.right_col, dunGen.GameStore.bottom_col, dunGen.GameStore.left_col)
             player_object.update(library.KEY_PRESSED)
             player_object.draw(dunGen.TILE_SIZE, screen)
+
+            playerLight.update_light(fuel_meter.get_fuel_percentage())
+            playerLight.initialise_lightning(dunGen.TILE_SIZE)
+            playerLight.draw_light(screen, dunGen)
+            playerLight.overlay(screen)
 
         elif game_state.get_state() == "game over":
             pass
