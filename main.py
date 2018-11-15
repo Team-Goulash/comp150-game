@@ -631,7 +631,6 @@ def main():
                         if not dunGen.GameStore.previousY == dunGen.GameStore.y:
                             dunGen.GameStore.y -= movement_speed
                             dunGen.GameStore.previousY = dunGen.GameStore.y
-                        # dunGen.GameStore.playerY = dunGen.GameStore.previousPlayerY
 
                 if library.KEY_PRESSED["backwards"] and \
                         not library.KEY_PRESSED["forwards"]:
@@ -656,7 +655,6 @@ def main():
                         if not dunGen.GameStore.previousY == dunGen.GameStore.y:
                             dunGen.GameStore.y += movement_speed
                             dunGen.GameStore.previousY = dunGen.GameStore.y
-                        # dunGen.GameStore.playerY = dunGen.GameStore.previousPlayerY
 
                 if library.KEY_PRESSED["left"] and \
                         not library.KEY_PRESSED["right"]:
@@ -681,7 +679,6 @@ def main():
                         if not dunGen.GameStore.previousX == dunGen.GameStore.x:
                             dunGen.GameStore.x -= movement_speed
                             dunGen.GameStore.previousX = dunGen.GameStore.x
-                        # dunGen.GameStore.playerX = dunGen.GameStore.previousPlayerX
 
                 if library.KEY_PRESSED["right"] and \
                         not library.KEY_PRESSED["left"]:
@@ -706,7 +703,6 @@ def main():
                         if not dunGen.GameStore.previousX == dunGen.GameStore.x:
                             dunGen.GameStore.x += movement_speed
                             dunGen.GameStore.previousX = dunGen.GameStore.x
-                        # dunGen.GameStore.playerX = dunGen.GameStore.previousPlayerX
 
                 # update animation times
                 if not library.GAME_OVER and library.HAS_STARTED:

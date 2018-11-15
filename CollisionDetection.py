@@ -131,9 +131,6 @@ def detect_collision():
             TileStore.previous_inputs[2] = False
             TileStore.previous_inputs[3] = False
 
-        # save the current position of the player
-        dunGen.GameStore.previousPlayerY = dunGen.GameStore.player.position[0]
-        dunGen.GameStore.previousPlayerX = dunGen.GameStore.player.position[1]
         # save the current predicted tile
         dunGen.GameStore.last_tile = TileStore.current_tile_index2
 
@@ -164,11 +161,6 @@ def detect_collision():
         for i in range(len(dunGen.GameStore.collisions)):
             if dunGen.GameStore.collisions[i]:
                 true_collisions.append(dunGen.GameStore.collisions[i])
-
-        # if there are no true collisions yet, save the player position
-        if len(true_collisions) < 1:
-            dunGen.GameStore.previousPlayerX = dunGen.GameStore.player.position[0]
-            dunGen.GameStore.previousPlayerY = dunGen.GameStore.player.position[0]
 
         # block the movement in corresponding directions
         # depending on the current and predicted tiles' types

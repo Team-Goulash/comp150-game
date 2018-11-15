@@ -29,11 +29,7 @@ materials = tile_class.tileTypes
 class GameStore:
     """A variable storage class."""
 
-    #playerX = 0
-    #playerY = 0
     player = None
-    previousPlayerX = 0
-    previousPlayerY = 0
     previousX = 0
     previousY = 0
     offsetX = 0
