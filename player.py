@@ -97,12 +97,12 @@ class Player(pyBehaviour.Transform):
         UPDATE_LENGTH_IDLE
     )
 
-    def __init__(self, move_speed, scale, time_manager, get_world_position_funct):
+    def __init__(self, move_speed, scale, time_manager):
 
         self.move_speed = move_speed
         self.scale = scale
         self.time_manager = time_manager
-        self.get_world_position_funct = get_world_position_funct
+        self.get_world_position_funct = None
 
     def block_move_direction(self, forwards, right, backwards, left):
         """"""
@@ -134,6 +134,7 @@ class Player(pyBehaviour.Transform):
         :return:                (Direction, idle)
         """
         # find if no keys are pressed and set it to idle
+        print("aa", inputs)
         idle = not inputs["left"] and not \
             inputs["right"] and not \
             inputs["forwards"] and not \
@@ -173,7 +174,9 @@ class Player(pyBehaviour.Transform):
 
     def update(self, inputs):
 
-        next_animation_direction, idle = self.animation_direction(
+        self.previous_position = self.position
+
+        next_animation_direction, self.idle = self.animation_direction(
             self.current_direction,
             inputs
         )
@@ -203,7 +206,7 @@ class Player(pyBehaviour.Transform):
         if self.blocked_move_direct["forwards"]:
             return
 
-        self.position[0] += self.time_manager.delta_time * self.move_speed
+        self.position[1] -= self.time_manager.delta_time * self.move_speed
 
     def right(self):
         """Right key action"""
@@ -211,7 +214,7 @@ class Player(pyBehaviour.Transform):
         if self.blocked_move_direct["right"]:
             return
 
-        self.position[1] += self.time_manager.delta_time * self.move_speed
+        self.position[0] += self.time_manager.delta_time * self.move_speed
 
     def backwards(self):
         """Down key action"""
@@ -219,7 +222,7 @@ class Player(pyBehaviour.Transform):
         if self.blocked_move_direct["backwards"]:
             return
 
-        self.position[0] -= self.time_manager.delta_time * self.move_speed
+        self.position[1] += self.time_manager.delta_time * self.move_speed
 
     def left(self):
         """Left key action"""
@@ -227,22 +230,29 @@ class Player(pyBehaviour.Transform):
         if self.blocked_move_direct["left"]:
             return
 
-        self.position[1] -= self.time_manager.delta_time * self.move_speed
+        self.position[0] -= self.time_manager.delta_time * self.move_speed
 
-    def draw(self, surface):
+    def draw(self, tile_size, surface):
 
         if self.idle:
             current_animation = self.idle_animation[self.current_direction]
         else:
             current_animation = self.animation[self.current_direction]
 
+        current_animation.update_time(self.time_manager.delta_time)
+
         current_sprite = current_animation.get_current_sprite()
         # resize the object by scale
-        current_sprite = pygame.transform.scale(current_sprite, self.scale)
+        current_sprite = pygame.transform.scale(
+            current_sprite,
+            (int(tile_size * self.scale[0]), int(tile_size * self.scale[1]))
+        )
 
         pos_x, pos_y = self.get_world_position_funct(
             self.position[0],
             self.position[1]
         )
+
+        print(pos_x, pos_y)
 
         surface.blit(current_sprite, (pos_x, pos_y))

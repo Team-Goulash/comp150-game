@@ -34,6 +34,6 @@ class PyBehaviour:
 
 class Transform(PyBehaviour):
 
-    position = (0, 0)
+    position = [0, 0]
     rotation = 0
-    scale = (0, 0)
+    scale = [0, 0]
