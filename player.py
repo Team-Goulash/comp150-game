@@ -134,7 +134,6 @@ class Player(pyBehaviour.Transform):
         :return:                (Direction, idle)
         """
         # find if no keys are pressed and set it to idle
-        print("aa", inputs)
         idle = not inputs["left"] and not \
             inputs["right"] and not \
             inputs["forwards"] and not \
@@ -252,7 +251,5 @@ class Player(pyBehaviour.Transform):
             self.position[0],
             self.position[1]
         )
-
-        print(pos_x, pos_y)
 
         surface.blit(current_sprite, (pos_x, pos_y))
