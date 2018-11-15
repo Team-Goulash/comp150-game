@@ -100,50 +100,6 @@ title_text = pygame.font.Font("UI/AMS hand writing.ttf", 115)
 button_text = pygame.font.Font("UI/AMS hand writing.ttf", 55)
 button_text_60 = pygame.font.Font("UI/AMS hand writing.ttf", 60)
 
-
-# set player animations
-player_animation = ["", "", "", ""]
-# Todo turn magic numbers in animations into constants
-# set left animation
-player_animation[library.LEFT] = Animator("Characters/"
-                                          "girl_sideLeft_spriteSheet.png",
-                                          library.scaleNum, 3, 7, 0.75)
-# set right animation
-player_animation[library.RIGHT] = Animator("Characters/"
-                                           "girl_sideRight_spriteSheet.png",
-                                           library.scaleNum, 3, 7, 0.75)
-# set forwards animation
-player_animation[library.FORWARDS] = Animator("Characters/"
-                                              "girl_back_spriteSheet.png",
-                                              library.scaleNum, 3, 7, 0.75)
-# set backwards animation
-player_animation[library.BACKWARDS] = Animator("Characters/"
-                                               "girl_front_spriteSheet.png",
-                                               library.scaleNum, 3, 7, 0.75)
-
-# set player idle animations
-player_idle_animation = ["", "", "", ""]
-# set left idle animation
-player_idle_animation[library.LEFT] = Animator("Characters/girl_sideLeftIdle"
-                                               "_spriteSheet.png",
-                                               library.scaleNum, 3, 7, 1.5)
-# set right idle animation
-player_idle_animation[library.RIGHT] = Animator("Characters/girl_sideRightIdle"
-                                                "_spriteSheet.png",
-                                                library.scaleNum, 3, 7, 1.5)
-# set forwards idle animation
-player_idle_animation[library.FORWARDS] = Animator("Characters/girl_backIdle"
-                                                   "_spriteSheet.png",
-                                                   library.scaleNum, 3, 7, 1.5)
-# set backwards idle animation
-player_idle_animation[library.BACKWARDS] = Animator("Characters/girl_frontIdle"
-                                                    "_spriteSheet.png",
-                                                    library.scaleNum,
-                                                    3, 7, 1.5)
-
-ghost_animations = Animator("Well Escape Tiles/ghostTiles/ghost_0_face_3.png",
-                            library.scaleNum, 3, 7, 1.5)  # list()
-
 aiAnimationPaths = aiAnimations.AiAnimation()
 
 # Game and menu states
@@ -584,65 +540,6 @@ def start():
     library.RESET = False
 
 
-def change_direction(last_dir, current_dir):
-    """
-    Reset the players animator if the direction changes.
-
-    :param last_dir:        players direction from last frame
-    :param current_dir:     players direction this frame
-    :return:                current direction
-    """
-    if last_dir != current_dir:
-        player_animation[last_dir].reset()
-    return current_dir
-
-
-def animation_direction(last_direction):
-    """
-    Get the next animation direction.
-
-    this prevents it from resetting if two keys are pressed at the same time!
-    :return: (Direction, idle)
-    """
-    # find if any keys are pressed and set it to idle
-    idle = not library.KEY_PRESSED["left"] and not \
-        library.KEY_PRESSED["right"] and not \
-        library.KEY_PRESSED["forwards"] and not \
-        library.KEY_PRESSED["backwards"]
-
-    # if there's no keys pressed return early as there's nothing to test
-    if idle:
-        return last_direction, idle
-
-    # set direction to last direction
-    # in case there is opposite keys being pressed
-    direction = last_direction
-
-    # set to idle if both left and right keys are pressed
-    if library.KEY_PRESSED["left"] and library.KEY_PRESSED["right"]:
-        idle = True
-    elif library.KEY_PRESSED["left"]:       # set left direction
-        direction = library.LEFT
-    elif library.KEY_PRESSED["right"]:      # set right direction
-        direction = library.RIGHT
-
-    # do forwards and backwards in separate if
-    # as the animation trumps left and right
-    # set to idle if both forwards and backwards keys are pressed
-    if library.KEY_PRESSED["forwards"] and library.KEY_PRESSED["backwards"]:
-        # set to idle if neither left or right is pressed
-        idle = not library.KEY_PRESSED["left"] and not\
-            library.KEY_PRESSED["right"]
-    elif library.KEY_PRESSED["forwards"]:
-        direction = library.FORWARDS        # set forwards direction
-        idle = False
-    elif library.KEY_PRESSED["backwards"]:
-        direction = library.BACKWARDS       # set backwards direction
-        idle = False
-
-    return direction, idle
-
-
 def set_game_states(state):
 
     state.add_state("main menu", "main menu")
@@ -698,21 +595,10 @@ def main():
 
         display_pause_menu = False
 
-        # set the players animation direction and idle for the animation
-        next_animation_direction, player_idle = \
-            animation_direction(current_direction)
-        # set the current direction
-        current_direction = change_direction(current_direction,
-                                             next_animation_direction)
-
         if not library.PAUSED and library.HAS_STARTED:
             # multiply the movement by delta_time to ensure constant speed
             # no matter the FPS
             movement_speed = 75 * delta_time
-
-        # switch between active and idle
-        if not player_idle:
-            player = player_animation[current_direction]
 
         # prevent the player from moving if the game has not finished resetting
         if library.RESET or library.PAUSED or library.GAME_OVER or not library.HAS_STARTED:
@@ -822,16 +708,8 @@ def main():
                             dunGen.GameStore.previousX = dunGen.GameStore.x
                         # dunGen.GameStore.playerX = dunGen.GameStore.previousPlayerX
 
-                # switch between active and idle
-                if not player_idle:
-                    player = player_animation[current_direction]
-                else:
-                    player = player_idle_animation[current_direction]
-
                 # update animation times
                 if not library.GAME_OVER and library.HAS_STARTED:
-                    player.update_time(delta_time)
-                    ghost_animations.update_time(delta_time)
                     fuel_meter.update_fuel_timer(delta_time)
             else:
                 display_pause_menu = True
@@ -883,6 +761,7 @@ def main():
             playerLight.initialise_lightning(dunGen.TILE_SIZE)
             playerLight.draw_light(screen, dunGen)
             playerLight.overlay(screen)
+
             # Fuel Meta (UI)
             fuel_meter.display_fuel_meter(screen, (630, 50))
 
