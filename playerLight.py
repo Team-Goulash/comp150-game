@@ -31,8 +31,8 @@ def draw_light(surface, other_script):
     :return:            No return.
     """
     current_tile_x, current_tile_y = other_script.\
-        get_coordiantes_from_position(other_script.GameStore.playerX,
-                                      other_script.GameStore.playerY,
+        get_coordiantes_from_position(other_script.GameStore.player.position[0],
+                                      other_script.GameStore.player.position[1],
                                       (0.5, 0.85))
 
     current_tile_x -= ((Variables.light_range - 1) // 2)

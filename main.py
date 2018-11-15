@@ -1,5 +1,9 @@
 """MAIN CODEBASE."""
+
 import pygame
+import timeManager
+from stateContr import StateController
+from player import Player
 import sys
 import library
 import random
@@ -17,6 +21,8 @@ import colorBlindFilter
 import CollisionDetection as colDetect
 import aiAnimations
 
+import mainMenu
+
 # initialize pygame
 pygame.init()
 # Set the window size
@@ -27,6 +33,10 @@ WINDOW_WIDTH = 1334
 screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
 
 import tileEditor as Editor
+
+menu = mainMenu.Menu()
+menus = None            # this is set just befor main is called at the end of the script
+
 # UI Buttons
 main_menu_buttons = {"new game": None, "continue": None, "options": None,
                      "controls": None, "quit game": None, "back": None}
@@ -90,51 +100,13 @@ title_text = pygame.font.Font("UI/AMS hand writing.ttf", 115)
 button_text = pygame.font.Font("UI/AMS hand writing.ttf", 55)
 button_text_60 = pygame.font.Font("UI/AMS hand writing.ttf", 60)
 
-
-# set player animations
-player_animation = ["", "", "", ""]
-# Todo turn magic numbers in animations into constants
-# set left animation
-player_animation[library.LEFT] = Animator("Characters/"
-                                          "girl_sideLeft_spriteSheet.png",
-                                          library.scaleNum, 3, 7, 0.75)
-# set right animation
-player_animation[library.RIGHT] = Animator("Characters/"
-                                           "girl_sideRight_spriteSheet.png",
-                                           library.scaleNum, 3, 7, 0.75)
-# set forwards animation
-player_animation[library.FORWARDS] = Animator("Characters/"
-                                              "girl_back_spriteSheet.png",
-                                              library.scaleNum, 3, 7, 0.75)
-# set backwards animation
-player_animation[library.BACKWARDS] = Animator("Characters/"
-                                               "girl_front_spriteSheet.png",
-                                               library.scaleNum, 3, 7, 0.75)
-
-# set player idle animations
-player_idle_animation = ["", "", "", ""]
-# set left idle animation
-player_idle_animation[library.LEFT] = Animator("Characters/girl_sideLeftIdle"
-                                               "_spriteSheet.png",
-                                               library.scaleNum, 3, 7, 1.5)
-# set right idle animation
-player_idle_animation[library.RIGHT] = Animator("Characters/girl_sideRightIdle"
-                                                "_spriteSheet.png",
-                                                library.scaleNum, 3, 7, 1.5)
-# set forwards idle animation
-player_idle_animation[library.FORWARDS] = Animator("Characters/girl_backIdle"
-                                                   "_spriteSheet.png",
-                                                   library.scaleNum, 3, 7, 1.5)
-# set backwards idle animation
-player_idle_animation[library.BACKWARDS] = Animator("Characters/girl_frontIdle"
-                                                    "_spriteSheet.png",
-                                                    library.scaleNum,
-                                                    3, 7, 1.5)
-
-ghost_animations = Animator("Well Escape Tiles/ghostTiles/ghost_0_face_3.png",
-                            library.scaleNum, 3, 7, 1.5)  # list()
-
 aiAnimationPaths = aiAnimations.AiAnimation()
+
+# Game and menu states
+game_state = StateController()
+menu_state = StateController()
+time = timeManager.TimeManager(pygame.time.get_ticks() / 1000.0)
+player_object = Player(75, (0.9, 0.9), time)
 
 if not os.path.exists("Well Escape tiles/varieties"):
     os.makedirs("Well Escape tiles/varieties")
@@ -177,6 +149,11 @@ def event_inputs():
 
         if event.type == KEYUP:
             if event.key == library.PAUSE and library.MAIN_MENU is False: # Pauses the game
+                if game_state.get_state() == "game":
+                    game_state.set_state("paused")
+                elif game_state.get_state() == "paused":
+                    game_state.set_state("game")
+                # Todo remove once new ui has been implemented
                 library.PAUSED = not library.PAUSED
                 library.CONTROLS = False
                 library.OPTIONS = False
@@ -194,6 +171,7 @@ def event_inputs():
                 library.HAD_FIRST_RUN = True
 
                 # Starts a new game
+                game_state.set_state("game")
                 library.HAS_STARTED = True
                 library.MAIN_MENU = False
                 library.PAUSED = False
@@ -234,6 +212,7 @@ def event_inputs():
                     and library.PAUSE_MENU is True:
                 #   Resumes the game
                 library.PAUSED = False
+                game_state.set_state("game")
             elif option_buttons["options"].is_pressed(pygame.mouse.get_pos(), (460, 288), library.KEY_PRESSED["mouse"])\
                     and library.PAUSE_MENU is True:
                 #   Opens the options interface
@@ -242,6 +221,7 @@ def event_inputs():
                     and library.PAUSE_MENU is True:
                 #  Restarts the game
                 library.PAUSED = False
+                game_state.set_state("game")
                 # Todo this needs to just reset the current room insted of makeing a new one.
                 dunGen.reset(dunGen.GameStore.current_dungeon == 0, True)
             elif option_buttons["controls"].is_pressed(pygame.mouse.get_pos(), (460, 488), library.KEY_PRESSED["mouse"])\
@@ -253,6 +233,7 @@ def event_inputs():
                     and library.PAUSE_MENU is True:
                 # Sends you to the main menu
                 print("menu test")
+                game_state.set_state("main menu")
                 main_menu()
                 library.HAS_STARTED = False
 
@@ -543,8 +524,8 @@ def start():
         dunGen.GameStore.playerSpawnPoint = [door_pos[0], door_pos[1]
                                              + (dunGen.TILE_SIZE * 0.5)]
 
-    dunGen.GameStore.playerX = dunGen.GameStore.playerSpawnPoint[0]
-    dunGen.GameStore.playerY = dunGen.GameStore.playerSpawnPoint[1]
+    player_object.position[0] = dunGen.GameStore.playerSpawnPoint[0]
+    player_object.position[1] = dunGen.GameStore.playerSpawnPoint[1]
 
     # variables for centering the level
     dunGen.GameStore.x = screen_rect.centerx - level_rect.centerx
@@ -559,84 +540,54 @@ def start():
     library.RESET = False
 
 
-def change_direction(last_dir, current_dir):
-    """
-    Reset the players animator if the direction changes.
+def set_game_states(state):
 
-    :param last_dir:        players direction from last frame
-    :param current_dir:     players direction this frame
-    :return:                current direction
-    """
-    if last_dir != current_dir:
-        player_animation[last_dir].reset()
-    return current_dir
+    state.add_state("main menu", "main menu")
+    state.add_state("loading", "loading")
+    state.add_state("game", "game")
+    state.add_state("game over", "game over")
+    state.add_state("paused", "paused")
+    state.add_state("editor", "editor")
+
+    # set the state to the default main menu
+    state.set_state("main menu")
 
 
-def animation_direction(last_direction):
-    """
-    Get the next animation direction.
+def set_menu_states(state):
 
-    this prevents it from resetting if two keys are pressed at the same time!
-    :return: (Direction, idle)
-    """
-    # find if any keys are pressed and set it to idle
-    idle = not library.KEY_PRESSED["left"] and not \
-        library.KEY_PRESSED["right"] and not \
-        library.KEY_PRESSED["forwards"] and not \
-        library.KEY_PRESSED["backwards"]
+    state.add_state("main menu", "Main Menu")
+    state.add_state("options", "Options")
+    state.add_state("contr", "Controls")
 
-    # if there's no keys pressed return early as there's nothing to test
-    if idle:
-        return last_direction, idle
-
-    # set direction to last direction
-    # in case there is opposite keys being pressed
-    direction = last_direction
-
-    # set to idle if both left and right keys are pressed
-    if library.KEY_PRESSED["left"] and library.KEY_PRESSED["right"]:
-        idle = True
-    elif library.KEY_PRESSED["left"]:       # set left direction
-        direction = library.LEFT
-    elif library.KEY_PRESSED["right"]:      # set right direction
-        direction = library.RIGHT
-
-    # do forwards and backwards in separate if
-    # as the animation trumps left and right
-    # set to idle if both forwards and backwards keys are pressed
-    if library.KEY_PRESSED["forwards"] and library.KEY_PRESSED["backwards"]:
-        # set to idle if neither left or right is pressed
-        idle = not library.KEY_PRESSED["left"] and not\
-            library.KEY_PRESSED["right"]
-    elif library.KEY_PRESSED["forwards"]:
-        direction = library.FORWARDS        # set forwards direction
-        idle = False
-    elif library.KEY_PRESSED["backwards"]:
-        direction = library.BACKWARDS       # set backwards direction
-        idle = False
-
-    return direction, idle
+    # set the state to the default main menu
+    state.set_state("main menu")
 
 
 def main():
     """Main game loop."""
+    player_object.get_world_position_funct = dunGen.get_position_with_offset
     dunGen.create_dungeon()
-    ticks_since_last_frame = 0
 
     # players current direction
     current_direction = library.BACKWARDS
+
+    # setup the states for both game and menus
+    set_game_states(game_state)
+    set_menu_states(menu_state)
+
+    dunGen.GameStore.player = player_object
 
     # main game loop
     while True:
         movement_speed = 0
 
-        t = pygame.time.get_ticks()
+        time.update_time(pygame.time.get_ticks()/1000.0)
+
         # amount of time that passed since the last frame in seconds
-        delta_time = (t - ticks_since_last_frame) / 1000.0
+        delta_time = time.delta_time
 
         if library.EDITOR:
             Editor.display()
-            ticks_since_last_frame = t
             continue
 
         # Get inputs
@@ -644,21 +595,10 @@ def main():
 
         display_pause_menu = False
 
-        # set the players animation direction and idle for the animation
-        next_animation_direction, player_idle = \
-            animation_direction(current_direction)
-        # set the current direction
-        current_direction = change_direction(current_direction,
-                                             next_animation_direction)
-
         if not library.PAUSED and library.HAS_STARTED:
             # multiply the movement by delta_time to ensure constant speed
             # no matter the FPS
             movement_speed = 75 * delta_time
-
-        # switch between active and idle
-        if not player_idle:
-            player = player_animation[current_direction]
 
         # prevent the player from moving if the game has not finished resetting
         if library.RESET or library.PAUSED or library.GAME_OVER or not library.HAS_STARTED:
@@ -674,7 +614,6 @@ def main():
                     if not dunGen.GameStore.top_col:
                         # move the player and assign prediction values
                         dunGen.GameStore.previousY = dunGen.GameStore.y
-                        dunGen.GameStore.playerY -= movement_speed
                         dunGen.GameStore.y += movement_speed
 
                         dunGen.GameStore.prediction_Y = -10
@@ -692,7 +631,6 @@ def main():
                         if not dunGen.GameStore.previousY == dunGen.GameStore.y:
                             dunGen.GameStore.y -= movement_speed
                             dunGen.GameStore.previousY = dunGen.GameStore.y
-                        dunGen.GameStore.playerY = dunGen.GameStore.previousPlayerY
 
                 if library.KEY_PRESSED["backwards"] and \
                         not library.KEY_PRESSED["forwards"]:
@@ -700,7 +638,6 @@ def main():
                     if not dunGen.GameStore.bottom_col:
                         # move the player and assign prediction values
                         dunGen.GameStore.previousY = dunGen.GameStore.y
-                        dunGen.GameStore.playerY += movement_speed
                         dunGen.GameStore.y -= movement_speed
 
                         dunGen.GameStore.prediction_Y = 10
@@ -718,7 +655,6 @@ def main():
                         if not dunGen.GameStore.previousY == dunGen.GameStore.y:
                             dunGen.GameStore.y += movement_speed
                             dunGen.GameStore.previousY = dunGen.GameStore.y
-                        dunGen.GameStore.playerY = dunGen.GameStore.previousPlayerY
 
                 if library.KEY_PRESSED["left"] and \
                         not library.KEY_PRESSED["right"]:
@@ -726,7 +662,6 @@ def main():
                     if not dunGen.GameStore.left_col:
                         # move the player and assign prediction values
                         dunGen.GameStore.previousX = dunGen.GameStore.x
-                        dunGen.GameStore.playerX -= movement_speed
                         dunGen.GameStore.x += movement_speed
 
                         dunGen.GameStore.prediction_X = -20
@@ -744,7 +679,6 @@ def main():
                         if not dunGen.GameStore.previousX == dunGen.GameStore.x:
                             dunGen.GameStore.x -= movement_speed
                             dunGen.GameStore.previousX = dunGen.GameStore.x
-                        dunGen.GameStore.playerX = dunGen.GameStore.previousPlayerX
 
                 if library.KEY_PRESSED["right"] and \
                         not library.KEY_PRESSED["left"]:
@@ -752,7 +686,6 @@ def main():
                     if not dunGen.GameStore.right_col:
                         # move the player and assign prediction values
                         dunGen.GameStore.previousX = dunGen.GameStore.x
-                        dunGen.GameStore.playerX += movement_speed
                         dunGen.GameStore.x -= movement_speed
 
                         dunGen.GameStore.prediction_X = 15
@@ -770,18 +703,9 @@ def main():
                         if not dunGen.GameStore.previousX == dunGen.GameStore.x:
                             dunGen.GameStore.x += movement_speed
                             dunGen.GameStore.previousX = dunGen.GameStore.x
-                        dunGen.GameStore.playerX = dunGen.GameStore.previousPlayerX
-
-                # switch between active and idle
-                if not player_idle:
-                    player = player_animation[current_direction]
-                else:
-                    player = player_idle_animation[current_direction]
 
                 # update animation times
                 if not library.GAME_OVER and library.HAS_STARTED:
-                    player.update_time(delta_time)
-                    ghost_animations.update_time(delta_time)
                     fuel_meter.update_fuel_timer(delta_time)
             else:
                 display_pause_menu = True
@@ -809,44 +733,65 @@ def main():
 
                 # update player's position
                 player_x_pos, player_y_pos = dunGen.get_position_with_offset(
-                    dunGen.GameStore.playerX, dunGen.GameStore.playerY
+                    player_object.position[0], player_object.position[1]
                 )
 
                 dunGen.draw_chest()
-
-                # draw the player
-                screen.blit(pygame.transform.scale(player.get_current_sprite(),
-                            (int(dunGen.TILE_SIZE * 0.9),
-                             int(dunGen.TILE_SIZE * 0.9))),
-                            (player_x_pos, player_y_pos))
 
                 aiAnimationPaths.update_animations(delta_time, screen)
 
                 if aiAnimationPaths.ghost_in_position(player_x_pos, player_y_pos, screen):
                     library.GAME_OVER = True
 
-                playerLight.update_light(fuel_meter.get_fuel_percentage())
-                playerLight.initialise_lightning(dunGen.TILE_SIZE)
-                playerLight.draw_light(screen, dunGen)
-                playerLight.overlay(screen)
+        # NEW MAIN CODE
+        if game_state.get_state() == "loading":
+            pass
+        elif game_state.get_state() == "game":
 
-                fuel_meter.display_fuel_meter(screen, (630, 50))
+            # Player
+            player_object.block_move_direction(dunGen.GameStore.top_col, dunGen.GameStore.right_col, dunGen.GameStore.bottom_col, dunGen.GameStore.left_col)
+            player_object.update(library.KEY_PRESSED)
+            player_object.draw(dunGen.TILE_SIZE, screen)
+            # Light
+            playerLight.update_light(fuel_meter.get_fuel_percentage())
+            playerLight.initialise_lightning(dunGen.TILE_SIZE)
+            playerLight.draw_light(screen, dunGen)
+            playerLight.overlay(screen)
 
-        if fuel_meter.torch_time == 0:
-            library.GAME_OVER = True
-        if dunGen.GameStore.reset_fuel:
-            fuel_meter.reset_fuel()
-            dunGen.GameStore.reset_fuel = False
-        elif dunGen.GameStore.add_fuel:
-            fuel_meter.add_fuel()
-            dunGen.GameStore.add_fuel = False
+            # Fuel Meta (UI)
+            fuel_meter.display_fuel_meter(screen, (630, 50))
+
+            if fuel_meter.torch_time == 0:
+                game_state.set_state("game over")
+                # todo remove when ui is sorted
+                library.GAME_OVER = True
+
+            if dunGen.GameStore.reset_fuel:
+                fuel_meter.reset_fuel()
+                dunGen.GameStore.reset_fuel = False
+            elif dunGen.GameStore.add_fuel:
+                fuel_meter.add_fuel()
+                dunGen.GameStore.add_fuel = False
+
+        elif game_state.get_state() == "game over":
+            pass
+        elif game_state.get_state() == "main menu":
+            # New ui code!
+            menus.draw_buttons(screen, pygame.mouse.get_pos(), library.KEY_PRESSED["mouse"])
+            menus.is_button_pressed(pygame.mouse.get_pos(), library.KEY_PRESSED["mouse"])
+        elif game_state.get_state() == "paused":
+            pass
+        elif game_state.get_state() == "editor":
+            pass
 
         # update the display.
         fps_clock.tick(FPS)
         pygame.display.flip()
-        ticks_since_last_frame = t
 
 
 if __name__ == "__main__":
+    menu.set_functions_by_name("exit", exit_game)
+    menus = menu.initialize_menu()
+
     colorBlindFilter.initialization()
     main()
