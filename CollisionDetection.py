@@ -38,11 +38,11 @@ def find_current_tile(prediction_x, prediction_y):
 
     previous_tile = dunGen.allTilePositions[dunGen.GameStore.current_tile]
     # round the current player position to the position of the nearest tile
-    current_tile_x = int(((dunGen.GameStore.playerX +
+    current_tile_x = int(((dunGen.GameStore.player.position[0] +
                            prediction_x)
                           / dunGen.TILE_SIZE)
                          + 0.5) * dunGen.TILE_SIZE
-    current_tile_y = int(((dunGen.GameStore.playerY +
+    current_tile_y = int(((dunGen.GameStore.player.position[1] +
                            prediction_y)
                           / dunGen.TILE_SIZE)
                          + 0.85) * dunGen.TILE_SIZE
@@ -131,9 +131,6 @@ def detect_collision():
             TileStore.previous_inputs[2] = False
             TileStore.previous_inputs[3] = False
 
-        # save the current position of the player
-        dunGen.GameStore.previousPlayerY = dunGen.GameStore.playerY
-        dunGen.GameStore.previousPlayerX = dunGen.GameStore.playerX
         # save the current predicted tile
         dunGen.GameStore.last_tile = TileStore.current_tile_index2
 
@@ -143,7 +140,7 @@ def detect_collision():
                 and TileStore.current_tile_material == 1:
                 if library.KEY_PRESSED["space"]:
                     dunGen.reset()
-                if TileStore.current_tile_pos[1] < dunGen.GameStore.playerY:
+                if TileStore.current_tile_pos[1] < dunGen.GameStore.player.position[1]:
                     dunGen.GameStore.bottom_col = True
                 else:
                     dunGen.GameStore.bottom_col = False
@@ -164,11 +161,6 @@ def detect_collision():
         for i in range(len(dunGen.GameStore.collisions)):
             if dunGen.GameStore.collisions[i]:
                 true_collisions.append(dunGen.GameStore.collisions[i])
-
-        # if there are no true collisions yet, save the player position
-        if len(true_collisions) < 1:
-            dunGen.GameStore.previousPlayerX = dunGen.GameStore.playerX
-            dunGen.GameStore.previousPlayerY = dunGen.GameStore.playerY
 
         # block the movement in corresponding directions
         # depending on the current and predicted tiles' types

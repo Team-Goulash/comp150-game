@@ -236,3 +236,26 @@ class UIInput(UIButtons):
         surface.blit(self.input_surface, screen_position)
 
         return self.focus
+
+# Todo Test and doc.
+class UIToggle(UIButtons):
+
+    tick_image = None
+    checked = False
+
+    def __init__(self, button_hover_src, button_normal_src,
+                 button_pressed_src, tick_src, size):
+        UIButtons.__init__(self, button_hover_src, button_normal_src, button_pressed_src, size)
+
+        # set the size of the tick to be 25% smaller than the button.
+        toggle_size = (size[0]*0.75, size[1]*0.75)
+
+        self.tick_image = self.set_button_image(tick_src, toggle_size , library.BLACK)
+
+    def is_pressed(self, cursor_pos, screen_pos, button_click):
+
+        self.checked = not self.checked
+
+        return UIButtons.is_pressed(self, cursor_pos, screen_pos, button_click)
+
+

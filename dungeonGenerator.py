@@ -29,10 +29,7 @@ materials = tile_class.tileTypes
 class GameStore:
     """A variable storage class."""
 
-    playerX = 0
-    playerY = 0
-    previousPlayerX = 0
-    previousPlayerY = 0
+    player = None
     previousX = 0
     previousY = 0
     offsetX = 0
@@ -92,7 +89,6 @@ def reset(first_scene=False, is_reset=False):
     GameStore.well_room = first_scene
     GameStore.reset_fuel = True # fuel_meter.add_fuel() # reset_fuel()
     GameStore.levelCount = GameStore.START_LEVEL_COUNT + GameStore.current_dungeon
-    GameStore.playerX, GameStore.playerY = 0, 0
     floorTilesX.clear()
     floorTilesY.clear()
     wallTiles.clear()

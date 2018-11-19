@@ -15,6 +15,7 @@ BACKWARDS = 3
 # boolean values for key pressed states
 KEY_PRESSED = {"left": False, "right": False, "forwards": False,
                "backwards": False, "mouse": False, "space": False}
+
 PAUSED = False
 MAIN_MENU = False
 OPTIONS = False
@@ -23,11 +24,13 @@ GAME_OVER = False
 CONTROLS = False
 SETTINGS = False
 MAIN_MENU_CONTROLS = False
+
+HAD_FIRST_RUN = False
 HAS_STARTED = False
 EDITOR = False
 RESET = False
 
-HAD_FIRST_RUN = False
+
 
 # set Colors (r, g, b, a)
 BLUE = (0, 0, 255, 255)
