@@ -60,7 +60,7 @@ class MusicGenerator:
 
         print(self.threshold)
 
-    def snare(self, i):
+    def snare(self):
         snare_speed = 20
         if self.currentNote == 4:
             self.snare_freq = random.randint(100, 1000)
