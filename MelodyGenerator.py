@@ -34,26 +34,33 @@ class MusicGenerator:
     current_chord = 1
     frequency = random.choice(D_MINOR_CHORDS[current_chord])
     frequency2 = random.choice(D_MINOR_CHORDS[current_chord]) * 2
+
     snare_freq = 1
     hi_hat_freq = 1
+
     currentProgress = 0
-    currentNote = 2
-    currentNote2 = 0
-    multiplier = 10
+
+    currentNote = 1
+    currentNote2 = 1
+
+    multiplier = 4
     songRate = SAMPLE_RATE * multiplier
-    volume = 0
+
+    volume = 0.5
+
     threshold = 0.1
 
     def chord_progression(self, i):
         if i >= self.songRate * self.threshold:
             self.threshold += 0.1
             if self.current_chord < len(self.D_MINOR_CHORDS.values()):
-                self.current_chord += 3
+                self.current_chord += 2
             else:
                 self.current_chord = 1
+
         print(self.threshold)
 
-    def snare(self):
+    def snare(self, i):
         snare_speed = 20
         if self.currentNote == 4:
             self.snare_freq = random.randint(100, 1000)
@@ -101,12 +108,10 @@ class MusicGenerator:
         for i in range(0, self.songRate):
             self.currentProgress += 1
 
-            self.fade_in(self)
             self.chord_progression(self, i)
-            self.snare(self)
+            self.snare(self, i)
             self.hi_hat(self)
             self.melody(self)
-            self.fade_out(self, i)
 
             sample_value = self.create_value(self, i, self.frequency, self.volume / 4)
             sample_value2 = self.create_value(self, i, self.frequency2,
@@ -127,8 +132,8 @@ class MusicGenerator:
 
 
 MusicGenerator.generate_track(MusicGenerator)
-sound = pygame.mixer.Sound(MusicGenerator.filename)
-pygame.mixer.Sound.set_volume(sound, 100)
+sound = pygame.mixer.music.load(MusicGenerator.filename)
+pygame.mixer.music.play(-1)
 
 
 def main():
@@ -139,9 +144,7 @@ def main():
                 sys.exit()
             if event.type == KEYDOWN:
                 if event.key == K_SPACE:
-                    sound.stop()
-                    sound.play()
-
+                    pass
 
 if __name__ == "__main__":
     main()
