@@ -28,51 +28,65 @@ class MusicGenerator:
     D_MINOR_CHORD_F = [D_MINOR["F"], D_MINOR["D"], D_MINOR["Bflat"]]
     D_MINOR_CHORD_G = [D_MINOR["G"], D_MINOR["E"], D_MINOR["C"]]
 
-    current_chord = D_MINOR_CHORD_A
-    frequency = random.choice(current_chord)
-    frequency2 = random.choice(current_chord) * 2
-    noise = 1
+    D_MINOR_CHORDS = {1: D_MINOR_CHORD_A, 2: D_MINOR_CHORD_B, 3: D_MINOR_CHORD_C, 4: D_MINOR_CHORD_D,
+                      5: D_MINOR_CHORD_E, 6: D_MINOR_CHORD_F, 7: D_MINOR_CHORD_G}
+
+    current_chord = 1
+    frequency = random.choice(D_MINOR_CHORDS[current_chord])
+    frequency2 = random.choice(D_MINOR_CHORDS[current_chord]) * 2
+    snare_freq = 1
+    hi_hat_freq = 1
     currentProgress = 0
     currentNote = 2
+    currentNote2 = 0
     multiplier = 10
     songRate = SAMPLE_RATE * multiplier
     volume = 0
+    threshold = 0.1
 
     def chord_progression(self, i):
-        if i == self.songRate * 0.1:
-            self.current_chord = self.D_MINOR_CHORD_B
-        elif i == self.songRate * 0.2:
-            self.current_chord = self.D_MINOR_CHORD_C
-        elif i == self.songRate * 0.3:
-            self.current_chord = self.D_MINOR_CHORD_F
-        elif i == self.songRate * 0.5:
-            self.current_chord = self.D_MINOR_CHORD_E
-        elif i == self.songRate * 0.75:
-            self.current_chord = self.D_MINOR_CHORD_D
+        if i >= self.songRate * self.threshold:
+            self.threshold += 0.1
+            if self.current_chord < len(self.D_MINOR_CHORDS.values()):
+                self.current_chord += 3
+            else:
+                self.current_chord = 1
+        print(self.threshold)
 
     def snare(self):
         snare_speed = 20
         if self.currentNote == 4:
-            self.noise = random.randint(100, 1000)
+            self.snare_freq = random.randint(100, 1000)
             if self.currentProgress == self.songRate / (snare_speed
                                                         * self.multiplier):
-                self.noise = 1
+                self.snare_freq = 1
                 self.currentNote = 0
 
+    def hi_hat(self):
+        hi_hat_speed = 150
+        if self.currentNote2 == 1:
+            self.hi_hat_freq = random.randint(5000, 10000)
+            if self.currentProgress == self.songRate / (hi_hat_speed
+                                                        * self.multiplier):
+                self.hi_hat_freq = 1
+                self.currentNote2 = 0
+
     def melody(self):
-        tempo = 6
+        tempo = 10
         if self.currentProgress == self.songRate / (tempo * self.multiplier):
-            self.frequency = random.choice(self.current_chord)
-            self.frequency2 = random.choice(self.current_chord) * 2
+            self.frequency = random.choice(self.D_MINOR_CHORDS[self.current_chord])
+            self.frequency2 = random.choice(self.D_MINOR_CHORDS[self.current_chord]) * 2
             self.currentNote += 1
+            self.currentNote2 += 1
             self.currentProgress = 0
 
     def create_value(self, i, frequency, volume):
-        value = math.sin(
+        max_sample_value = 2**15 - 1
+        sample_value = math.sin(
             2.0 * math.pi * frequency * (
                     i / float(self.SAMPLE_RATE))) * (
-                    volume * 32767)
-        return value
+                    volume * max_sample_value)
+        return sample_value
 
     def fade_out(self, i):
         if i >= self.songRate * 0.9:
@@ -90,16 +104,18 @@ class MusicGenerator:
             self.fade_in(self)
             self.chord_progression(self, i)
             self.snare(self)
+            self.hi_hat(self)
             self.melody(self)
             self.fade_out(self, i)
 
-            value = self.create_value(self, i, self.frequency, self.volume / 3)
-            value2 = self.create_value(self, i, self.frequency2,
-                                       self.volume / 3)
-            value3 = self.create_value(self, i, self.noise, self.volume / 3)
+            sample_value = self.create_value(self, i, self.frequency, self.volume / 4)
+            sample_value2 = self.create_value(self, i, self.frequency2,
+                                              self.volume / 4)
+            sample_value3 = self.create_value(self, i, self.snare_freq, self.volume / 4)
+            sample_value4 = self.create_value(self, i, self.hi_hat_freq, self.volume / 4)
 
-            print(value + value2 + value3)
-            packed_value = struct.pack('i', int(value + value2 + value3))
+            print(sample_value + sample_value2 + sample_value3 + sample_value4)
+            packed_value = struct.pack('i', int(sample_value + sample_value2 + sample_value3 + sample_value4))
 
             for j in range(0, self.wav_write .getnchannels()):
                 self.values.append(packed_value)
