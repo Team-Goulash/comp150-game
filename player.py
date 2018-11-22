@@ -3,6 +3,7 @@ import library
 import pygame
 from animator import Animator
 
+
 class Player(pyBehaviour.Transform):
 
     previous_position = (0, 0)

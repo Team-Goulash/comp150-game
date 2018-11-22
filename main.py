@@ -166,7 +166,7 @@ def event_inputs():
             if main_menu_buttons["new game"].is_pressed(pygame.mouse.get_pos(), (460, 168),
                                                         library.KEY_PRESSED["mouse"]) and library.MAIN_MENU is True:
                 if library.HAD_FIRST_RUN:
-                    dunGen.reset(True)
+                    dunGen.DungeonGenerator.reset(dunGen.DungeonGenerator, True)
 
                 library.HAD_FIRST_RUN = True
 
@@ -223,7 +223,7 @@ def event_inputs():
                 library.PAUSED = False
                 game_state.set_state("game")
                 # Todo this needs to just reset the current room insted of makeing a new one.
-                dunGen.reset(dunGen.GameStore.current_dungeon == 0, True)
+                dunGen.DungeonGenerator.reset(dunGen.DungeonGenerator, dunGen.DungeonGenerator.current_dungeon == 0, True)
             elif option_buttons["controls"].is_pressed(pygame.mouse.get_pos(), (460, 488), library.KEY_PRESSED["mouse"])\
                     and library.PAUSE_MENU is True:
                 # Opens the controls interface
@@ -253,7 +253,7 @@ def event_inputs():
                                                          and library.GAME_OVER is True):
                 library.GAME_OVER = False
                 library.RESET = True
-                dunGen.reset(True)
+                dunGen.DungeonGenerator.reset(dunGen.DungeonGenerator, True, True)
 
             elif game_over_buttons["exit to menu"].is_pressed(pygame.mouse.get_pos(), (460, 318),
                                                             library.KEY_PRESSED["mouse"] and library.GAME_OVER is True):
@@ -509,34 +509,34 @@ def start():
     """Initialise the game."""
     # create movement variables
     screen_rect = screen.get_rect()
-    level_rect = dunGen.GameStore.levels[0].get_rect()
+    level_rect = dunGen.DungeonGenerator.levels[0].get_rect()
 
-    if dunGen.GameStore.well_room:
+    if dunGen.DungeonGenerator.well_room:
         # find a random floor tile and get it's position coordinates
         spawn_x = (math.ceil(len(dunGen.floorTilesX) * 0.5)
                    + random.randint(-2, 2)) * dunGen.TILE_SIZE
         spawn_y = (math.ceil(len(dunGen.floorTilesY) * 0.5)
                    + random.randint(-1, 1)) * dunGen.TILE_SIZE
-        dunGen.GameStore.playerSpawnPoint = [spawn_x, spawn_y]
-        dunGen.GameStore.well_room = False
+        dunGen.DungeonGenerator.playerSpawnPoint = [spawn_x, spawn_y]
+        dunGen.DungeonGenerator.well_room = False
     else:
         door_pos = dunGen.allTilePositions[dunGen.allTiles.index(2)]
-        dunGen.GameStore.playerSpawnPoint = [door_pos[0], door_pos[1]
-                                             + (dunGen.TILE_SIZE * 0.5)]
+        dunGen.DungeonGenerator.playerSpawnPoint = [door_pos[0], door_pos[1]
+                                                    + (dunGen.TILE_SIZE * 0.5)]
 
-    player_object.position[0] = dunGen.GameStore.playerSpawnPoint[0]
-    player_object.position[1] = dunGen.GameStore.playerSpawnPoint[1]
+    player_object.position[0] = dunGen.DungeonGenerator.playerSpawnPoint[0]
+    player_object.position[1] = dunGen.DungeonGenerator.playerSpawnPoint[1]
 
     # variables for centering the level
-    dunGen.GameStore.x = screen_rect.centerx - level_rect.centerx
-    dunGen.GameStore.y = screen_rect.centery - level_rect.centery
+    dunGen.DungeonGenerator.x = screen_rect.centerx - level_rect.centerx
+    dunGen.DungeonGenerator.y = screen_rect.centery - level_rect.centery
 
     # variables for offsetting everything
     # so the starting tile is always at the center
-    dunGen.GameStore.offsetX = -level_rect.centerx +\
-        dunGen.GameStore.playerSpawnPoint[0]
-    dunGen.GameStore.offsetY = -level_rect.centery +\
-        dunGen.GameStore.playerSpawnPoint[1]
+    dunGen.DungeonGenerator.offsetX = -level_rect.centerx + \
+                                      dunGen.DungeonGenerator.playerSpawnPoint[0]
+    dunGen.DungeonGenerator.offsetY = -level_rect.centery + \
+                                      dunGen.DungeonGenerator.playerSpawnPoint[1]
     library.RESET = False
 
 
@@ -565,8 +565,8 @@ def set_menu_states(state):
 
 def main():
     """Main game loop."""
-    player_object.get_world_position_funct = dunGen.get_position_with_offset
-    dunGen.create_dungeon()
+    player_object.get_world_position_funct = dunGen.DungeonGenerator.get_position_with_offset
+    dunGen.DungeonGenerator.create_dungeon(dunGen.DungeonGenerator)
 
     # players current direction
     current_direction = library.BACKWARDS
@@ -575,7 +575,7 @@ def main():
     set_game_states(game_state)
     set_menu_states(menu_state)
 
-    dunGen.GameStore.player = player_object
+    dunGen.DungeonGenerator.player = player_object
 
     # main game loop
     while True:
@@ -606,103 +606,103 @@ def main():
 
         if not library.RESET:
             if not library.PAUSED:
-                colDetect.detect_collision()
+                colDetect.CollisionDetector.detect_collision(colDetect.CollisionDetector)
                 # Key press actions
                 if library.KEY_PRESSED["forwards"] and \
                         not library.KEY_PRESSED["backwards"]:
-                    dunGen.GameStore.bottom_col = False
-                    if not dunGen.GameStore.top_col:
+                    dunGen.DungeonGenerator.bottom_col = False
+                    if not dunGen.DungeonGenerator.top_col:
                         # move the player and assign prediction values
-                        dunGen.GameStore.previousY = dunGen.GameStore.y
-                        dunGen.GameStore.y += movement_speed
+                        dunGen.DungeonGenerator.previousY = dunGen.DungeonGenerator.y
+                        dunGen.DungeonGenerator.y += movement_speed
 
-                        dunGen.GameStore.prediction_Y = -10
+                        dunGen.DungeonGenerator.prediction_Y = -10
                         if not library.KEY_PRESSED["right"] and \
                                 not library.KEY_PRESSED["left"]:
-                            dunGen.GameStore.prediction_X = 0
-                            dunGen.GameStore.secondary_prediction_X = 0
+                            dunGen.DungeonGenerator.prediction_X = 0
+                            dunGen.DungeonGenerator.secondary_prediction_X = 0
 
-                        if not dunGen.GameStore.left_col and \
-                                not dunGen.GameStore.right_col:
-                            dunGen.GameStore.secondary_prediction_Y = -10
+                        if not dunGen.DungeonGenerator.left_col and \
+                                not dunGen.DungeonGenerator.right_col:
+                            dunGen.DungeonGenerator.secondary_prediction_Y = -10
                     else:
                         # block the player movement
-                        dunGen.GameStore.prediction_Y = 0
-                        if not dunGen.GameStore.previousY == dunGen.GameStore.y:
-                            dunGen.GameStore.y -= movement_speed
-                            dunGen.GameStore.previousY = dunGen.GameStore.y
+                        dunGen.DungeonGenerator.prediction_Y = 0
+                        if not dunGen.DungeonGenerator.previousY == dunGen.DungeonGenerator.y:
+                            dunGen.DungeonGenerator.y -= movement_speed
+                            dunGen.DungeonGenerator.previousY = dunGen.DungeonGenerator.y
 
                 if library.KEY_PRESSED["backwards"] and \
                         not library.KEY_PRESSED["forwards"]:
-                    dunGen.GameStore.top_col = False
-                    if not dunGen.GameStore.bottom_col:
+                    dunGen.DungeonGenerator.top_col = False
+                    if not dunGen.DungeonGenerator.bottom_col:
                         # move the player and assign prediction values
-                        dunGen.GameStore.previousY = dunGen.GameStore.y
-                        dunGen.GameStore.y -= movement_speed
+                        dunGen.DungeonGenerator.previousY = dunGen.DungeonGenerator.y
+                        dunGen.DungeonGenerator.y -= movement_speed
 
-                        dunGen.GameStore.prediction_Y = 10
+                        dunGen.DungeonGenerator.prediction_Y = 10
                         if not library.KEY_PRESSED["right"] and \
                                 not library.KEY_PRESSED["left"]:
-                            dunGen.GameStore.prediction_X = 0
-                            dunGen.GameStore.secondary_prediction_X = 0
+                            dunGen.DungeonGenerator.prediction_X = 0
+                            dunGen.DungeonGenerator.secondary_prediction_X = 0
 
-                        if not dunGen.GameStore.left_col and \
-                                not dunGen.GameStore.right_col:
-                            dunGen.GameStore.secondary_prediction_Y = 10
+                        if not dunGen.DungeonGenerator.left_col and \
+                                not dunGen.DungeonGenerator.right_col:
+                            dunGen.DungeonGenerator.secondary_prediction_Y = 10
                     else:
                         # block the player movement
-                        dunGen.GameStore.prediction_Y = 0
-                        if not dunGen.GameStore.previousY == dunGen.GameStore.y:
-                            dunGen.GameStore.y += movement_speed
-                            dunGen.GameStore.previousY = dunGen.GameStore.y
+                        dunGen.DungeonGenerator.prediction_Y = 0
+                        if not dunGen.DungeonGenerator.previousY == dunGen.DungeonGenerator.y:
+                            dunGen.DungeonGenerator.y += movement_speed
+                            dunGen.DungeonGenerator.previousY = dunGen.DungeonGenerator.y
 
                 if library.KEY_PRESSED["left"] and \
                         not library.KEY_PRESSED["right"]:
-                    dunGen.GameStore.right_col = False
-                    if not dunGen.GameStore.left_col:
+                    dunGen.DungeonGenerator.right_col = False
+                    if not dunGen.DungeonGenerator.left_col:
                         # move the player and assign prediction values
-                        dunGen.GameStore.previousX = dunGen.GameStore.x
-                        dunGen.GameStore.x += movement_speed
+                        dunGen.DungeonGenerator.previousX = dunGen.DungeonGenerator.x
+                        dunGen.DungeonGenerator.x += movement_speed
 
-                        dunGen.GameStore.prediction_X = -20
+                        dunGen.DungeonGenerator.prediction_X = -20
                         if not library.KEY_PRESSED["forwards"] and \
                                 not library.KEY_PRESSED["backwards"]:
-                            dunGen.GameStore.prediction_Y = 0
-                            dunGen.GameStore.secondary_prediction_Y = 0
+                            dunGen.DungeonGenerator.prediction_Y = 0
+                            dunGen.DungeonGenerator.secondary_prediction_Y = 0
 
-                        if not dunGen.GameStore.bottom_col and \
-                                not dunGen.GameStore.top_col:
-                            dunGen.GameStore.secondary_prediction_X = -20
+                        if not dunGen.DungeonGenerator.bottom_col and \
+                                not dunGen.DungeonGenerator.top_col:
+                            dunGen.DungeonGenerator.secondary_prediction_X = -20
                     else:
                         # block the player movement
-                        dunGen.GameStore.prediction_X = 0
-                        if not dunGen.GameStore.previousX == dunGen.GameStore.x:
-                            dunGen.GameStore.x -= movement_speed
-                            dunGen.GameStore.previousX = dunGen.GameStore.x
+                        dunGen.DungeonGenerator.prediction_X = 0
+                        if not dunGen.DungeonGenerator.previousX == dunGen.DungeonGenerator.x:
+                            dunGen.DungeonGenerator.x -= movement_speed
+                            dunGen.DungeonGenerator.previousX = dunGen.DungeonGenerator.x
 
                 if library.KEY_PRESSED["right"] and \
                         not library.KEY_PRESSED["left"]:
-                    dunGen.GameStore.left_col = False
-                    if not dunGen.GameStore.right_col:
+                    dunGen.DungeonGenerator.left_col = False
+                    if not dunGen.DungeonGenerator.right_col:
                         # move the player and assign prediction values
-                        dunGen.GameStore.previousX = dunGen.GameStore.x
-                        dunGen.GameStore.x -= movement_speed
+                        dunGen.DungeonGenerator.previousX = dunGen.DungeonGenerator.x
+                        dunGen.DungeonGenerator.x -= movement_speed
 
-                        dunGen.GameStore.prediction_X = 15
+                        dunGen.DungeonGenerator.prediction_X = 15
                         if not library.KEY_PRESSED["forwards"] and \
                                 not library.KEY_PRESSED["backwards"]:
-                            dunGen.GameStore.prediction_Y = 0
-                            dunGen.GameStore.secondary_prediction_Y = 0
+                            dunGen.DungeonGenerator.prediction_Y = 0
+                            dunGen.DungeonGenerator.secondary_prediction_Y = 0
 
-                        if not dunGen.GameStore.bottom_col and \
-                                not dunGen.GameStore.top_col:
-                            dunGen.GameStore.secondary_prediction_X = 15
+                        if not dunGen.DungeonGenerator.bottom_col and \
+                                not dunGen.DungeonGenerator.top_col:
+                            dunGen.DungeonGenerator.secondary_prediction_X = 15
                     else:
                         # block the player movement
-                        dunGen.GameStore.prediction_X = 0
-                        if not dunGen.GameStore.previousX == dunGen.GameStore.x:
-                            dunGen.GameStore.x += movement_speed
-                            dunGen.GameStore.previousX = dunGen.GameStore.x
+                        dunGen.DungeonGenerator.prediction_X = 0
+                        if not dunGen.DungeonGenerator.previousX == dunGen.DungeonGenerator.x:
+                            dunGen.DungeonGenerator.x += movement_speed
+                            dunGen.DungeonGenerator.previousX = dunGen.DungeonGenerator.x
 
                 # update animation times
                 if not library.GAME_OVER and library.HAS_STARTED:
@@ -723,20 +723,20 @@ def main():
                 # fill the background
                 screen.fill(library.BLACK)
                 # render the level on screen
-                for i in range(len(dunGen.GameStore.levels) - 1, -1, -1):
-                    screen.blit(dunGen.GameStore.levels[i],
-                                (dunGen.GameStore.x +
-                                 dunGen.GameStore.starting_point_x[i] -
-                                 dunGen.GameStore.offsetX, dunGen.GameStore.y +
-                                 dunGen.GameStore.starting_point_y[i] -
-                                 dunGen.GameStore.offsetY))
+                for i in range(len(dunGen.DungeonGenerator.levels) - 1, -1, -1):
+                    screen.blit(dunGen.DungeonGenerator.levels[i],
+                                (dunGen.DungeonGenerator.x +
+                                 dunGen.DungeonGenerator.starting_point_x[i] -
+                                 dunGen.DungeonGenerator.offsetX, dunGen.DungeonGenerator.y +
+                                 dunGen.DungeonGenerator.starting_point_y[i] -
+                                 dunGen.DungeonGenerator.offsetY))
 
                 # update player's position
-                player_x_pos, player_y_pos = dunGen.get_position_with_offset(
-                    player_object.position[0], player_object.position[1]
-                )
+                player_x_pos, player_y_pos = dunGen.DungeonGenerator.\
+                    get_position_with_offset(player_object.position[0],
+                                             player_object.position[1])
 
-                dunGen.draw_chest()
+                dunGen.DungeonGenerator.draw_chest(dunGen.DungeonGenerator)
 
                 aiAnimationPaths.update_animations(delta_time, screen)
 
@@ -749,7 +749,7 @@ def main():
         elif game_state.get_state() == "game":
 
             # Player
-            player_object.block_move_direction(dunGen.GameStore.top_col, dunGen.GameStore.right_col, dunGen.GameStore.bottom_col, dunGen.GameStore.left_col)
+            player_object.block_move_direction(dunGen.DungeonGenerator.top_col, dunGen.DungeonGenerator.right_col, dunGen.DungeonGenerator.bottom_col, dunGen.DungeonGenerator.left_col)
             player_object.update(library.KEY_PRESSED)
             player_object.draw(dunGen.TILE_SIZE, screen)
             # Light
@@ -766,12 +766,12 @@ def main():
                 # todo remove when ui is sorted
                 library.GAME_OVER = True
 
-            if dunGen.GameStore.reset_fuel:
+            if dunGen.DungeonGenerator.reset_fuel:
                 fuel_meter.reset_fuel()
-                dunGen.GameStore.reset_fuel = False
-            elif dunGen.GameStore.add_fuel:
+                dunGen.DungeonGenerator.reset_fuel = False
+            elif dunGen.DungeonGenerator.add_fuel:
                 fuel_meter.add_fuel()
-                dunGen.GameStore.add_fuel = False
+                dunGen.DungeonGenerator.add_fuel = False
 
         elif game_state.get_state() == "game over":
             pass
