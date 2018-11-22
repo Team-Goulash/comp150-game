@@ -5,6 +5,7 @@ import dungeonGenerator as dunGen
 import main
 import library
 
+
 class CollisionDetector:
     """Class that contains all the collision code."""
 

@@ -47,11 +47,13 @@ class DungeonGenerator:
     left_col = False
     right_col = False
     collisions = [top_col, bottom_col, left_col, right_col]
-    start_x = 0
-    start_y = 0
+    start_x = []
+    start_y = []
+    end_x = []
+    end_y = []
     # todo rename level count to room count
     START_LEVEL_COUNT = 3
-    levelCount = 3
+    levelCount = 2
     current_dungeon = 0
     levels = []
     chests = []
@@ -92,6 +94,10 @@ class DungeonGenerator:
         allTiles.clear()
         allTileMaterials.clear()
         self.chests.clear()
+        self.start_x.clear()
+        self.start_y.clear()
+        self.end_x.clear()
+        self.end_y.clear()
         # Todo check that the animation are being reset
         #  once the doors are not getting spawned on next level!
         main.aiAnimationPaths.reset_animator(first_scene)
@@ -104,16 +110,20 @@ class DungeonGenerator:
         library.RESET = True
         for i in range(len(self.levels)):
             if i > 0:
+                self.gen_rand_map_tiles(self, i)
+                print(self.start_x)
+                print(self.end_x)
                 # set the starting point for the next room
                 self.starting_point_x[i] = \
                     self.starting_point_x[i - 1] + \
-                    self.start_x * TILE_SIZE - TILE_SIZE
+                    self.end_x[i-1] * TILE_SIZE - (self.start_x[i-1] * TILE_SIZE)
 
                 self.starting_point_y[i] = \
                     self.starting_point_y[i - 1] + \
-                    self.start_y * TILE_SIZE
+                    self.end_y[i-1] * TILE_SIZE
 
             # create the room
+            self.gen_rand_map_tiles(self, i)
             self.initialize_level(self, i)
             self.gen_chest_map(self, i)
 
@@ -203,6 +213,8 @@ class DungeonGenerator:
                     else:
                         tile = 0
                         t_type = floor
+                    self.start_x.append(x)
+                    self.start_y.append(y)
                 else:
                     if instance == len(self.levels) - 1:
                         tile = 2
@@ -210,8 +222,8 @@ class DungeonGenerator:
                     else:
                         tile = 0
                         t_type = floor
-                    self.start_x = x
-                    self.start_y = y
+                    self.end_x.append(x)
+                    self.end_y.append(y)
 
                 # horizontal row of tiles
                 tile_row.append(tile)
@@ -306,7 +318,6 @@ class DungeonGenerator:
     def initialize_level(self, surface_id):
         """Draw the tiles with according images on a blank surface."""
         # generate the map
-        self.gen_rand_map_tiles(self, surface_id)
         DungeonGenerator.levels[surface_id] = pygame.Surface(
             (DungeonGenerator.MAP_WIDTH * TILE_SIZE,
              DungeonGenerator.MAP_HEIGHT * TILE_SIZE))
