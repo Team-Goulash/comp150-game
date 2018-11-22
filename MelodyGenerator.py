@@ -1,10 +1,18 @@
-"""Tinkering audio contract 3 by Joachim Rayski."""
+"""
+Tinkering audio contract 3 by Joachim Rayski.
+
+Driver - Joachim Rayski
+Navigator - None
+"""
+
 import pygame
 import sys
 import wave
 import math
 import struct
 import random
+import shutil
+import os
 from pygame.locals import *
 
 pygame.init()
@@ -14,11 +22,17 @@ pygame.display.set_mode((250, 250), 0, 32)
 class MusicGenerator:
     """A class which handles everything to do with music generation."""
 
-    # Create the .wav file with all of it's parameters
-    filename = "song.wav"
-    wav_write = wave.open(filename, 'w')
-    wav_write.setparams((1, 2, 44100, 0, 'NONE', 'not compressed'))
-    SAMPLE_RATE = wav_write.getframerate()
+    current_track = 0
+
+    # create the music folder
+    if not os.path.exists("Music"):
+        os.makedirs("Music")
+    else:
+        shutil.rmtree("Music")
+        os.makedirs("Music")
+
+    filename = "Music/melody"
+    filetype = ".wav"
 
     D_MINOR_SCALE = {"D": 587.33, "E": 659.25,
                      "F": 698.46, "G": 783.99, "A": 880.00,
@@ -65,7 +79,8 @@ class MusicGenerator:
     currentNote2 = 1
 
     multiplier = 2
-    songRate = SAMPLE_RATE * multiplier
+    sample_rate = 44100
+    songRate = sample_rate * multiplier
 
     volume = 0.5
 
@@ -124,7 +139,7 @@ class MusicGenerator:
 
         :return:
         """
-        tempo = 6
+        tempo = 10
         if self.currentProgress == self.songRate / (tempo * self.multiplier):
 
             self.melody_frequency_1 = random.choice(
@@ -149,7 +164,7 @@ class MusicGenerator:
         max_sample_value = 2**15 - 1
         sample_value = math.sin(
             2.0 * math.pi * frequency * (
-                    i / float(self.SAMPLE_RATE))) * (
+                    i / float(self.sample_rate))) * (
                     volume * max_sample_value)
         return sample_value
 
@@ -179,6 +194,13 @@ class MusicGenerator:
 
         :return:
         """
+        self.current_track += 1
+        # Create the .wav file with all of it's parameters
+        wav_write = wave.open(self.filename + str(self.current_track)
+                              + self.filetype, 'w')
+        wav_write.setparams((1, 2, self.sample_rate,
+                             0, 'NONE', 'not compressed'))
+
         for i in range(0, self.songRate):
             self.currentProgress += 1
 
@@ -208,14 +230,15 @@ class MusicGenerator:
                                                 + sample_value4))
 
             # append the packed value into the values list
-            for j in range(0, self.wav_write .getnchannels()):
+            for j in range(0, wav_write .getnchannels()):
                 self.values.append(packed_value)
 
         # write the values list into the .wav files using a byte string
         value_str = b"".join(self.values)
-        self.wav_write.writeframesraw(value_str)
+        wav_write.writeframesraw(value_str)
 
-        self.wav_write.close()
+        wav_write.close()
+        self.values.clear()
 
 
 def main():
@@ -224,18 +247,25 @@ def main():
 
     :return:
     """
-    # Generate and play the track
-    MusicGenerator.generate_track(MusicGenerator)
-    pygame.mixer.music.load(MusicGenerator.filename)
-    pygame.mixer.music.play(-1)
     while True:
         for event in pygame.event.get():
             if event.type == QUIT:
                 pygame.quit()
+                # delete the music folder
+                if os.path.exists("Music"):
+                    shutil.rmtree("Music")
                 sys.exit()
             if event.type == KEYDOWN:
                 if event.key == K_SPACE:
-                    pass
+                    # Generate and play the track
+                    MusicGenerator.generate_track(MusicGenerator)
+                    print(str(MusicGenerator.filename
+                              + str(MusicGenerator.current_track)
+                              + MusicGenerator.filetype))
+                    pygame.mixer.music.load(str(MusicGenerator.filename
+                                            + str(MusicGenerator.current_track)
+                                            + MusicGenerator.filetype))
+                    pygame.mixer.music.play(-1)
 
 
 if __name__ == "__main__":
