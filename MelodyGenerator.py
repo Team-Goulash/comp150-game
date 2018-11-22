@@ -103,8 +103,6 @@ class MusicGenerator:
             else:
                 self.current_chord = 1
 
-        print(self.song_point)
-
     def snare(self):
         """
         Create a snare sound using noise and play it every 4th note.
@@ -220,9 +218,6 @@ class MusicGenerator:
             sample_value4 = self.create_value(self, i, self.hi_hat_frequency,
                                               self.volume / 4)
 
-            print(sample_value + sample_value2 +
-                  sample_value3 + sample_value4)
-
             # pack all of the values together
             packed_value = struct.pack('i', int(sample_value
                                                 + sample_value2
@@ -259,9 +254,6 @@ def main():
                 if event.key == K_SPACE:
                     # Generate and play the track
                     MusicGenerator.generate_track(MusicGenerator)
-                    print(str(MusicGenerator.filename
-                              + str(MusicGenerator.current_track)
-                              + MusicGenerator.filetype))
                     pygame.mixer.music.load(str(MusicGenerator.filename
                                             + str(MusicGenerator.current_track)
                                             + MusicGenerator.filetype))
