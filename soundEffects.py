@@ -9,6 +9,7 @@ class SoundFX:
     load and save wav files and soundEffects library
     """
     playing = False
+    echo_playing = False
     footstep_sound = None # pygame.mixer.Sound('./Game Sounds/Foot Steps.wav')
     echo_footprint_sound = None
     volume = 0
@@ -111,7 +112,8 @@ class SoundFX:
         plays the echo wav file that was created.
         :return:
         """
-        self.echo_footprint_sound.play()
+        if self.echo_playing is False:
+            self.echo_footprint_sound.play(0)
 
     def play_footprint(self):
         """
