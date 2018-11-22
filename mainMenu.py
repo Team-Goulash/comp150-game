@@ -11,7 +11,8 @@ class Menu:
         print(name)
         if name == "exit":
             self.exit_funct = funct
-            print("jjjjjj")
+        elif name == "game state":
+            self.game_state = funct
         elif name == "menu_state":
             self.menu_state = funct
 
