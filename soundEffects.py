@@ -106,6 +106,13 @@ class SoundFX:
         self.generate_echo(0.6, 2590, 1, self.SAMPLE_RATE)
         self.save_wav_file('Game Sounds/Foot Steps Echo')
 
+    def play_echo_sound(self):
+        """
+        plays the echo wav file that was created.
+        :return:
+        """
+        self.echo_footprint_sound.play()
+
     def play_footprint(self):
         """
         checks whether the keys are being pressed and plays the sound

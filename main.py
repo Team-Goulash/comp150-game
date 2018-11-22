@@ -148,6 +148,8 @@ def event_inputs():
                 print("taking color blind screenshot")
             elif event.key == K_y:
                 sound_effects.apply_echo()
+            elif event.key == K_h:
+                sound_effects.play_echo_sound()
             elif event.key == K_SPACE:
                 library.KEY_PRESSED["space"] = event.type == KEYDOWN
 
