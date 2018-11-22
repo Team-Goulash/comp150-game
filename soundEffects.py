@@ -103,6 +103,10 @@ class SoundFX:
                 break
 
     def apply_echo(self):
+        """
+        applies the echo to the .wav file.
+        :return:
+        """
         self.read_wav_file('Game Sounds/Foot Steps')
         self.generate_echo(0.6, 2590, 1, self.SAMPLE_RATE)
         self.save_wav_file('Game Sounds/Foot Steps Echo')
