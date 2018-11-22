@@ -2,8 +2,6 @@ import pygame
 import library
 import wave
 import struct
-import math
-from pygame.locals import *
 
 
 class SoundFX:
@@ -12,6 +10,7 @@ class SoundFX:
     """
     playing = False
     footstep_sound = None # pygame.mixer.Sound('./Game Sounds/Foot Steps.wav')
+    echo_footprint_sound = None
     volume = 0
     sample_data = []
     SAMPLE_RATE = 44100
@@ -19,6 +18,7 @@ class SoundFX:
 
     def __init__(self, vol=0.7):
         self.playing = False
+        self.echo_footprint_sound = pygame.mixer.Sound('Game Sounds/Foot Steps Echo.wav')
         self.footstep_sound = pygame.mixer.Sound('Game Sounds/Foot Steps.wav')
         self.volume = vol
 
