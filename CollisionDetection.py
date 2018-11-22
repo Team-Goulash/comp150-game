@@ -138,17 +138,15 @@ def detect_collision():
         # and let the player press space to restart
         if TileStore.current_tile_type == 2 \
                 and TileStore.current_tile_material == 1:
-                if library.KEY_PRESSED["space"]:
-                    dunGen.reset()
+                dunGen.reset()
                 if TileStore.current_tile_pos[1] < dunGen.GameStore.player.position[1]:
                     dunGen.GameStore.bottom_col = True
                 else:
                     dunGen.GameStore.bottom_col = False
 
         if TileStore.current_chest_index > -1:
-            if library.KEY_PRESSED["space"]:
-                dunGen.GameStore.add_fuel = True
-                dunGen.GameStore.chests.pop(TileStore.current_chest_index)
+            dunGen.GameStore.add_fuel = True
+            dunGen.GameStore.chests.pop(TileStore.current_chest_index)
 
     # if the secondary predicted tile is a wall tile
     if TileStore.current_tile_type3 == 1 or TileStore.current_tile_type2 == 1 \
