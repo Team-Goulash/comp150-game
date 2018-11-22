@@ -7,7 +7,7 @@ import library
 
 
 class CollisionDetector:
-    """Class that contains all the collision code."""
+    """Make the player collide with the world."""
 
     current_tile_index = 0
     current_tile_pos = [0, 0]

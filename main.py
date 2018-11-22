@@ -14,9 +14,9 @@ import playerLight
 import math
 from fuelMeter import *
 from pygame.locals import *
-from animator import Animator
 
 import dungeonGenerator as dunGen
+import MelodyGenerator as melGen
 import colorBlindFilter
 import CollisionDetection as colDetect
 import aiAnimations
@@ -563,6 +563,21 @@ def set_menu_states(state):
     state.set_state("main menu")
 
 
+def menu_audio(is_playing, stop):
+    # todo test again once the state machine has been fully implemented
+    if not stop and not is_playing:
+        pygame.mixer.music.play(-1)
+        return True
+
+    elif stop and is_playing:
+        pygame.mixer.music.stop()
+        return False
+
+    print(is_playing)
+
+    return is_playing
+
+
 def main():
     """Main game loop."""
     player_object.get_world_position_funct = dunGen.DungeonGenerator.get_position_with_offset
@@ -576,6 +591,13 @@ def main():
     set_menu_states(menu_state)
 
     dunGen.DungeonGenerator.player = player_object
+
+    melGen.MusicGenerator.generate_track(melGen.MusicGenerator)
+    pygame.mixer.music.load(str(melGen.MusicGenerator.filename
+                                + str(melGen.MusicGenerator.current_track)
+                                + melGen.MusicGenerator.filetype))
+
+    menu_audio_is_playing = False
 
     # main game loop
     while True:
@@ -745,7 +767,8 @@ def main():
 
         # NEW MAIN CODE
         if game_state.get_state() == "loading":
-            pass
+
+            menu_audio_is_playing = menu_audio(menu_audio_is_playing, True)
         elif game_state.get_state() == "game":
 
             # Player
@@ -773,14 +796,18 @@ def main():
                 fuel_meter.add_fuel()
                 dunGen.DungeonGenerator.add_fuel = False
 
+                menu_audio_is_playing = menu_audio(menu_audio_is_playing, True)
+
         elif game_state.get_state() == "game over":
-            pass
+            menu_audio_is_playing = menu_audio(menu_audio_is_playing, True)
         elif game_state.get_state() == "main menu":
             # New ui code!
             menus.draw_buttons(screen, pygame.mouse.get_pos(), library.KEY_PRESSED["mouse"])
             menus.is_button_pressed(pygame.mouse.get_pos(), library.KEY_PRESSED["mouse"])
+
+            menu_audio_is_playing = menu_audio(menu_audio_is_playing, False)
         elif game_state.get_state() == "paused":
-            pass
+            menu_audio_is_playing = menu_audio(menu_audio_is_playing, False)
         elif game_state.get_state() == "editor":
             pass
 

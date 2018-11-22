@@ -20,7 +20,7 @@ pygame.display.set_mode((250, 250), 0, 32)
 
 
 class MusicGenerator:
-    """A class which handles everything to do with music generation."""
+    """Generate the procedural music track using sine waves."""
 
     current_track = 0
 

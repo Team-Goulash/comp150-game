@@ -26,7 +26,7 @@ materials = tile_class.tileTypes
 
 
 class DungeonGenerator:
-    """A variable storage class."""
+    """Generate the procedural dungeon from a pixel map."""
 
     player = None
     previousX = 0
