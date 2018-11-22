@@ -1,11 +1,10 @@
-"""Driver - Joachim / Navigator - None"""
+"""Driver - Joachim / Navigator - None."""
 import pygame
 import random
 import tileGenerator
 import main
 import library
 import loadSave
-import os
 from random import choices
 
 tile_class = tileGenerator.Tiles()
@@ -77,14 +76,13 @@ class DungeonGenerator:
 
     def reset(self, first_scene=False, is_reset=False):
         """reset all the tile variables and create a new dungeon."""
-
         if not first_scene and not is_reset:
             self.current_dungeon += 1
         elif first_scene:
             self.current_dungeon = 0
 
         self.well_room = first_scene
-        self.reset_fuel = True # fuel_meter.add_fuel() # reset_fuel()
+        self.reset_fuel = True  # fuel_meter.add_fuel() # reset_fuel()
         self.levelCount = self.START_LEVEL_COUNT + self.current_dungeon
         floorTilesX.clear()
         floorTilesY.clear()
@@ -94,7 +92,8 @@ class DungeonGenerator:
         allTiles.clear()
         allTileMaterials.clear()
         self.chests.clear()
-        # Todo check that the animation are being reset once the doors are not geting spwaned on next level!
+        # Todo check that the animation are being reset
+        #  once the doors are not getting spawned on next level!
         main.aiAnimationPaths.reset_animator(first_scene)
         self.current_tile = 0
         self.create_dungeon(self)
@@ -118,11 +117,12 @@ class DungeonGenerator:
             self.initialize_level(self, i)
             self.gen_chest_map(self, i)
 
-        main.aiAnimationPaths.apply_position_offset_to_room_path(self.starting_point_x, self.starting_point_y)
+        main.aiAnimationPaths.apply_position_offset_to_room_path(
+            self.starting_point_x, self.starting_point_y)
         main.start()
 
     def gen_chest_map(self, level_id):
-
+        """Generate a map of all chests in the level."""
         map_width = self.chest_map.get_width()
         map_height = self.chest_map.get_height()
 
@@ -130,9 +130,8 @@ class DungeonGenerator:
             for x in range(map_width):
 
                 pixel = self.chest_map.get_at((x, y))
-                pixel_tone = (pixel.r + pixel.g + pixel.b) / 3  # pixel brightness
 
-                if pixel.r == 125 and pixel.a > 100: # 0 < pixel_tone < 255:
+                if pixel.r == 125 and pixel.a > 100:  # 0 < pixel_tone < 255:
                     pos_x = x * TILE_SIZE + self.starting_point_x[level_id]
                     pos_y = y * TILE_SIZE + self.starting_point_y[level_id]
                     chest = [pos_x, pos_y]
@@ -141,13 +140,15 @@ class DungeonGenerator:
         return self.chests
 
     def draw_chest(self):
+        """Draw a chest on screen."""
         for chest in range(len(self.chests)):
             current_chest = self.chests[chest]
             x_pos = self.x + current_chest[0] - self.offsetX
             y_pos = self.y + current_chest[1] - self.offsetY
             main.screen.blit(tile_class.tileTypes[3][0], (x_pos,
                                                           y_pos,
-                                                          TILE_SIZE, TILE_SIZE))
+                                                          TILE_SIZE,
+                                                          TILE_SIZE))
 
     def gen_rand_map_tiles(self, instance):
         """
@@ -179,8 +180,8 @@ class DungeonGenerator:
         tileTypes.clear()
         tileMats.clear()
 
-        # Scroll through each pixel in a map and assign according tiles depending
-        # on the pixel brightness.
+        # Scroll through each pixel in a map and assign according tiles
+        # depending on the pixel brightness.
         # Assign a randomly chosen material type value to each tile.
         for y in range(self.MAP_HEIGHT):
             tile_row = []
@@ -188,7 +189,7 @@ class DungeonGenerator:
             mat_row = []
             for x in range(self.MAP_WIDTH):
                 pixel = self.pixel_map.get_at((x, y))
-                pixel_tone = (pixel.r + pixel.g + pixel.b) / 3  # pixel brightness
+                pixel_tone = (pixel.r + pixel.g + pixel.b) / 3
                 if pixel_tone == 255:
                     tile = 0
                     t_type = floor
@@ -211,41 +212,50 @@ class DungeonGenerator:
                         t_type = floor
                     self.start_x = x
                     self.start_y = y
-                tile_row.append(tile)  # horizontal row of tiles
-                type_row.append(t_type)  # horizontal row of tile types
+
+                # horizontal row of tiles
+                tile_row.append(tile)
+                # horizontal row of tile types
+                type_row.append(t_type)
 
                 # single material
                 material = choices(material_types, material_weights)[0]
-                mat_row.append(material)  # horizontal row of materials
+                # horizontal row of materials
+                mat_row.append(material)
 
-            tiles.append(tile_row)  # vertical column of horizontal tile rows
-            tileTypes.append(type_row)  # vertical column of horizontal type rows
-            tileMats.append(mat_row)  # vertical column of horizontal material rows
+            # vertical column of horizontal tile rows
+            tiles.append(tile_row)
+            # vertical column of horizontal type rows
+            tileTypes.append(type_row)
+            # vertical column of horizontal material rows
+            tileMats.append(mat_row)
         return tiles
 
     @staticmethod
     def get_position_with_offset(x_pos, y_pos):
-        """gets the objects position with the map offset included"""
+        """Get the objects position with the map offset included."""
         x_pos = DungeonGenerator.x + x_pos - DungeonGenerator.offsetX
         y_pos = DungeonGenerator.y + y_pos - DungeonGenerator.offsetY
 
         return x_pos, y_pos
 
     def get_positon_by_tile_coordinates(self, x_cord, y_cord):
-
-        x_pos, y_pos = self.get_position_with_offset(TILE_SIZE * x_cord, TILE_SIZE * y_cord)
+        """Get a position using the tile coordinates."""
+        x_pos, y_pos = self.get_position_with_offset(TILE_SIZE * x_cord,
+                                                     TILE_SIZE * y_cord)
 
         return x_pos, y_pos
 
     @staticmethod
     def get_coordinates_from_position(x_position, y_position, offset=(0, 0)):
         """
-        Driver: ashley
+        Driver: ashley.
+
         :param x_position:      x position to get coords for
         :param y_position:      y position to get coords for
+        :param offset           position offset
         :return:                (X coords, Y Coords)
         """
-
         x_coords = x_position / TILE_SIZE + offset[0]
         y_coords = y_position / TILE_SIZE + offset[1]
 
@@ -256,7 +266,8 @@ class DungeonGenerator:
         """
         Assign a randomly chosen variation texture.
 
-        :arg material_id:   specifies the type of material the function will assign
+        :arg material_id:   specifies the type of material
+         the function will assign
         :arg type_id        specifies the type of image
          that will be used as a base image
         :arg image_id:      input image the function will modify
@@ -284,7 +295,8 @@ class DungeonGenerator:
                                         "Procedural-" + str(image_id) +
                                         "_type-" + str(type_id) +
                                         "_mat-" + str(material_id) +
-                                        "_inst-" + str(tileclass.random_inst) + ".png")
+                                        "_inst-" + str(tileclass.random_inst)
+                                        + ".png")
         else:
             # keep the texture the same
             texture = base_image
@@ -302,12 +314,14 @@ class DungeonGenerator:
         # generate material variations
         while DungeonGenerator.mud_variations > 0:
             for i in range(len(tile_class.tileTypes[1])):
-                tile_class.generate_material(1, i, 1, DungeonGenerator.mud_variations)
+                tile_class.generate_material(1, i, 1, DungeonGenerator.
+                                             mud_variations)
             DungeonGenerator.mud_variations -= 1
 
         while DungeonGenerator.moss_variations > 0:
             for i in range(len(tile_class.tileTypes[1])):
-                tile_class.generate_material(1, i, 2, DungeonGenerator.moss_variations)
+                tile_class.generate_material(1, i, 2, DungeonGenerator.
+                                             moss_variations)
             DungeonGenerator.moss_variations -= 1
 
         # draw the tiles to the level surface
@@ -321,34 +335,44 @@ class DungeonGenerator:
                     if surface_id == 0:
                         if column == 1:
                             floorTilesX.append([x_pos +
-                                                DungeonGenerator.starting_point_x[surface_id],
+                                                DungeonGenerator.
+                                               starting_point_x[surface_id],
                                                 y_pos +
-                                                DungeonGenerator.starting_point_y[surface_id]])
+                                                DungeonGenerator.
+                                               starting_point_y[surface_id]])
                         if row == 1:
                             floorTilesY.append([x_pos +
-                                                DungeonGenerator.starting_point_x[surface_id],
+                                                DungeonGenerator.
+                                               starting_point_x[surface_id],
                                                 y_pos +
-                                                DungeonGenerator.starting_point_y[surface_id]])
+                                                DungeonGenerator.
+                                               starting_point_y[surface_id]])
 
-                    material = self.assign_material(tile_class, tiles[column][row],
-                                               tileTypes[column][row],
-                                               tileMats[column][row])
+                    material = self.assign_material(tile_class,
+                                                    tiles[column][row],
+                                                    tileTypes[column][row],
+                                                    tileMats[column][row])
 
                 elif tiles[column][row] == 1:
                     wallTiles.append([x_pos +
-                                      DungeonGenerator.starting_point_x[surface_id],
+                                      DungeonGenerator.starting_point_x[
+                                          surface_id],
                                       y_pos +
-                                      DungeonGenerator.starting_point_y[surface_id]])
+                                      DungeonGenerator.starting_point_y[
+                                          surface_id]])
 
-                    material = self.assign_material(tile_class, tiles[column][row],
-                                               tileTypes[column][row],
-                                               tileMats[column][row])
+                    material = self.assign_material(tile_class,
+                                                    tiles[column][row],
+                                                    tileTypes[column][row],
+                                                    tileMats[column][row])
 
                 elif tiles[column][row] == 2:
                     doorTiles.append([x_pos +
-                                      DungeonGenerator.starting_point_x[surface_id],
+                                      DungeonGenerator.starting_point_x[
+                                          surface_id],
                                       y_pos +
-                                      DungeonGenerator.starting_point_y[surface_id]])
+                                      DungeonGenerator.starting_point_y[
+                                          surface_id]])
 
                     material = self.assign_material(
                         tile_class, tiles[column][row],
@@ -359,38 +383,49 @@ class DungeonGenerator:
                         tile_class, tiles[column][row],
                         tileTypes[column][row], tileMats[column][row])
 
-                # todo make the allTiles list a 2d array (append only the columns)
+                # todo make the allTiles list a 2d array
+                # (append only the columns)
                 allTiles.append(tiles[column][row])
                 allTileMaterials.append(tileTypes[column][row])
                 allTilePositions.append([x_pos +
-                                         DungeonGenerator.starting_point_x[surface_id],
+                                         DungeonGenerator.starting_point_x[
+                                             surface_id],
                                          y_pos +
-                                         DungeonGenerator.starting_point_y[surface_id]])
-                DungeonGenerator.levels[surface_id].blit(material, (x_pos, y_pos,
-                                                                    TILE_SIZE, TILE_SIZE))
+                                         DungeonGenerator.starting_point_y[
+                                             surface_id]])
+                DungeonGenerator.levels[surface_id].blit(material,
+                                                         (x_pos, y_pos,
+                                                          TILE_SIZE,
+                                                          TILE_SIZE))
 
     def get_dungeon_room(self, first):
         """
         Choose a pixel map.
 
-        :param first:   specifies if there's a need to generate the starting room
+        :param first:   specifies if there's a need to generate
+         the starting room
         :return:    a randomly chosen pixel map
         """
         # load up the pixel maps
-        start_map = "pixelLevels/startMap/"     # the start map need to come from its own folder so it is not included in the main room maps
+        # the start map need to come from its own folder
+        # so it is not included in the main room maps
+        start_map = "pixelLevels/startMap/"
         pixel_map = "pixelLevels/"
         chest_map = "pixelLevels/chestMaps/"
-        ai_map =    "pixelLevels/aiOverlays/"
+        ai_map = "pixelLevels/aiOverlays/"
 
         # we only need to store the file names with out the path.
         # as there **MUST** be a corresponding image in both
         # chestMaps and aiOverlays with the same name.
 
-        rooms = loadSave.get_file_names_in_directory(pixel_map, ".png") # [hallway, small_room, mid_room]
+        # [hallway, small_room, mid_room]
+        rooms = loadSave.get_file_names_in_directory(pixel_map, ".png")
 
         indexes = list(range(len(rooms)))
-        # Todo this needs to be set at the start so it does not change each time we select a room.
-        room_weights = self.get_random_room_weights(len(indexes))  # [0.5, 0.75, 0.25]
+        # Todo this needs to be set at the start
+        # so it does not change each time we select a room.
+        # [0.5, 0.75, 0.25]
+        room_weights = self.get_random_room_weights(len(indexes))
 
         if first:
             # load up and choose the starting room pixel map
@@ -399,7 +434,8 @@ class DungeonGenerator:
         else:
             # choose a random pixel map
             current_index = random.choices(indexes, room_weights)[0]
-            current_module = pygame.image.load(pixel_map + rooms[current_index])
+            current_module = pygame.image.load(pixel_map + rooms[
+                current_index])
             current_chest = pygame.image.load(chest_map + rooms[current_index])
             main.aiAnimationPaths.load_paths(ai_map + rooms[current_index])
 
@@ -407,7 +443,8 @@ class DungeonGenerator:
 
     @staticmethod
     def get_random_room_weights(count):
-        """Get a random list of weights
+        """Get a random list of weights.
+
         :param count:   Amount of weights to generate
         :return:        weights list
         """

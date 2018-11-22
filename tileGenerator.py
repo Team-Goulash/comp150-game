@@ -1,4 +1,4 @@
-"""Driver - Joachim / Navigator - None"""
+"""Driver - Joachim / Navigator - None."""
 import pygame
 import random
 import os

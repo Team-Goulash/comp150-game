@@ -1,12 +1,13 @@
+"""Collision System by Joachim Rayski."""
 import pygame
 from pygame.locals import *
 import dungeonGenerator as dunGen
 import main
 import library
-import fuelMeter
-
 
 class CollisionDetector:
+    """Class that contains all the collision code."""
+
     current_tile_index = 0
     current_tile_pos = [0, 0]
     current_tile_type = 0
@@ -31,12 +32,13 @@ class CollisionDetector:
     def find_current_tile(prediction_x, prediction_y):
         """
         Find or predict the tile the player is/will be on.
+
         :param prediction_x: offset for predicting the next tile on the x axis
         :param prediction_y: offset for predicting the next tile on the y axis
         :return: index of the current tile the player is on
         """
-
-        previous_tile = dunGen.allTilePositions[dunGen.DungeonGenerator.current_tile]
+        previous_tile = dunGen.allTilePositions[dunGen.DungeonGenerator.
+                                                current_tile]
         # round the current player position to the position of the nearest tile
         current_tile_x = int(((dunGen.DungeonGenerator.player.position[0] +
                                prediction_x)
@@ -51,17 +53,23 @@ class CollisionDetector:
         # if a tile with the calculated position exists
         # and it's not the same as the previous tile
         # set it as the current tile and return the value
-        if tile_pos in dunGen.allTilePositions and not tile_pos == previous_tile:
-            dunGen.DungeonGenerator.current_tile = dunGen.allTilePositions.index(tile_pos)
+        if tile_pos in dunGen.allTilePositions\
+                and not tile_pos == previous_tile:
+            dunGen.DungeonGenerator.current_tile = \
+                dunGen.allTilePositions.index(tile_pos)
+
         return dunGen.DungeonGenerator.current_tile
 
     def detect_collision(self):
         """Check for collision between the player and the wall tiles."""
-
-        dunGen.DungeonGenerator.collisions = [dunGen.DungeonGenerator.top_col,
-                                              dunGen.DungeonGenerator.bottom_col,
-                                              dunGen.DungeonGenerator.left_col,
-                                              dunGen.DungeonGenerator.right_col]
+        dunGen.DungeonGenerator.collisions = [dunGen.DungeonGenerator.
+                                              top_col,
+                                              dunGen.DungeonGenerator.
+                                              bottom_col,
+                                              dunGen.DungeonGenerator.
+                                              left_col,
+                                              dunGen.DungeonGenerator.
+                                              right_col]
 
         # find values of the tile the player is currently on
         self.current_tile_index = self.find_current_tile(0, 0)
@@ -74,7 +82,8 @@ class CollisionDetector:
 
         # find values of the predicted tile that the player might land on
         self.current_tile_index2 = self.find_current_tile(
-            dunGen.DungeonGenerator.prediction_X, dunGen.DungeonGenerator.prediction_Y)
+            dunGen.DungeonGenerator.prediction_X,
+            dunGen.DungeonGenerator.prediction_Y)
         self.current_tile_pos2 = dunGen.allTilePositions[
             self.current_tile_index2]
         self.current_tile_type2 = dunGen.allTiles[
@@ -82,11 +91,11 @@ class CollisionDetector:
         self.current_tile_material2 = dunGen.allTileMaterials[
             self.current_tile_index2]
 
-        # find values of the second predicted tile that the player might land on
-        self.current_tile_index3 = self.find_current_tile(dunGen.DungeonGenerator.
-                                                                  secondary_prediction_X,
-                                                                  dunGen.DungeonGenerator.
-                                                                  secondary_prediction_Y)
+        # find values of the second predicted tile
+        # that the player might land on
+        self.current_tile_index3 = self.find_current_tile(
+            dunGen.DungeonGenerator.secondary_prediction_X,
+            dunGen.DungeonGenerator.secondary_prediction_Y)
         self.current_tile_pos3 = dunGen.allTilePositions[
             self.current_tile_index3]
         self.current_tile_type3 = dunGen.allTiles[
@@ -137,8 +146,10 @@ class CollisionDetector:
             # and let the player press space to restart
             if self.current_tile_type == 2 \
                     and self.current_tile_material == 1:
-                    dunGen.DungeonGenerator.reset(dunGen.DungeonGenerator, False, True)
-                    if self.current_tile_pos[1] < dunGen.DungeonGenerator.player.position[1]:
+                    dunGen.DungeonGenerator.reset(dunGen.DungeonGenerator,
+                                                  False, True)
+                    if self.current_tile_pos[1] <\
+                            dunGen.DungeonGenerator.player.position[1]:
                         dunGen.DungeonGenerator.bottom_col = True
                     else:
                         dunGen.DungeonGenerator.bottom_col = False
@@ -157,7 +168,8 @@ class CollisionDetector:
             true_collisions = []
             for i in range(len(dunGen.DungeonGenerator.collisions)):
                 if dunGen.DungeonGenerator.collisions[i]:
-                    true_collisions.append(dunGen.DungeonGenerator.collisions[i])
+                    true_collisions.append(dunGen.DungeonGenerator.
+                                           collisions[i])
 
             # block the movement in corresponding directions
             # depending on the current and predicted tiles' types
@@ -199,6 +211,7 @@ class CollisionDetector:
             dunGen.DungeonGenerator.right_col = False
 
     def draw_collision(self):
+        """Draw the collision bounds."""
         # create a rect for the current tile
         current_tile_rect = Rect(dunGen.DungeonGenerator.x
                                  + self.current_tile_pos[0]
