@@ -1,6 +1,5 @@
-import pygame, random, os
+import pygame
 from pygame.locals import *
-from random import choices
 
 # assign variables or names to used keys
 PAUSE = K_ESCAPE
