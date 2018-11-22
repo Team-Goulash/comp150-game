@@ -1,4 +1,4 @@
-"""Driver - Joachim / Navigator - None"""
+"""Driver - Joachim / Navigator - None."""
 import pygame
 import random
 import os
@@ -8,7 +8,7 @@ scaleNum = library.scaleNum
 
 
 class Tiles:
-    """A Class which stores all the variables and tile generation functions."""
+    """Procedurally generate features on tiles by colouring pixels."""
 
     # load tile images
     floorPath = "Well Escape tiles/FloorTiles/"
