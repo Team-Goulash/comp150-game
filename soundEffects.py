@@ -34,9 +34,7 @@ class SoundFX:
                 largest = self.abs(self.sample_data[s])
 
         amplification = (self.MAX_VOLUME / largest) * mutiplyer
-        print(largest, amplification)
-        print("Largest sample value in the original sound was ", largest)
-        print("Amplification multiplier is ", amplification)
+        print("largest: ", largest, "amplification", amplification)
 
         for s in range(len(self.sample_data)):
             louder = amplification * self.sample_data[s]
@@ -58,7 +56,6 @@ class SoundFX:
         sample_bytes = []
         self.normalise(0.5)
         for i in range(len(self.sample_data)):
-            print(self.sample_data[i])
             sample_bytes.append(struct.pack('h', int(self.sample_data[i])))
         byte_string = b''.join(sample_bytes)
         save_file = wave.open(filename + ".wav", "w")
