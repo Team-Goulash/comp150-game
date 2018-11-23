@@ -125,12 +125,14 @@ class SoundFX:
         checks if the keys are no longer being pressed and stops the sound
         :return:
         """
-        if not self.playing and (library.KEY_PRESSED["backwards"] or library.KEY_PRESSED["forwards"] or library.KEY_PRESSED["right"]
+        if not self.playing and (library.KEY_PRESSED["backwards"] or library.KEY_PRESSED["forwards"] or
+                                 library.KEY_PRESSED["right"]
                                  or library.KEY_PRESSED["left"]):
             self.footstep_sound.play(0)
             self.footstep_sound.set_volume(self.volume)
             self.playing = True
-        elif self.playing and not (library.KEY_PRESSED["backwards"] or library.KEY_PRESSED["forwards"] or library.KEY_PRESSED["right"]
+        elif self.playing and not (library.KEY_PRESSED["backwards"] or library.KEY_PRESSED["forwards"] or
+                                   library.KEY_PRESSED["right"]
                                    or library.KEY_PRESSED["left"]):
             self.footstep_sound.stop()
             self.playing = False
