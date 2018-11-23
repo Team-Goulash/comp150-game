@@ -105,7 +105,7 @@ class MusicGenerator:
 
     def snare(self):
         """
-        Create a snare sound using noise and play it every 4th note.
+        Generate a snare sound using noise and play it every 4th note.
 
         :return:
         """
@@ -119,7 +119,7 @@ class MusicGenerator:
 
     def hi_hat(self):
         """
-        Create a hi-hat sound using noise and play it every note.
+        Generate a hi-hat sound using noise and play it every note.
 
         :return:
         """
@@ -133,7 +133,7 @@ class MusicGenerator:
 
     def melody(self):
         """
-        Create a melody using the current chord notes.
+        Generate a melody using the current chord notes.
 
         :return:
         """
@@ -227,8 +227,8 @@ class MusicGenerator:
                                               self.volume / number_of_values)
             sample_value4 = self.create_value(self, i, self.hi_hat_frequency,
                                               self.volume / number_of_values)
-
-            square_wave_sample_value = sample_value * 2 * self.square_wave(sample_value) * 0.5
+            square_wave_sample_value = sample_value * 2 * self.square_wave(
+                sample_value) * 0.5
 
             # pack all of the values together
             packed_value = struct.pack('i', int(sample_value
