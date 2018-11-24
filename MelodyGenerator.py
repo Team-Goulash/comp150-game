@@ -82,7 +82,7 @@ class MusicGenerator:
     sample_rate = 44100
     songRate = sample_rate * multiplier
 
-    volume = 0      # TODO: change back to 0.5
+    volume = 0.1      # TODO: change back to 0.5
 
     song_point = 0.1
 
