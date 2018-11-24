@@ -8,7 +8,6 @@ import pygame
 import sys
 import library
 import UI
-# import pathlib
 import loadSave
 import os
 import image_effects
