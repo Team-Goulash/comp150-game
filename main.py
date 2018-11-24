@@ -576,17 +576,15 @@ def set_menu_states(state):
     state.set_state("main menu")
 
 
-def menu_audio(is_playing, stop):
-    # todo test again once the state machine has been fully implemented
-    if not stop and not is_playing:
+def menu_audio(is_playing, play):
+
+    if play and not is_playing:
         pygame.mixer.music.play(-1)
         return True
 
-    elif stop and is_playing:
+    elif not play and is_playing:
         pygame.mixer.music.stop()
         return False
-
-    print(is_playing)
 
     return is_playing
 
@@ -796,22 +794,23 @@ def main():
                 fuel_meter.add_fuel()
                 dunGen.DungeonGenerator.add_fuel = False
 
-                menu_audio_is_playing = menu_audio(menu_audio_is_playing, True)
+            menu_audio_is_playing = menu_audio(menu_audio_is_playing, False)
 
         elif game_state.get_state() == "game over":
             # todo. nuffing is working on the game over screen!!
             game_over()
+
             menu_audio_is_playing = menu_audio(menu_audio_is_playing, True)
         elif game_state.get_state() == "main menu":
             # New ui code!
             menus.draw_buttons(screen, pygame.mouse.get_pos(), library.KEY_PRESSED["mouse"])
             menus.is_button_pressed(pygame.mouse.get_pos(), library.KEY_PRESSED["mouse"])
 
-            menu_audio_is_playing = menu_audio(menu_audio_is_playing, False)
+            menu_audio_is_playing = menu_audio(menu_audio_is_playing, True)
             if menu_state.get_state() == "Controls":
                 ui_controls()
         elif game_state.get_state() == "paused":
-            menu_audio_is_playing = menu_audio(menu_audio_is_playing, False)
+            menu_audio_is_playing = menu_audio(menu_audio_is_playing, True)
             pause_menu()
         elif game_state.get_state() == "editor":
             Editor.display()
