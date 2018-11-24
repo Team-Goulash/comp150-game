@@ -890,7 +890,7 @@ def run_effect(effect_id):
 
     image_effects.run_effect(
         effect_id, EditorStore.edit_tile, effect_inputs,
-        (loading_bar, screen, (0, 0, WINDOW_WIDTH, 50)
+        (library.loading_bar, screen, (0, 0, WINDOW_WIDTH, 50)
          )
     )
 
@@ -917,26 +917,6 @@ def resize_preview_image(preview_image):
                         int(image_size[1] * multiplier)
                         )
     )
-
-
-def loading_bar(surface, rect, percent):
-    """
-    Displays a loading bar on surface and updates display.
-
-    :param surface: surface to display loading bar on.
-    :param rect:    the position and size of the loading bar
-    (x, y, width, height).
-    :param percent: the loading percentage.
-    :return:        None.
-    """
-    text_surface = text_fontface.render("Loading", True, library.BLACK)
-    pygame.draw.rect(surface, library.GREY, rect)
-    pygame.draw.rect(
-        surface, library.WHITE,
-        (rect[0] + 5, rect[1] + 5, (rect[2] - 10) * percent, rect[3] - 8)
-    )
-    surface.blit(text_surface, (50, 10))
-    pygame.display.flip()
 
 
 def set_directory(directory):

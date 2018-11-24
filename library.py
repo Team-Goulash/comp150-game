@@ -56,6 +56,8 @@ buttonTwoClick = pygame.transform.scale(pygame.image.load("UI/Button_001_pressed
 buttonOne = pygame.transform.scale(pygame.image.load("UI/Button_000_normal.png"), buttonSize)
 buttonTwo = pygame.transform.scale(pygame.image.load("UI/Button_001_normal.png"), buttonSize)
 
+loading_bar_font_face = pygame.font.Font("UI/AMS hand writing.ttf", 18)
+
 scaleNum = 90
 # load the player image
 playerImg = pygame.transform.scale(pygame.image.load("Characters/Player.png"),
@@ -106,9 +108,30 @@ def lerp_vector2(start_position, end_position, percentage):
 
     return pos_x, pos_y
 
+
 def abs(value):
     """force number to positive"""
     if value < 0:
         return -value
     else:
         return value
+
+
+def loading_bar(surface, rect, percent):
+    """
+    Displays a loading bar on surface and updates display.
+
+    :param surface: surface to display loading bar on.
+    :param rect:    the position and size of the loading bar
+    (x, y, width, height).
+    :param percent: the loading percentage.
+    :return:        None.
+    """
+    text_surface = loading_bar_font_face.render("Loading", True, BLACK)
+    pygame.draw.rect(surface, GREY, rect)
+    pygame.draw.rect(
+        surface, WHITE,
+        (rect[0] + 5, rect[1] + 5, (rect[2] - 10) * percent, rect[3] - 8)
+    )
+    surface.blit(text_surface, (50, 10))
+    pygame.display.flip()
