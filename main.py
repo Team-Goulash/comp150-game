@@ -739,8 +739,6 @@ def main():
             # Display main menu if the game has not started
             if not library.HAS_STARTED:
                 main_menu()
-            elif library.GAME_OVER:
-                game_over()
             # display the pause menu if the game paused
             elif display_pause_menu is True:
                 pause_menu()
@@ -803,6 +801,7 @@ def main():
                 menu_audio_is_playing = menu_audio(menu_audio_is_playing, True)
 
         elif game_state.get_state() == "game over":
+            game_over()
             menu_audio_is_playing = menu_audio(menu_audio_is_playing, True)
         elif game_state.get_state() == "main menu":
             # New ui code!
