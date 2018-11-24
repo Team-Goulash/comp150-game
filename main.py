@@ -781,7 +781,7 @@ def main():
                                          player_object.position[1])
 
             if aiAnimationPaths.ghost_in_position(player_x_pos, player_y_pos, screen):
-                library.GAME_OVER = True
+                game_state.set_state("game over")
 
             # Light
             playerLight.update_light(fuel_meter.get_fuel_percentage())
@@ -795,8 +795,6 @@ def main():
 
             if fuel_meter.torch_time == 0:
                 game_state.set_state("game over")
-                # todo remove when ui is sorted
-                library.GAME_OVER = True
 
             if dunGen.DungeonGenerator.reset_fuel:
                 fuel_meter.reset_fuel()
