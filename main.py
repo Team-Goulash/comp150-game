@@ -826,11 +826,15 @@ def main():
 
 if __name__ == "__main__":
 
+    # set games state in the tile editor so we can return.
+    Editor.EditorStore.game_state = game_state
+
+    # set shared functions with the menu system
     menu.set_functions_by_name("exit", exit_game)
     menu.set_functions_by_name("menu_state", menu_state)
     menu.set_functions_by_name("game state", game_state)
 
     menus = menu.initialize_menu()
-
     colorBlindFilter.initialization()
+
     main()

@@ -20,6 +20,7 @@ class EditorStore:
 
     # has the editor been initialized
     initialized = False
+    game_state = None
     update_image_directory = False
     current_directory = "./Well Escape tiles"
     # stores the tile paths from the current directory
@@ -775,7 +776,7 @@ def button_action(action_type, button_data=None):
             if standalone_mode:
                 quit()
             # un-set the editor
-            library.EDITOR = False
+            EditorStore.game_state.set_state("main menu")
             # Set buttons back to start menu so
             # if we return to editor its good to go.
             EditorStore.current_menu_buttons = start_menu_button_data
