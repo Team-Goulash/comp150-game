@@ -752,7 +752,7 @@ def main():
 
             # Display main menu if the game has not started
             if not library.HAS_STARTED:
-                main_menu()
+                pass
             # display the pause menu if the game paused
             else:
                 pass
