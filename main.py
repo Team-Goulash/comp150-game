@@ -753,7 +753,6 @@ def main():
                                  dunGen.DungeonGenerator.offsetY))
 
 
-                dunGen.DungeonGenerator.draw_chest(dunGen.DungeonGenerator)
 
 
         # NEW MAIN CODE
@@ -764,6 +763,8 @@ def main():
 
             sound_effects.play_footprint()
 
+            #Dungon
+            dunGen.DungeonGenerator.draw_chest(dunGen.DungeonGenerator)
 
             # Ghost Animation
             aiAnimationPaths.update_animations(delta_time, screen)
