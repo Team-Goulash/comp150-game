@@ -592,9 +592,6 @@ def menu_audio(is_playing, stop):
 
 def draw_dungeon():
 
-    # fill the background
-    screen.fill(library.BLACK)
-
     # Todo this can be optimized so it only draws the rooms we can see.
     for i in range(len(dunGen.DungeonGenerator.levels) - 1, -1, -1):
         screen.blit(dunGen.DungeonGenerator.levels[i],
@@ -748,19 +745,11 @@ def main():
                             dunGen.DungeonGenerator.x += movement_speed
                             dunGen.DungeonGenerator.previousX = dunGen.DungeonGenerator.x
 
-            else:
-                display_pause_menu = True
-
-
-            # Display main menu if the game has not started
-            if not library.HAS_STARTED:
-                pass
-            # display the pause menu if the game paused
-            else:
-                pass
+        # fill the background
+        screen.fill(library.BLACK)
 
         # NEW MAIN CODE
-        if game_state.get_state() == "loading":
+        if game_state.get_state() == "loading": # treat this as RESET.
 
             menu_audio_is_playing = menu_audio(menu_audio_is_playing, True)
         elif game_state.get_state() == "game":
