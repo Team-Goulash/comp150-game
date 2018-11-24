@@ -587,6 +587,20 @@ def menu_audio(is_playing, stop):
 
     return is_playing
 
+def draw_dungeon():
+
+    # fill the background
+    screen.fill(library.BLACK)
+
+    # Todo this can be optimized so it only draws the rooms we can see.
+    for i in range(len(dunGen.DungeonGenerator.levels) - 1, -1, -1):
+        screen.blit(dunGen.DungeonGenerator.levels[i],
+                    (dunGen.DungeonGenerator.x +
+                     dunGen.DungeonGenerator.starting_point_x[i] -
+                     dunGen.DungeonGenerator.offsetX, dunGen.DungeonGenerator.y +
+                     dunGen.DungeonGenerator.starting_point_y[i] -
+                     dunGen.DungeonGenerator.offsetY))
+
 
 def main():
     """Main game loop."""
@@ -741,16 +755,7 @@ def main():
                 main_menu()
             # display the pause menu if the game paused
             else:
-                # fill the background
-                screen.fill(library.BLACK)
-                # render the level on screen
-                for i in range(len(dunGen.DungeonGenerator.levels) - 1, -1, -1):
-                    screen.blit(dunGen.DungeonGenerator.levels[i],
-                                (dunGen.DungeonGenerator.x +
-                                 dunGen.DungeonGenerator.starting_point_x[i] -
-                                 dunGen.DungeonGenerator.offsetX, dunGen.DungeonGenerator.y +
-                                 dunGen.DungeonGenerator.starting_point_y[i] -
-                                 dunGen.DungeonGenerator.offsetY))
+                pass
 
 
 
@@ -764,6 +769,7 @@ def main():
             sound_effects.play_footprint()
 
             #Dungon
+            draw_dungeon()
             dunGen.DungeonGenerator.draw_chest(dunGen.DungeonGenerator)
 
             # Ghost Animation
