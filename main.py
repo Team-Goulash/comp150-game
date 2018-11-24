@@ -752,17 +752,9 @@ def main():
                                  dunGen.DungeonGenerator.starting_point_y[i] -
                                  dunGen.DungeonGenerator.offsetY))
 
-                # update player's position
-                player_x_pos, player_y_pos = dunGen.DungeonGenerator.\
-                    get_position_with_offset(player_object.position[0],
-                                             player_object.position[1])
 
                 dunGen.DungeonGenerator.draw_chest(dunGen.DungeonGenerator)
 
-                aiAnimationPaths.update_animations(delta_time, screen)
-
-                if aiAnimationPaths.ghost_in_position(player_x_pos, player_y_pos, screen):
-                    library.GAME_OVER = True
 
         # NEW MAIN CODE
         if game_state.get_state() == "loading":
@@ -771,10 +763,23 @@ def main():
         elif game_state.get_state() == "game":
 
             sound_effects.play_footprint()
+
+
+            # Ghost Animation
+            aiAnimationPaths.update_animations(delta_time, screen)
+
             # Player
             player_object.block_move_direction(dunGen.DungeonGenerator.top_col, dunGen.DungeonGenerator.right_col, dunGen.DungeonGenerator.bottom_col, dunGen.DungeonGenerator.left_col)
             player_object.update(library.KEY_PRESSED)
             player_object.draw(dunGen.TILE_SIZE, screen)
+
+            player_x_pos, player_y_pos = dunGen.DungeonGenerator.\
+                get_position_with_offset(player_object.position[0],
+                                         player_object.position[1])
+
+            if aiAnimationPaths.ghost_in_position(player_x_pos, player_y_pos, screen):
+                library.GAME_OVER = True
+
             # Light
             playerLight.update_light(fuel_meter.get_fuel_percentage())
             playerLight.initialise_lightning(dunGen.TILE_SIZE)
