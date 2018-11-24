@@ -56,7 +56,7 @@ buttonTwoClick = pygame.transform.scale(pygame.image.load("UI/Button_001_pressed
 buttonOne = pygame.transform.scale(pygame.image.load("UI/Button_000_normal.png"), buttonSize)
 buttonTwo = pygame.transform.scale(pygame.image.load("UI/Button_001_normal.png"), buttonSize)
 
-loading_bar_font_face = pygame.font.Font("UI/AMS hand writing.ttf", 18)
+loading_bar_font_face = None    # gets set in main.
 
 scaleNum = 90
 # load the player image

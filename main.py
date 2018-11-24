@@ -35,6 +35,9 @@ screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
 
 import tileEditor as Editor
 
+# set the load bar font here so we know pygame has initialized
+library.loading_bar_font_face = pygame.font.Font("UI/AMS hand writing.ttf", 18)
+
 menu = mainMenu.Menu()
 menus = None            # this is set just befor main is called at the end of the script
 
