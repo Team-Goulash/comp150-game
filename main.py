@@ -617,10 +617,6 @@ def main():
         # amount of time that passed since the last frame in seconds
         delta_time = time.delta_time
 
-        if library.EDITOR:
-            Editor.display()
-            continue
-
         # Get inputs
         event_inputs()
 
@@ -820,7 +816,7 @@ def main():
         elif game_state.get_state() == "paused":
             menu_audio_is_playing = menu_audio(menu_audio_is_playing, False)
         elif game_state.get_state() == "editor":
-            pass
+            Editor.display()
 
         # update the display.
         fps_clock.tick(FPS)
