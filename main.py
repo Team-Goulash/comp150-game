@@ -9,6 +9,7 @@ import library
 import random
 import UI
 import os
+import soundEffects
 import shutil
 import playerLight
 import math
@@ -108,6 +109,8 @@ menu_state = StateController()
 time = timeManager.TimeManager(pygame.time.get_ticks() / 1000.0)
 player_object = Player(75, (0.9, 0.9), time)
 
+sound_effects = soundEffects.SoundFX()
+
 if not os.path.exists("Well Escape tiles/varieties"):
     os.makedirs("Well Escape tiles/varieties")
 else:
@@ -131,7 +134,6 @@ def event_inputs():
                 # set right key pressed (D)
             elif event.key == library.MOVE["right"]:
                 library.KEY_PRESSED["right"] = event.type == KEYDOWN
-
                 # set forwards key pressed (W)
             elif event.key == library.MOVE["forwards"]:
                 library.KEY_PRESSED["forwards"] = event.type == KEYDOWN
@@ -144,6 +146,10 @@ def event_inputs():
                 colorBlindFilter.color_blind_filter()
                 colorBlindFilter.loop_image()
                 print("taking color blind screenshot")
+            elif event.key == K_y:
+                sound_effects.apply_echo()
+            elif event.key == K_h:
+                sound_effects.play_echo_sound()
             elif event.key == K_SPACE:
                 library.KEY_PRESSED["space"] = event.type == KEYDOWN
 
@@ -539,6 +545,9 @@ def start():
                                       dunGen.DungeonGenerator.playerSpawnPoint[1]
     library.RESET = False
 
+#UI functions
+def ui_controls():
+    screen.blit(pygame.transform.scale(pygame.image.load("UI/Controls.png"), (800, 600)), (200, 200))
 
 def set_game_states(state):
 
@@ -557,7 +566,7 @@ def set_menu_states(state):
 
     state.add_state("main menu", "Main Menu")
     state.add_state("options", "Options")
-    state.add_state("contr", "Controls")
+    state.add_state("Controls", "Controls")
 
     # set the state to the default main menu
     state.set_state("main menu")
@@ -770,7 +779,7 @@ def main():
 
             menu_audio_is_playing = menu_audio(menu_audio_is_playing, True)
         elif game_state.get_state() == "game":
-
+            sound_effects.play_footprint()
             # Player
             player_object.block_move_direction(dunGen.DungeonGenerator.top_col, dunGen.DungeonGenerator.right_col, dunGen.DungeonGenerator.bottom_col, dunGen.DungeonGenerator.left_col)
             player_object.update(library.KEY_PRESSED)
@@ -806,6 +815,8 @@ def main():
             menus.is_button_pressed(pygame.mouse.get_pos(), library.KEY_PRESSED["mouse"])
 
             menu_audio_is_playing = menu_audio(menu_audio_is_playing, False)
+            if menu_state.get_state() == "Controls":
+                ui_controls()
         elif game_state.get_state() == "paused":
             menu_audio_is_playing = menu_audio(menu_audio_is_playing, False)
         elif game_state.get_state() == "editor":
@@ -817,7 +828,11 @@ def main():
 
 
 if __name__ == "__main__":
+
     menu.set_functions_by_name("exit", exit_game)
+    menu.set_functions_by_name("menu_state", menu_state)
+    menu.set_functions_by_name("game state", game_state)
+
     menus = menu.initialize_menu()
 
     colorBlindFilter.initialization()
