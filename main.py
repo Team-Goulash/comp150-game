@@ -202,6 +202,7 @@ def event_inputs():
                                                            library.KEY_PRESSED["mouse"]) and library.MAIN_MENU is True:
                 # Opens tile editor
                 library.EDITOR = True
+                game_state.set_state("editor")
             elif library.SETTINGS is True and main_menu_buttons["back"].is_pressed(pygame.mouse.get_pos(), (51, 613),
                                                                                    library.KEY_PRESSED["mouse"]):
                 # Checks to see if you're in settings before going back to the main menu
