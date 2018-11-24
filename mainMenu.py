@@ -2,7 +2,6 @@ import menuUi
 import library
 import dungeonGenerator as dunGen
 
-
 class Menu:
 
     exit_funct = None
@@ -29,7 +28,7 @@ class Menu:
 
     def start_game_action(self):
         if library.HAD_FIRST_RUN:
-            dunGen.reset(True)
+            dunGen.DungeonGenerator.reset(dunGen.DungeonGenerator, True)
 
         library.HAD_FIRST_RUN = True
         self.game_state.set_state("game")
