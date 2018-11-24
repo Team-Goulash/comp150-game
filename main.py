@@ -732,9 +732,6 @@ def main():
                             dunGen.DungeonGenerator.x += movement_speed
                             dunGen.DungeonGenerator.previousX = dunGen.DungeonGenerator.x
 
-                # update animation times
-                if not library.GAME_OVER and library.HAS_STARTED:
-                    fuel_meter.update_fuel_timer(delta_time)
             else:
                 display_pause_menu = True
 
@@ -776,6 +773,7 @@ def main():
 
             menu_audio_is_playing = menu_audio(menu_audio_is_playing, True)
         elif game_state.get_state() == "game":
+
             sound_effects.play_footprint()
             # Player
             player_object.block_move_direction(dunGen.DungeonGenerator.top_col, dunGen.DungeonGenerator.right_col, dunGen.DungeonGenerator.bottom_col, dunGen.DungeonGenerator.left_col)
@@ -786,8 +784,8 @@ def main():
             playerLight.initialise_lightning(dunGen.TILE_SIZE)
             playerLight.draw_light(screen, dunGen)
             playerLight.overlay(screen)
-
             # Fuel Meta (UI)
+            fuel_meter.update_fuel_timer(delta_time)
             fuel_meter.display_fuel_meter(screen, (630, 50))
 
             if fuel_meter.torch_time == 0:
