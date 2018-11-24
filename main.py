@@ -740,8 +740,6 @@ def main():
             if not library.HAS_STARTED:
                 main_menu()
             # display the pause menu if the game paused
-            elif display_pause_menu is True:
-                pause_menu()
             else:
                 # fill the background
                 screen.fill(library.BLACK)
@@ -813,6 +811,7 @@ def main():
                 ui_controls()
         elif game_state.get_state() == "paused":
             menu_audio_is_playing = menu_audio(menu_audio_is_playing, False)
+            pause_menu()
         elif game_state.get_state() == "editor":
             Editor.display()
 
