@@ -628,10 +628,8 @@ def main():
         movement_speed = 0
 
         time.update_time(pygame.time.get_ticks()/1000.0)
-
         # amount of time that passed since the last frame in seconds
         delta_time = time.delta_time
-
         # Get inputs
         event_inputs()
 
@@ -698,6 +696,7 @@ def main():
                             dunGen.DungeonGenerator.y += movement_speed
                             dunGen.DungeonGenerator.previousY = dunGen.DungeonGenerator.y
 
+
                 if library.KEY_PRESSED["left"] and \
                         not library.KEY_PRESSED["right"]:
                     dunGen.DungeonGenerator.right_col = False
@@ -757,9 +756,6 @@ def main():
             else:
                 pass
 
-
-
-
         # NEW MAIN CODE
         if game_state.get_state() == "loading":
 
@@ -792,6 +788,7 @@ def main():
             playerLight.initialise_lightning(dunGen.TILE_SIZE)
             playerLight.draw_light(screen, dunGen)
             playerLight.overlay(screen)
+
             # Fuel Meta (UI)
             fuel_meter.update_fuel_timer(delta_time)
             fuel_meter.display_fuel_meter(screen, (630, 50))
@@ -811,6 +808,7 @@ def main():
                 menu_audio_is_playing = menu_audio(menu_audio_is_playing, True)
 
         elif game_state.get_state() == "game over":
+            # todo. nuffing is working on the game over screen!!
             game_over()
             menu_audio_is_playing = menu_audio(menu_audio_is_playing, True)
         elif game_state.get_state() == "main menu":
