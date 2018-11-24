@@ -625,7 +625,7 @@ def main():
 
     # main game loop
     while True:
-        movement_speed = 0
+        movement_speed = 0      # Todo, do we need to set the move speed with the new state system
 
         time.update_time(pygame.time.get_ticks()/1000.0)
         # amount of time that passed since the last frame in seconds
@@ -633,13 +633,14 @@ def main():
         # Get inputs
         event_inputs()
 
-        display_pause_menu = False
-
+        # Todo, do we need to update the move speed with the new state system
         if not library.PAUSED and library.HAS_STARTED:
             # multiply the movement by delta_time to ensure constant speed
             # no matter the FPS
             movement_speed = 75 * delta_time
 
+        # Todo, do we need to update the move speed with the new state system
+        # Todo, should there be a reset state? or could we just use the loading state
         # prevent the player from moving if the game has not finished resetting
         if library.RESET or library.PAUSED or library.GAME_OVER or not library.HAS_STARTED:
             movement_speed = 0
