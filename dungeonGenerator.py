@@ -84,7 +84,6 @@ class DungeonGenerator:
             self.current_dungeon = 0
 
         self.well_room = first_scene
-        self.reset_fuel = True  # fuel_meter.add_fuel() # reset_fuel()
         self.levelCount = self.START_LEVEL_COUNT + self.current_dungeon
         self.starting_point_x.clear()
         self.starting_point_y.clear()
@@ -93,6 +92,9 @@ class DungeonGenerator:
             self.levels.append(pygame.Surface)
             self.starting_point_x.append(0)
             self.starting_point_y.append(0)
+
+        if is_reset:
+            self.reset_fuel = True  # fuel_meter.add_fuel() # reset_fuel()
 
         floorTilesX.clear()
         floorTilesY.clear()
