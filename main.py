@@ -629,125 +629,15 @@ def main():
 
     # main game loop
     while True:
-        movement_speed = 0      # Todo, do we need to set the move speed with the new state system
 
         time.update_time(pygame.time.get_ticks()/1000.0)
+
         # amount of time that passed since the last frame in seconds
         delta_time = time.delta_time
+        movement_speed = 75 * delta_time
+
         # Get inputs
         event_inputs()
-
-        # Todo, do we need to update the move speed with the new state system
-        if not library.PAUSED and library.HAS_STARTED:
-            # multiply the movement by delta_time to ensure constant speed
-            # no matter the FPS
-            movement_speed = 75 * delta_time
-
-        # Todo, do we need to update the move speed with the new state system
-        # Todo, should there be a reset state? or could we just use the loading state
-        # prevent the player from moving if the game has not finished resetting
-        if library.RESET or library.PAUSED or library.GAME_OVER or not library.HAS_STARTED:
-            movement_speed = 0
-
-        if not library.RESET:
-            if not library.PAUSED:
-                colDetect.CollisionDetector.detect_collision(colDetect.CollisionDetector)
-                # Key press actions
-                if library.KEY_PRESSED["forwards"] and \
-                        not library.KEY_PRESSED["backwards"]:
-                    dunGen.DungeonGenerator.bottom_col = False
-                    if not dunGen.DungeonGenerator.top_col:
-                        # move the player and assign prediction values
-                        dunGen.DungeonGenerator.previousY = dunGen.DungeonGenerator.y
-                        dunGen.DungeonGenerator.y += movement_speed
-
-                        dunGen.DungeonGenerator.prediction_Y = -10
-                        if not library.KEY_PRESSED["right"] and \
-                                not library.KEY_PRESSED["left"]:
-                            dunGen.DungeonGenerator.prediction_X = 0
-                            dunGen.DungeonGenerator.secondary_prediction_X = 0
-
-                        if not dunGen.DungeonGenerator.left_col and \
-                                not dunGen.DungeonGenerator.right_col:
-                            dunGen.DungeonGenerator.secondary_prediction_Y = -10
-                    else:
-                        # block the player movement
-                        dunGen.DungeonGenerator.prediction_Y = 0
-                        if not dunGen.DungeonGenerator.previousY == dunGen.DungeonGenerator.y:
-                            dunGen.DungeonGenerator.y -= movement_speed
-                            dunGen.DungeonGenerator.previousY = dunGen.DungeonGenerator.y
-
-                if library.KEY_PRESSED["backwards"] and \
-                        not library.KEY_PRESSED["forwards"]:
-                    dunGen.DungeonGenerator.top_col = False
-                    if not dunGen.DungeonGenerator.bottom_col:
-                        # move the player and assign prediction values
-                        dunGen.DungeonGenerator.previousY = dunGen.DungeonGenerator.y
-                        dunGen.DungeonGenerator.y -= movement_speed
-
-                        dunGen.DungeonGenerator.prediction_Y = 10
-                        if not library.KEY_PRESSED["right"] and \
-                                not library.KEY_PRESSED["left"]:
-                            dunGen.DungeonGenerator.prediction_X = 0
-                            dunGen.DungeonGenerator.secondary_prediction_X = 0
-
-                        if not dunGen.DungeonGenerator.left_col and \
-                                not dunGen.DungeonGenerator.right_col:
-                            dunGen.DungeonGenerator.secondary_prediction_Y = 10
-                    else:
-                        # block the player movement
-                        dunGen.DungeonGenerator.prediction_Y = 0
-                        if not dunGen.DungeonGenerator.previousY == dunGen.DungeonGenerator.y:
-                            dunGen.DungeonGenerator.y += movement_speed
-                            dunGen.DungeonGenerator.previousY = dunGen.DungeonGenerator.y
-
-                if library.KEY_PRESSED["left"] and \
-                        not library.KEY_PRESSED["right"]:
-                    dunGen.DungeonGenerator.right_col = False
-                    if not dunGen.DungeonGenerator.left_col:
-                        # move the player and assign prediction values
-                        dunGen.DungeonGenerator.previousX = dunGen.DungeonGenerator.x
-                        dunGen.DungeonGenerator.x += movement_speed
-
-                        dunGen.DungeonGenerator.prediction_X = -20
-                        if not library.KEY_PRESSED["forwards"] and \
-                                not library.KEY_PRESSED["backwards"]:
-                            dunGen.DungeonGenerator.prediction_Y = 0
-                            dunGen.DungeonGenerator.secondary_prediction_Y = 0
-
-                        if not dunGen.DungeonGenerator.bottom_col and \
-                                not dunGen.DungeonGenerator.top_col:
-                            dunGen.DungeonGenerator.secondary_prediction_X = -20
-                    else:
-                        # block the player movement
-                        dunGen.DungeonGenerator.prediction_X = 0
-                        if not dunGen.DungeonGenerator.previousX == dunGen.DungeonGenerator.x:
-                            dunGen.DungeonGenerator.x -= movement_speed
-                            dunGen.DungeonGenerator.previousX = dunGen.DungeonGenerator.x
-
-                if library.KEY_PRESSED["right"] and \
-                        not library.KEY_PRESSED["left"]:
-                    dunGen.DungeonGenerator.left_col = False
-                    if not dunGen.DungeonGenerator.right_col:
-                        # move the player and assign prediction values
-                        dunGen.DungeonGenerator.previousX = dunGen.DungeonGenerator.x
-                        dunGen.DungeonGenerator.x -= movement_speed
-
-                        dunGen.DungeonGenerator.prediction_X = 15
-                        if not library.KEY_PRESSED["forwards"] and \
-                                not library.KEY_PRESSED["backwards"]:
-                            dunGen.DungeonGenerator.prediction_Y = 0
-                            dunGen.DungeonGenerator.secondary_prediction_Y = 0
-
-                        if not dunGen.DungeonGenerator.bottom_col and \
-                                not dunGen.DungeonGenerator.top_col:
-                            dunGen.DungeonGenerator.secondary_prediction_X = 15
-                    else:
-                        # block the player movement
-                        dunGen.DungeonGenerator.prediction_X = 0
-                        if not dunGen.DungeonGenerator.previousX == dunGen.DungeonGenerator.x:
-                            dunGen.DungeonGenerator.x += movement_speed
-                            dunGen.DungeonGenerator.previousX = dunGen.DungeonGenerator.x
 
         # fill the background
         screen.fill(library.BLACK)
@@ -760,7 +650,14 @@ def main():
 
             sound_effects.play_footprint()
 
-            #Dungon
+            # Dungeon
+            colDetect.CollisionDetector.detect_collision(colDetect.CollisionDetector)
+
+            dunGen.DungeonGenerator. update_dungeon(dunGen.DungeonGenerator, "forwards", "backwards", movement_speed, -10, "right", "left")
+            dunGen.DungeonGenerator. update_dungeon(dunGen.DungeonGenerator, "backwards", "forwards", -movement_speed, 10, "right", "left")
+            dunGen.DungeonGenerator. update_dungeon(dunGen.DungeonGenerator, "left", "right", movement_speed, -20, "forwards", "backwards")
+            dunGen.DungeonGenerator. update_dungeon(dunGen.DungeonGenerator, "right", "left", -movement_speed, 15, "forwards", "backwards")
+
             draw_dungeon()
             dunGen.DungeonGenerator.draw_chest(dunGen.DungeonGenerator)
 

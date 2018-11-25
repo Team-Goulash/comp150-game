@@ -475,3 +475,153 @@ class DungeonGenerator:
             weights.append(random.random())
 
         return weights
+
+    def get_edge_name_from_move_direction(self, move_direction):
+
+        if move_direction == "forwards":
+            return "top"
+        elif move_direction == "right":
+            return "right"
+        elif move_direction == "backwards":
+            return "bottom"
+        elif move_direction == "left":
+            return "left"
+        else:
+            print("Error: direction (", move_direction, ") not fond (DungGen.get_edge_name_from_move_direction)")
+
+    def get_collider_edge(self, edge_name):
+        """get players collider edges value
+        Driver: Ashley
+        :param edge_name:   Name of edge to reset
+        :return:            Value of the player collider edges
+        """
+
+        if edge_name == "top":
+            return self.top_col
+        elif edge_name == "right":
+            return self.right_col
+        elif edge_name == "bottom":
+            return self.bottom_col
+        elif edge_name == "left":
+            return self.left_col
+        else:
+            print("Error: Edge (", edge_name, ") not fond (DungGen.get_collider_edge)")
+
+    def reset_collider_edge(self, edge_name):
+        """Resets players collider edges
+        Driver: Ashley
+        :param edge_name:   Name of edge to reset
+        :return:            None
+        """
+
+        if edge_name == "top":
+            self.top_col = False
+        elif edge_name == "right":
+            self.right_col = False
+        elif edge_name == "bottom":
+            self.bottom_col = False
+        elif edge_name == "left":
+            self.left_col = False
+        else:
+            print("Error: Edge (", edge_name, ") not fond (DungGen.reset_collider_edge)")
+
+    def update_position(self, move_direction, move_amount, previous_position=None):
+        """
+
+        :param move_direction:
+        :param move_amount:
+        :param previous_position:
+        :return:
+        """
+        if move_direction == "forwards" or move_direction == "backwards":
+            if previous_position is None:
+                self.previousY = self.y
+            else:
+                self.previousY = previous_position
+            self.y += move_amount
+
+        else:
+            if previous_position is None:
+                self.previousX = self.x
+            else:
+                self.previousX = previous_position
+
+            self.x += move_amount
+
+    def get_axis_position_from_move_direction(self, move_direction):
+        """
+
+        :param move_direction:
+        :return:
+        """
+        if move_direction == "forwards" or move_direction == "backwards":
+            return self.y
+        else:
+            return self.x
+
+    def get_axis_previous_position_from_move_direction(self, move_direction):
+        """
+
+        :param move_direction:
+        :return:
+        """
+        if move_direction == "forwards" or move_direction == "backwards":
+            return self.previousY
+        else:
+            return self.previousX
+
+    def set_prediction(self, move_direction, main_value = None, secondary_value = None):
+        """
+
+        :param move_direction:
+        :param value:
+        :return:
+        """
+        if move_direction == "forwards" or move_direction == "backwards":
+            if main_value is not None:
+                self.prediction_Y = main_value
+
+            if secondary_value is not None:
+                self.secondary_prediction_Y = secondary_value
+        else:
+            if main_value is not None:
+                self.prediction_X = main_value
+
+            if secondary_value is not None:
+                self.secondary_prediction_X = secondary_value
+
+    def update_dungeon(self, move_direction, opposite_move_direction, move_amount, prediction_value, other_direction_1, other_direction_2):
+        """Update the dungeon positions
+        Drive: Ashley
+
+        """
+        if library.KEY_PRESSED[move_direction] and not library.KEY_PRESSED[opposite_move_direction]:
+
+            move_direction_edge_name = self.get_edge_name_from_move_direction(self, move_direction)
+            opposite_move_direction_edge_name = self.get_edge_name_from_move_direction(self, opposite_move_direction)
+            other_direction_1_edge_name = self.get_edge_name_from_move_direction(self, other_direction_1)
+            other_direction_2_edge_name = self.get_edge_name_from_move_direction(self, other_direction_2)
+
+            self.reset_collider_edge(self, opposite_move_direction_edge_name)
+
+            if not self.get_collider_edge(self, move_direction_edge_name):
+                # move the dungeon and assign prediction values
+                prv_axis_position = self.get_axis_position_from_move_direction(self, move_direction)
+                self.update_position(self, move_direction, move_amount, prv_axis_position)
+                self.set_prediction(self, move_direction, main_value=prediction_value)
+
+                if not (library.KEY_PRESSED[other_direction_1] or library.KEY_PRESSED[other_direction_2]):
+                    self.set_prediction(self, other_direction_1, main_value=0, secondary_value=0)
+
+                if not (self.get_collider_edge(self, other_direction_1_edge_name) or self.get_collider_edge(self, other_direction_2_edge_name)):
+                    self.set_prediction(self, move_direction, secondary_value=prediction_value)
+
+            else:
+                self.set_prediction(self, move_direction, main_value=0)
+
+                current_pos = self.get_axis_position_from_move_direction(self, move_direction)
+                prv_pos = self.get_axis_previous_position_from_move_direction(self, move_direction)
+
+                if current_pos != prv_pos:
+                    self.update_position(self, move_direction, 0)
+
