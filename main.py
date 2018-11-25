@@ -37,6 +37,8 @@ import tileEditor as Editor
 
 # set the load bar font here so we know pygame has initialized
 library.loading_bar_font_face = pygame.font.Font("UI/AMS hand writing.ttf", 18)
+debug_header_font_face = pygame.font.Font("UI/AMS hand writing.ttf", 36)
+debug_font_face = pygame.font.Font("UI/AMS hand writing.ttf", 22)
 
 menu = mainMenu.Menu()
 menus = None            # this is set just befor main is called at the end of the script
@@ -819,6 +821,13 @@ def main():
             pause_menu()
         elif game_state.get_state() == "editor":
             Editor.display()
+
+        if library.debug_mode:
+            # display some stats to screen
+            debug_header_surface = debug_header_font_face.render("DEBUG MODE", True, library.WHITE)
+            debug_room_count_surface = debug_font_face.render("Level Room count: "+ str(dunGen.DungeonGenerator.levelCount), True, library.WHITE)
+            screen.blit(debug_header_surface, (0, 0))
+            screen.blit(debug_room_count_surface, (0, 33))
 
         # update the display.
         fps_clock.tick(FPS)
