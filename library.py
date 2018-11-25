@@ -15,7 +15,11 @@ BACKWARDS = 3
 KEY_PRESSED = {"left": False, "right": False, "forwards": False,
                "backwards": False, "mouse": False, "space": False}
 
-PAUSED = False
+HAD_FIRST_RUN = False
+HAS_STARTED = False
+RESET = False
+
+# Todo Remove States
 MAIN_MENU = False
 OPTIONS = False
 PAUSE_MENU = False
@@ -23,13 +27,7 @@ GAME_OVER = False
 CONTROLS = False
 SETTINGS = False
 MAIN_MENU_CONTROLS = False
-
-HAD_FIRST_RUN = False
-HAS_STARTED = False
-EDITOR = False
-RESET = False
-
-
+PAUSED = False
 
 # set Colors (r, g, b, a)
 BLUE = (0, 0, 255, 255)
