@@ -826,6 +826,13 @@ def main():
             # display some stats to screen
             debug_header_surface = debug_header_font_face.render("DEBUG MODE", True, library.WHITE)
             debug_room_count_surface = debug_font_face.render("Level Room count: "+ str(dunGen.DungeonGenerator.levelCount), True, library.WHITE)
+
+            for room in range(len(dunGen.DungeonGenerator.starting_point_x)):
+                room_numb = room + 1
+                room_numb_surface = debug_font_face.render(str(room_numb), True, library.WHITE)
+                display_position = dunGen.DungeonGenerator.get_position_with_offset(dunGen.DungeonGenerator.starting_point_x[room] + (dunGen.TILE_SIZE // 2), dunGen.DungeonGenerator.starting_point_y[room]+ (dunGen.TILE_SIZE // 2))
+                screen.blit(room_numb_surface, display_position)
+
             screen.blit(debug_header_surface, (0, 0))
             screen.blit(debug_room_count_surface, (0, 33))
 
