@@ -157,6 +157,9 @@ def event_inputs():
                 library.KEY_PRESSED["space"] = event.type == KEYDOWN
 
         if event.type == KEYUP:
+            if event.key == K_F12:
+                library.debug_mode = not library.debug_mode
+
             if event.key == library.PAUSE and library.MAIN_MENU is False: # Pauses the game
                 if game_state.get_state() == "game":
                     game_state.set_state("paused")
@@ -588,6 +591,7 @@ def menu_audio(is_playing, play):
 
     return is_playing
 
+
 def draw_dungeon():
 
     # Todo this can be optimized so it only draws the rooms we can see.
@@ -695,7 +699,6 @@ def main():
                             dunGen.DungeonGenerator.y += movement_speed
                             dunGen.DungeonGenerator.previousY = dunGen.DungeonGenerator.y
 
-
                 if library.KEY_PRESSED["left"] and \
                         not library.KEY_PRESSED["right"]:
                     dunGen.DungeonGenerator.right_col = False
@@ -771,7 +774,7 @@ def main():
                 get_position_with_offset(player_object.position[0],
                                          player_object.position[1])
 
-            if aiAnimationPaths.ghost_in_position(player_x_pos, player_y_pos, screen):
+            if not library.debug_mode and aiAnimationPaths.ghost_in_position(player_x_pos, player_y_pos, screen):
                 game_state.set_state("game over")
 
             # Light
@@ -781,7 +784,9 @@ def main():
             playerLight.overlay(screen)
 
             # Fuel Meta (UI)
-            fuel_meter.update_fuel_timer(delta_time)
+            if not library.debug_mode:
+                fuel_meter.update_fuel_timer(delta_time)
+
             fuel_meter.display_fuel_meter(screen, (630, 50))
 
             if fuel_meter.torch_time == 0:

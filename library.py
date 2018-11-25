@@ -61,6 +61,8 @@ scaleNum = 90
 playerImg = pygame.transform.scale(pygame.image.load("Characters/Player.png"),
                                    (int(scaleNum * 0.75), int(scaleNum * 0.75)))
 
+debug_mode = False
+
 
 def clamp(min, max, value):
     """
