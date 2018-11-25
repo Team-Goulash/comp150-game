@@ -111,8 +111,7 @@ class DungeonGenerator:
         for i in range(len(self.levels)):
             if i > 0:
                 self.gen_rand_map_tiles(self, i)
-                print(self.start_x)
-                print(self.end_x)
+
                 # set the starting point for the next room
                 self.starting_point_x[i] = \
                     self.starting_point_x[i - 1] + \
@@ -121,9 +120,10 @@ class DungeonGenerator:
                 self.starting_point_y[i] = \
                     self.starting_point_y[i - 1] + \
                     self.end_y[i-1] * TILE_SIZE
+            else:
+                # create the room
+                self.gen_rand_map_tiles(self, i)
 
-            # create the room
-            self.gen_rand_map_tiles(self, i)
             self.initialize_level(self, i)
             self.gen_chest_map(self, i)
 

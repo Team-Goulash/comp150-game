@@ -57,7 +57,6 @@ class AiAnimation:
                 if len(path) > 1:
                     paths.append(path)
 
-
             path = []
 
         self.ghost_paths.append(paths)
