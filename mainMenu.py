@@ -2,6 +2,7 @@ import menuUi
 import library
 import dungeonGenerator as dunGen
 
+
 class Menu:
 
     exit_funct = None
@@ -22,7 +23,7 @@ class Menu:
     def test_button_function(self):
         print("Buttons Pressed")
 
-    def back_action(self):
+    def return_to_menu_action(self):
         self.menu_state.set_state("main menu")
         self.menu_ui.set_current_menu("Main Menu")
 
@@ -32,6 +33,9 @@ class Menu:
 
         library.HAD_FIRST_RUN = True
         self.game_state.set_state("game")
+
+    def tile_editor_action(self):
+        self.game_state.set_state("editor")
 
     def controls_action(self):
         self.menu_state.set_state("Controls")
@@ -45,14 +49,20 @@ class Menu:
         menu_ui.add_button_type("default", None, None, None, (450, 50))
         menu_ui.add_button_type("back", None, None, None, (200, 50))
 
+        menu_ui.add_menu("Game Over")
+        menu_ui.add_button("Game Over", "default", "Restart", (690, 220), self.start_game_action)
+        menu_ui.add_button("Game Over", "default", "Exit To Menu", (690, 370), self.return_to_menu_action)
+        menu_ui.add_button("Game Over", "default", "Quit", (690, 520), self.exit_funct)
+
 
         menu_ui.add_menu("Main Menu")
         menu_ui.add_button("Main Menu", "default", "Start Game", (150, 250), self.start_game_action)
-        menu_ui.add_button("Main Menu", "default", "Controls", (150, 350), self.controls_action)
-        menu_ui.add_button("Main Menu", "default", "Quit", (150, 450), self.exit_funct)
+        menu_ui.add_button("Main Menu", "default", "Tile Editor", (150, 350), self.tile_editor_action)
+        menu_ui.add_button("Main Menu", "default", "Controls", (150, 450), self.controls_action)
+        menu_ui.add_button("Main Menu", "default", "Quit", (150, 550), self.exit_funct)
 
         menu_ui.add_menu("Controls")
-        menu_ui.add_button("Controls", "back", "Back", (75, 500), self.back_action)
+        menu_ui.add_button("Controls", "back", "Back", (75, 500), self.return_to_menu_action)
 
 
         # set the menu to the default menu

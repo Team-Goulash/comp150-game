@@ -787,7 +787,12 @@ def main():
 
         elif game_state.get_state() == "game over":
             # todo. nuffing is working on the game over screen!!
-            game_over()
+            menus.draw_buttons(
+                screen, pygame.mouse.get_pos(),
+                library.KEY_PRESSED["mouse"])
+            menus.is_button_pressed(
+                pygame.mouse.get_pos(),
+                library.KEY_PRESSED["mouse"])
 
             menu_audio_is_playing = menu_audio(menu_audio_is_playing, True)
         elif game_state.get_state() == "main menu":
