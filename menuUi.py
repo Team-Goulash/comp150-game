@@ -110,15 +110,18 @@ class UiMenu:
 
         return temp_surface
 
-    def draw_buttons(self, surface, mouse_pos, key_pressed, menu_name=None):
+    def draw_buttons(self, surface, mouse_pos, key_pressed, menu_tile=None, menu_name=None):
         """Draws all the buttons and menu header to the surface"""
         # note to self: button_type, button_label, position_rect, action_funct
 
         if menu_name is None:
             menu_name = self.current_menu
 
+        if menu_tile is None:
+            menu_title = menu_name
+
         # display the header in the hoz center of the screen
-        header_surface = self.get_header(menu_name,
+        header_surface = self.get_header(menu_title,
                                          self.header_fontface,
                                          self.HEADER_SIZE)
         offset_x, offset_y = self.center_surface(surface.get_size(),
