@@ -641,7 +641,9 @@ def debug():
 
 def main():
     """Main game loop."""
-    player_object.get_world_position_funct = dunGen.DungeonGenerator.get_position_with_offset
+
+    player_object.get_world_position_funct = \
+        dunGen.DungeonGenerator.get_position_with_offset
     dunGen.DungeonGenerator.create_dungeon(dunGen.DungeonGenerator)
 
     # players current direction
@@ -669,27 +671,61 @@ def main():
         delta_time = time.delta_time
         movement_speed = 75 * delta_time
 
-        # Get inputs
         event_inputs()
 
         # fill the background
         screen.fill(library.BLACK)
 
         # NEW MAIN CODE
-        if game_state.get_state() == "loading": # treat this as RESET.
+        if game_state.get_state() == "loading":  # treat this as RESET.
 
             menu_audio_is_playing = menu_audio(menu_audio_is_playing, True)
         elif game_state.get_state() == "game":
-
+            # Audio
             sound_effects.play_footprint()
+            menu_audio_is_playing = menu_audio(menu_audio_is_playing, False)
 
             # Dungeon
-            colDetect.CollisionDetector.detect_collision(colDetect.CollisionDetector)
+            colDetect.CollisionDetector.detect_collision(
+                colDetect.CollisionDetector
+            )
 
-            dunGen.DungeonGenerator. update_dungeon(dunGen.DungeonGenerator, "forwards", "backwards", movement_speed, -10, "right", "left")
-            dunGen.DungeonGenerator. update_dungeon(dunGen.DungeonGenerator, "backwards", "forwards", -movement_speed, 10, "right", "left")
-            dunGen.DungeonGenerator. update_dungeon(dunGen.DungeonGenerator, "left", "right", movement_speed, -20, "forwards", "backwards")
-            dunGen.DungeonGenerator. update_dungeon(dunGen.DungeonGenerator, "right", "left", -movement_speed, 15, "forwards", "backwards")
+            dunGen.DungeonGenerator. update_dungeon(
+                dunGen.DungeonGenerator,
+                "forwards",
+                "backwards",
+                movement_speed,
+                -10,
+                "right",
+                "left"
+            )
+            dunGen.DungeonGenerator. update_dungeon(
+                dunGen.DungeonGenerator,
+                "backwards",
+                "forwards",
+                -movement_speed,
+                10,
+                "right",
+                "left"
+            )
+            dunGen.DungeonGenerator. update_dungeon(
+                dunGen.DungeonGenerator,
+                "left",
+                "right",
+                movement_speed,
+                -20,
+                "forwards",
+                "backwards"
+            )
+            dunGen.DungeonGenerator. update_dungeon(
+                dunGen.DungeonGenerator,
+                "right",
+                "left",
+                -movement_speed,
+                15,
+                "forwards",
+                "backwards"
+            )
 
             draw_dungeon()
             dunGen.DungeonGenerator.draw_chest(dunGen.DungeonGenerator)
@@ -698,7 +734,12 @@ def main():
             aiAnimationPaths.update_animations(delta_time, screen)
 
             # Player
-            player_object.block_move_direction(dunGen.DungeonGenerator.top_col, dunGen.DungeonGenerator.right_col, dunGen.DungeonGenerator.bottom_col, dunGen.DungeonGenerator.left_col)
+            player_object.block_move_direction(
+                dunGen.DungeonGenerator.top_col,
+                dunGen.DungeonGenerator.right_col,
+                dunGen.DungeonGenerator.bottom_col,
+                dunGen.DungeonGenerator.left_col
+            )
             player_object.update(library.KEY_PRESSED)
             player_object.draw(dunGen.TILE_SIZE, screen)
 
@@ -706,7 +747,11 @@ def main():
                 get_position_with_offset(player_object.position[0],
                                          player_object.position[1])
 
-            if not library.debug_mode and aiAnimationPaths.ghost_in_position(player_x_pos, player_y_pos, screen):
+            if not library.debug_mode and aiAnimationPaths.ghost_in_position(
+                    player_x_pos,
+                    player_y_pos,
+                    screen
+            ):
                 game_state.set_state("game over")
 
             # Light
@@ -731,8 +776,6 @@ def main():
                 fuel_meter.add_fuel()
                 dunGen.DungeonGenerator.add_fuel = False
 
-            menu_audio_is_playing = menu_audio(menu_audio_is_playing, False)
-
         elif game_state.get_state() == "game over":
             # todo. nuffing is working on the game over screen!!
             game_over()
@@ -740,8 +783,15 @@ def main():
             menu_audio_is_playing = menu_audio(menu_audio_is_playing, True)
         elif game_state.get_state() == "main menu":
             # New ui code!
-            menus.draw_buttons(screen, pygame.mouse.get_pos(), library.KEY_PRESSED["mouse"])
-            menus.is_button_pressed(pygame.mouse.get_pos(), library.KEY_PRESSED["mouse"])
+            menus.draw_buttons(
+                screen,
+                pygame.mouse.get_pos(),
+                library.KEY_PRESSED["mouse"]
+            )
+            menus.is_button_pressed(
+                pygame.mouse.get_pos(),
+                library.KEY_PRESSED["mouse"]
+            )
 
             menu_audio_is_playing = menu_audio(menu_audio_is_playing, True)
             if menu_state.get_state() == "Controls":
