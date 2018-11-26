@@ -20,9 +20,9 @@ class Menu:
             self.menu_state = funct
 
     def return_to_menu_action(self):
-        self.game_state.set_state("main menu")
-        self.menu_state.set_state("main menu")
-        self.menu_ui.set_current_menu("Main Menu")
+        self.game_state.set_state(self.game_state.get_state())
+        self.menu_state.set_state(self.game_state.get_state())
+        self.menu_ui.set_current_menu(self.game_state.get_state())
 
     def resume_game_action(self):
         self.game_state.set_state("game")
@@ -41,7 +41,6 @@ class Menu:
         self.game_state.set_state("editor")
 
     def controls_action(self):
-        #self.game_state.set_state("main menu")
         self.menu_state.set_state("Controls")
         self.menu_ui.set_current_menu("Controls")
 
@@ -58,24 +57,24 @@ class Menu:
         menu_ui.add_button("Game Over", "default", "Exit To Menu", (690, 370), self.return_to_menu_action)
         menu_ui.add_button("Game Over", "default", "Quit", (690, 520), self.exit_funct)
 
-        menu_ui.add_menu("Paused")
-        menu_ui.add_button("Paused", "default", "Resume", (460, 208), self.resume_game_action)
-        menu_ui.add_button("Paused", "default", "Restart", (460, 308), self.start_game_action)
-        menu_ui.add_button("Paused", "default", "Controls", (460, 408), self.controls_action)
-        menu_ui.add_button("Paused", "default", "Exit To Menu", (460, 508), self.return_to_menu_action)
-        menu_ui.add_button("Paused", "default", "Quit", (460, 608), self.exit_funct)
+        menu_ui.add_menu("paused")
+        menu_ui.add_button("paused", "default", "Resume", (460, 208), self.resume_game_action)
+        menu_ui.add_button("paused", "default", "Restart", (460, 308), self.start_game_action)
+        menu_ui.add_button("paused", "default", "Controls", (460, 408), self.controls_action)
+        menu_ui.add_button("paused", "default", "Exit To Menu", (460, 508), self.return_to_menu_action)
+        menu_ui.add_button("paused", "default", "Quit", (460, 608), self.exit_funct)
 
-        menu_ui.add_menu("Main Menu")
-        menu_ui.add_button("Main Menu", "default", "Start Game", (150, 250), self.start_game_action)
-        menu_ui.add_button("Main Menu", "default", "Tile Editor", (150, 350), self.tile_editor_action)
-        menu_ui.add_button("Main Menu", "default", "Controls", (150, 450), self.controls_action)
-        menu_ui.add_button("Main Menu", "default", "Quit", (150, 550), self.exit_funct)
+        menu_ui.add_menu("main menu")
+        menu_ui.add_button("main menu", "default", "Start Game", (150, 250), self.start_game_action)
+        menu_ui.add_button("main menu", "default", "Tile Editor", (150, 350), self.tile_editor_action)
+        menu_ui.add_button("main menu", "default", "Controls", (150, 450), self.controls_action)
+        menu_ui.add_button("main menu", "default", "Quit", (150, 550), self.exit_funct)
 
         menu_ui.add_menu("Controls")
         menu_ui.add_button("Controls", "back", "Back", (75, 500), self.return_to_menu_action)
 
 
         # set the menu to the default menu
-        menu_ui.set_current_menu("Main Menu")
+        menu_ui.set_current_menu("main menu")
 
         return menu_ui

@@ -582,8 +582,9 @@ def set_game_states(state):
 
 def set_menu_states(state):
 
-    state.add_state("main menu", "Main Menu")
+    state.add_state("main menu", "main menu")
     state.add_state("options", "Options")
+    state.add_state("paused", "paused")
     state.add_state("Controls", "Controls")
 
     # set the state to the default main menu
@@ -813,11 +814,11 @@ def main():
                 menus.draw_buttons(
                     screen,
                     pygame.mouse.get_pos(),
-                    library.KEY_PRESSED["mouse"], "Main Menu"
+                    library.KEY_PRESSED["mouse"], "main menu"
                 )
                 menus.is_button_pressed(
                     pygame.mouse.get_pos(),
-                    library.KEY_PRESSED["mouse"], "Main Menu"
+                    library.KEY_PRESSED["mouse"], "main menu"
                 )
 
         elif game_state.get_state() == "paused":
@@ -837,11 +838,11 @@ def main():
                 menus.draw_buttons(
                     screen,
                     pygame.mouse.get_pos(),
-                    library.KEY_PRESSED["mouse"], "Paused"
+                    library.KEY_PRESSED["mouse"], "paused"
                 )
                 menus.is_button_pressed(
                     pygame.mouse.get_pos(),
-                    library.KEY_PRESSED["mouse"], "Paused"
+                    library.KEY_PRESSED["mouse"], "paused"
                 )
         elif game_state.get_state() == "editor":
             Editor.display()
