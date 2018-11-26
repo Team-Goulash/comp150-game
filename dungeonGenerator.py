@@ -477,6 +477,11 @@ class DungeonGenerator:
         return weights
 
     def get_edge_name_from_move_direction(self, move_direction):
+        """Get the related edge name for move direction
+        Driver: Ashley
+        :param move_direction: name of move direction
+        :return:               name of edge corresponding to the move direction
+        """
 
         if move_direction == "forwards":
             return "top"
@@ -487,10 +492,14 @@ class DungeonGenerator:
         elif move_direction == "left":
             return "left"
         else:
-            print("Error: direction (", move_direction, ") not fond (DungGen.get_edge_name_from_move_direction)")
+            print(
+                "Error: direction (",
+                move_direction,
+                ") not fond (DungGen.get_edge_name_from_move_direction)"
+            )
 
     def get_collider_edge(self, edge_name):
-        """get players collider edges value
+        """Get players collider edges value
         Driver: Ashley
         :param edge_name:   Name of edge to reset
         :return:            Value of the player collider edges
@@ -505,10 +514,14 @@ class DungeonGenerator:
         elif edge_name == "left":
             return self.left_col
         else:
-            print("Error: Edge (", edge_name, ") not fond (DungGen.get_collider_edge)")
+            print(
+                "Error: Edge (",
+                edge_name,
+                ") not fond (DungGen.get_collider_edge)"
+            )
 
     def reset_collider_edge(self, edge_name):
-        """Resets players collider edges
+        """Reset collider edge
         Driver: Ashley
         :param edge_name:   Name of edge to reset
         :return:            None
@@ -523,21 +536,31 @@ class DungeonGenerator:
         elif edge_name == "left":
             self.left_col = False
         else:
-            print("Error: Edge (", edge_name, ") not fond (DungGen.reset_collider_edge)")
+            print(
+                "Error: Edge (",
+                edge_name,
+                ") not fond (DungGen.reset_collider_edge)"
+            )
 
-    def update_position(self, move_direction, move_amount, previous_position=None):
+    def update_position(self,
+                        move_direction,
+                        move_amount,
+                        previous_position=None
+                        ):
+        """Update dungeon position
+        Driver: Ashley
+        :param move_direction:      name of direction to move in
+        :param move_amount:         amount to move
+        :param previous_position:   if None its set to position
+        :return:                    None
         """
 
-        :param move_direction:
-        :param move_amount:
-        :param previous_position:
-        :return:
-        """
         if move_direction == "forwards" or move_direction == "backwards":
             if previous_position is None:
                 self.previousY = self.y
             else:
                 self.previousY = previous_position
+
             self.y += move_amount
 
         else:
@@ -549,40 +572,51 @@ class DungeonGenerator:
             self.x += move_amount
 
     def get_axis_position_from_move_direction(self, move_direction):
+        """Get position of an axis corresponding to the move direction
+        Driver: Ashley
+        :param move_direction:  name of direction to get the position of
+        :return:                position of the corresponding axis
         """
 
-        :param move_direction:
-        :return:
-        """
         if move_direction == "forwards" or move_direction == "backwards":
             return self.y
         else:
             return self.x
 
     def get_axis_previous_position_from_move_direction(self, move_direction):
+        """Get previous position of an axis corresponding to the move direction
+        Driver: Ashley
+        :param move_direction:  name of direction to get the position of
+        :return:                previous position of the corresponding axis
         """
 
-        :param move_direction:
-        :return:
-        """
         if move_direction == "forwards" or move_direction == "backwards":
             return self.previousY
         else:
             return self.previousX
 
-    def set_prediction(self, move_direction, main_value = None, secondary_value = None):
+    def set_prediction(self,
+                       move_direction,
+                       main_value = None,
+                       secondary_value = None
+                       ):
+        """ Set main and secondary values corresponding to move direction
+        Driver: Ashley
+        :param move_direction:
+        :param main_value:          value to set main prediction
+                                    (ignored if None)
+        :param secondary_value:     value to set secondary prediction
+                                    (ignored if None)
+        :return:                    None
         """
 
-        :param move_direction:
-        :param value:
-        :return:
-        """
         if move_direction == "forwards" or move_direction == "backwards":
             if main_value is not None:
                 self.prediction_Y = main_value
 
             if secondary_value is not None:
                 self.secondary_prediction_Y = secondary_value
+
         else:
             if main_value is not None:
                 self.prediction_X = main_value
@@ -590,37 +624,111 @@ class DungeonGenerator:
             if secondary_value is not None:
                 self.secondary_prediction_X = secondary_value
 
-    def update_dungeon(self, move_direction, opposite_move_direction, move_amount, prediction_value, other_direction_1, other_direction_2):
-        """Update the dungeon positions
+    def update_dungeon(self,
+                       move_direction,
+                       opposite_move_direction,
+                       move_amount,
+                       prediction_value,
+                       other_direction_1,
+                       other_direction_2
+                       ):
+        """Update the dungeon position
         Drive: Ashley
 
+        :param move_direction:              Direction to test if moving
+        :param opposite_move_direction:     Opposite direction of move test
+        :param move_amount:                 Amount to move
+        :param prediction_value:            Prediction value
+        :param other_direction_1:           One of the other two directions
+        :param other_direction_2:           The other, other direction.
+        :return:                            None
         """
-        if library.KEY_PRESSED[move_direction] and not library.KEY_PRESSED[opposite_move_direction]:
 
-            move_direction_edge_name = self.get_edge_name_from_move_direction(self, move_direction)
-            opposite_move_direction_edge_name = self.get_edge_name_from_move_direction(self, opposite_move_direction)
-            other_direction_1_edge_name = self.get_edge_name_from_move_direction(self, other_direction_1)
-            other_direction_2_edge_name = self.get_edge_name_from_move_direction(self, other_direction_2)
+        if (library.KEY_PRESSED[move_direction] and
+                not library.KEY_PRESSED[opposite_move_direction]):
+            # Get names of all the edges so its orientated correctly
+            move_direction_edge_name = \
+                self.get_edge_name_from_move_direction(
+                    self,
+                    move_direction
+                    )
+
+            opposite_move_direction_edge_name = \
+                self.get_edge_name_from_move_direction(
+                    self,
+                    opposite_move_direction
+                    )
+
+            other_direction_1_edge_name = \
+                self.get_edge_name_from_move_direction(
+                    self,
+                    other_direction_1
+                    )
+
+            other_direction_2_edge_name = \
+                self.get_edge_name_from_move_direction(
+                    self,
+                    other_direction_2
+                    )
 
             self.reset_collider_edge(self, opposite_move_direction_edge_name)
 
             if not self.get_collider_edge(self, move_direction_edge_name):
                 # move the dungeon and assign prediction values
-                prv_axis_position = self.get_axis_position_from_move_direction(self, move_direction)
-                self.update_position(self, move_direction, move_amount, prv_axis_position)
-                self.set_prediction(self, move_direction, main_value=prediction_value)
+                prv_axis_position = \
+                    self.get_axis_position_from_move_direction(
+                        self,
+                        move_direction
+                        )
 
-                if not (library.KEY_PRESSED[other_direction_1] or library.KEY_PRESSED[other_direction_2]):
-                    self.set_prediction(self, other_direction_1, main_value=0, secondary_value=0)
+                self.update_position(
+                    self,
+                    move_direction,
+                    move_amount,
+                    prv_axis_position
+                    )
 
-                if not (self.get_collider_edge(self, other_direction_1_edge_name) or self.get_collider_edge(self, other_direction_2_edge_name)):
-                    self.set_prediction(self, move_direction, secondary_value=prediction_value)
+                self.set_prediction(
+                    self,
+                    move_direction,
+                    main_value=prediction_value
+                    )
+
+                if not (library.KEY_PRESSED[other_direction_1] or
+                        library.KEY_PRESSED[other_direction_2]):
+                    self.set_prediction(
+                        self,
+                        other_direction_1,
+                        main_value=0,
+                        secondary_value=0
+                        )
+
+                if not (self.get_collider_edge(self,
+                                               other_direction_1_edge_name
+                                               ) or
+                        self.get_collider_edge(self,
+                                               other_direction_2_edge_name
+                                               )):
+                    self.set_prediction(
+                        self,
+                        move_direction,
+                        secondary_value=prediction_value
+                    )
 
             else:
                 self.set_prediction(self, move_direction, main_value=0)
 
-                current_pos = self.get_axis_position_from_move_direction(self, move_direction)
-                prv_pos = self.get_axis_previous_position_from_move_direction(self, move_direction)
+                current_pos = \
+                    self.get_axis_position_from_move_direction(
+                        self,
+                        move_direction
+                    )
+
+                prv_pos = \
+                    self.get_axis_previous_position_from_move_direction(
+                        self,
+                        move_direction
+                    )
 
                 if current_pos != prv_pos:
                     self.update_position(self, move_direction, 0)
