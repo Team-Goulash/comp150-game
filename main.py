@@ -162,7 +162,16 @@ def event_inputs():
             if event.key == K_F12:
                 library.debug_mode = not library.debug_mode
 
-            if event.key == library.PAUSE and library.MAIN_MENU is False: # Pauses the game
+            if library.debug_mode:
+                if event.key == K_EQUALS:
+                    dunGen.DungeonGenerator.levelCount += 1
+                    dunGen.DungeonGenerator.current_dungeon += 1
+                elif event.key == K_MINUS and \
+                        dunGen.DungeonGenerator.levelCount > 3:
+                    dunGen.DungeonGenerator.levelCount -= 1
+                    dunGen.DungeonGenerator.current_dungeon -= 1
+
+            if event.key == library.PAUSE and library.MAIN_MENU is False:  # Pauses the game
                 if game_state.get_state() == "game":
                     game_state.set_state("paused")
                 elif game_state.get_state() == "paused":
