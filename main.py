@@ -684,7 +684,7 @@ def main():
         event_inputs()
 
         # fill the background
-        screen.fill(library.BLACK)
+        screen.fill(library.LIGHT_GREY)
 
         # NEW MAIN CODE
         if game_state.get_state() == "loading":  # treat this as RESET.
@@ -790,7 +790,7 @@ def main():
             # todo. nuffing is working on the game over screen!!
             menus.draw_buttons(
                 screen, pygame.mouse.get_pos(),
-                library.KEY_PRESSED["mouse"], "Game Over")
+                library.KEY_PRESSED["mouse"], "Game Over", "Game Over")
             menus.is_button_pressed(
                 pygame.mouse.get_pos(),
                 library.KEY_PRESSED["mouse"], "Game Over")
@@ -803,7 +803,7 @@ def main():
                 menus.draw_buttons(
                     screen,
                     pygame.mouse.get_pos(),
-                    library.KEY_PRESSED["mouse"], "Controls"
+                    library.KEY_PRESSED["mouse"], "Controls", "Controls"
                 )
                 menus.is_button_pressed(
                     pygame.mouse.get_pos(),
@@ -814,7 +814,7 @@ def main():
                 menus.draw_buttons(
                     screen,
                     pygame.mouse.get_pos(),
-                    library.KEY_PRESSED["mouse"], "main menu"
+                    library.KEY_PRESSED["mouse"], "Well Escape", "main menu"
                 )
                 menus.is_button_pressed(
                     pygame.mouse.get_pos(),
@@ -828,7 +828,7 @@ def main():
                 menus.draw_buttons(
                     screen,
                     pygame.mouse.get_pos(),
-                    library.KEY_PRESSED["mouse"], "Controls"
+                    library.KEY_PRESSED["mouse"], "Controls", "Controls"
                 )
                 menus.is_button_pressed(
                     pygame.mouse.get_pos(),
@@ -838,7 +838,7 @@ def main():
                 menus.draw_buttons(
                     screen,
                     pygame.mouse.get_pos(),
-                    library.KEY_PRESSED["mouse"], "paused"
+                    library.KEY_PRESSED["mouse"], "Paused", "paused"
                 )
                 menus.is_button_pressed(
                     pygame.mouse.get_pos(),
