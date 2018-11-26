@@ -24,6 +24,11 @@ class Menu:
         self.menu_state.set_state(self.game_state.get_state())
         self.menu_ui.set_current_menu(self.game_state.get_state())
 
+    def return_to_main_menu_action(self):
+        self.game_state.set_state("main menu")
+        self.menu_state.set_state("main menu")
+        self.menu_ui.set_current_menu("main menu")
+
     def resume_game_action(self):
         self.game_state.set_state("game")
 
@@ -53,16 +58,16 @@ class Menu:
         menu_ui.add_button_type("back", None, None, None, (200, 50))
 
         menu_ui.add_menu("Game Over")
-        menu_ui.add_button("Game Over", "default", "Restart", (690, 220), self.start_game_action)
-        menu_ui.add_button("Game Over", "default", "Exit To Menu", (690, 370), self.return_to_menu_action)
-        menu_ui.add_button("Game Over", "default", "Quit", (690, 520), self.exit_funct)
+        menu_ui.add_button("Game Over", "default", "Restart", (460, 288), self.start_game_action)
+        menu_ui.add_button("Game Over", "default", "Exit To Menu", (460, 399), self.return_to_menu_action)
+        menu_ui.add_button("Game Over", "default", "Quit", (460, 488), self.exit_funct)
 
         menu_ui.add_menu("paused")
-        menu_ui.add_button("paused", "default", "Resume", (460, 208), self.resume_game_action)
-        menu_ui.add_button("paused", "default", "Restart", (460, 308), self.start_game_action)
-        menu_ui.add_button("paused", "default", "Controls", (460, 408), self.controls_action)
-        menu_ui.add_button("paused", "default", "Exit To Menu", (460, 508), self.return_to_menu_action)
-        menu_ui.add_button("paused", "default", "Quit", (460, 608), self.exit_funct)
+        menu_ui.add_button("paused", "default", "Resume", (460, 228), self.resume_game_action)
+        menu_ui.add_button("paused", "default", "Restart", (460, 328), self.start_game_action)
+        menu_ui.add_button("paused", "default", "Controls", (460, 428), self.controls_action)
+        menu_ui.add_button("paused", "default", "Exit To Menu", (460, 528), self.return_to_main_menu_action)
+        menu_ui.add_button("paused", "default", "Quit", (460, 628), self.exit_funct)
 
         menu_ui.add_menu("main menu")
         menu_ui.add_button("main menu", "default", "Start Game", (150, 250), self.start_game_action)
