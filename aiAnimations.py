@@ -210,11 +210,43 @@ class AiAnimation:
                 animation_percentage
             )
 
-            surface.blit(animation[0].get_current_sprite(), dungeonGenerator.DungeonGenerator.get_position_with_offset(current_position[0], current_position[1]))
+            animation_move_direction = self.get_move_direction(self.ghost_paths[animation[1]][animation[2]][start_position], self.ghost_paths[animation[1]][animation[2]][end_position])
+            animation_surface = self.rotate_animation(animation[0].get_current_sprite(), animation_move_direction, forwards)
+
+            surface.blit(animation_surface, dungeonGenerator.DungeonGenerator.get_position_with_offset(current_position[0], current_position[1]))
 
             animation[6] = current_position
 
-    def flip_values(self, value_a, value_b):
+    def get_move_direction(self, start_position, end_position):
+        """Get direction animation is moving in"""
+
+
+        if start_position[0] > end_position[0]:
+            return "right"
+        elif start_position[0] < end_position[0]:
+            return "left"
+        elif start_position[1] > end_position[1]:
+            return "down"
+        elif start_position[1] < end_position[1]:
+            return "up"
+
+    def rotate_animation(self, animation_surface, direction, forwards):
+        """"""
+
+        rotate_amount = 90
+
+        # we ignore left as its the default move direction
+        if direction == "left":
+            return pygame.transform.flip(animation_surface, True, False)
+        elif direction == "up":
+            return pygame.transform.rotate(animation_surface, rotate_amount)
+        elif direction == "down":
+            return pygame.transform.rotate(animation_surface, -rotate_amount)
+
+        return animation_surface
+
+    @staticmethod
+    def flip_values(value_a, value_b):
         return value_b, value_a
 
     def ghost_in_position(self, pos_x, pos_y, surface):
