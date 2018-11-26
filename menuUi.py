@@ -110,12 +110,15 @@ class UiMenu:
 
         return temp_surface
 
-    def draw_buttons(self, surface, mouse_pos, key_pressed):
+    def draw_buttons(self, surface, mouse_pos, key_pressed, menu_name=None):
         """Draws all the buttons and menu header to the surface"""
         # note to self: button_type, button_label, position_rect, action_funct
 
+        if menu_name is None:
+            menu_name = self.current_menu
+
         # display the header in the hoz center of the screen
-        header_surface = self.get_header(self.current_menu,
+        header_surface = self.get_header(menu_name,
                                          self.header_fontface,
                                          self.HEADER_SIZE)
         offset_x, offset_y = self.center_surface(surface.get_size(),
@@ -124,7 +127,7 @@ class UiMenu:
         surface.blit(header_surface, (offset_x, self.HEADER_Y_POSITION))
 
         # display all the buttons for the current menu.
-        for button in self.menus[self.current_menu]:
+        for button in self.menus[menu_name]:
             surface.blit(
                 self.get_button(
                     self.buttons[button[0]].draw_button(
@@ -133,11 +136,14 @@ class UiMenu:
                 button[2]
             )
 
-    def is_button_pressed(self, mouse_position, mouse_is_pressed):
+    def is_button_pressed(self, mouse_position, mouse_is_pressed, menu_name=None):
         """find if any of the buttons on the current menu are being pressed"""
 
+        if menu_name is None:
+            menu_name = self.current_menu
+
         # See if any of the buttons are being pressed on the current menu.
-        for button in self.menus[self.current_menu]:
+        for button in self.menus[menu_name]:
             if self.buttons[button[0]].is_pressed(mouse_position,
                                                   button[2], mouse_is_pressed
                                                   ):
