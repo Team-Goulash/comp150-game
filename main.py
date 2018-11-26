@@ -789,38 +789,60 @@ def main():
             # todo. nuffing is working on the game over screen!!
             menus.draw_buttons(
                 screen, pygame.mouse.get_pos(),
-                library.KEY_PRESSED["mouse"])
+                library.KEY_PRESSED["mouse"], "Game Over")
             menus.is_button_pressed(
                 pygame.mouse.get_pos(),
-                library.KEY_PRESSED["mouse"])
+                library.KEY_PRESSED["mouse"], "Game Over")
 
             menu_audio_is_playing = menu_audio(menu_audio_is_playing, True)
         elif game_state.get_state() == "main menu":
-            # New ui code!
-            menus.draw_buttons(
-                screen,
-                pygame.mouse.get_pos(),
-                library.KEY_PRESSED["mouse"]
-            )
-            menus.is_button_pressed(
-                pygame.mouse.get_pos(),
-                library.KEY_PRESSED["mouse"]
-            )
-
             menu_audio_is_playing = menu_audio(menu_audio_is_playing, True)
             if menu_state.get_state() == "Controls":
                 ui_controls()
+                menus.draw_buttons(
+                    screen,
+                    pygame.mouse.get_pos(),
+                    library.KEY_PRESSED["mouse"], "Controls"
+                )
+                menus.is_button_pressed(
+                    pygame.mouse.get_pos(),
+                    library.KEY_PRESSED["mouse"], "Controls"
+                )
+            else:
+                # New ui code!
+                menus.draw_buttons(
+                    screen,
+                    pygame.mouse.get_pos(),
+                    library.KEY_PRESSED["mouse"], "Main Menu"
+                )
+                menus.is_button_pressed(
+                    pygame.mouse.get_pos(),
+                    library.KEY_PRESSED["mouse"], "Main Menu"
+                )
+
         elif game_state.get_state() == "paused":
             menu_audio_is_playing = menu_audio(menu_audio_is_playing, True)
-            menus.draw_buttons(
-                screen,
-                pygame.mouse.get_pos(),
-                library.KEY_PRESSED["mouse"]
-            )
-            menus.is_button_pressed(
-                pygame.mouse.get_pos(),
-                library.KEY_PRESSED["mouse"]
-            )
+            if menu_state.get_state() == "Controls":
+                ui_controls()
+                menus.draw_buttons(
+                    screen,
+                    pygame.mouse.get_pos(),
+                    library.KEY_PRESSED["mouse"], "Controls"
+                )
+                menus.is_button_pressed(
+                    pygame.mouse.get_pos(),
+                    library.KEY_PRESSED["mouse"], "Controls"
+                )
+            else:
+                menus.draw_buttons(
+                    screen,
+                    pygame.mouse.get_pos(),
+                    library.KEY_PRESSED["mouse"], "Paused"
+                )
+                menus.is_button_pressed(
+                    pygame.mouse.get_pos(),
+                    library.KEY_PRESSED["mouse"], "Paused"
+                )
         elif game_state.get_state() == "editor":
             Editor.display()
 

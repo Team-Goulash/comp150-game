@@ -19,16 +19,13 @@ class Menu:
         elif name == "menu_state":
             self.menu_state = funct
 
-    # button functions
-    def test_button_function(self):
-        print("Buttons Pressed")
-
     def return_to_menu_action(self):
+        self.game_state.set_state("main menu")
         self.menu_state.set_state("main menu")
         self.menu_ui.set_current_menu("Main Menu")
 
     def resume_game_action(self):
-        self.game_state("game")
+        self.game_state.set_state("game")
 
     def pause_game_action(self):
         pass
@@ -44,6 +41,7 @@ class Menu:
         self.game_state.set_state("editor")
 
     def controls_action(self):
+        #self.game_state.set_state("main menu")
         self.menu_state.set_state("Controls")
         self.menu_ui.set_current_menu("Controls")
 
@@ -66,7 +64,6 @@ class Menu:
         menu_ui.add_button("Paused", "default", "Controls", (460, 408), self.controls_action)
         menu_ui.add_button("Paused", "default", "Exit To Menu", (460, 508), self.return_to_menu_action)
         menu_ui.add_button("Paused", "default", "Quit", (460, 608), self.exit_funct)
-
 
         menu_ui.add_menu("Main Menu")
         menu_ui.add_button("Main Menu", "default", "Start Game", (150, 250), self.start_game_action)
