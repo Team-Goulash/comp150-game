@@ -35,6 +35,11 @@ screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
 
 import tileEditor as Editor
 
+# set the load bar font here so we know pygame has initialized
+library.loading_bar_font_face = pygame.font.Font("UI/AMS hand writing.ttf", 18)
+debug_header_font_face = pygame.font.Font("UI/AMS hand writing.ttf", 36)
+debug_font_face = pygame.font.Font("UI/AMS hand writing.ttf", 22)
+
 menu = mainMenu.Menu()
 menus = None            # this is set just befor main is called at the end of the script
 
@@ -154,7 +159,19 @@ def event_inputs():
                 library.KEY_PRESSED["space"] = event.type == KEYDOWN
 
         if event.type == KEYUP:
-            if event.key == library.PAUSE and library.MAIN_MENU is False: # Pauses the game
+            if event.key == K_F12:
+                library.debug_mode = not library.debug_mode
+
+            if library.debug_mode:
+                if event.key == K_EQUALS:
+                    dunGen.DungeonGenerator.levelCount += 1
+                    dunGen.DungeonGenerator.current_dungeon += 1
+                elif event.key == K_MINUS and \
+                        dunGen.DungeonGenerator.levelCount > 3:
+                    dunGen.DungeonGenerator.levelCount -= 1
+                    dunGen.DungeonGenerator.current_dungeon -= 1
+
+            if event.key == library.PAUSE and library.MAIN_MENU is False:  # Pauses the game
                 if game_state.get_state() == "game":
                     game_state.set_state("paused")
                 elif game_state.get_state() == "paused":
@@ -202,6 +219,7 @@ def event_inputs():
                                                            library.KEY_PRESSED["mouse"]) and library.MAIN_MENU is True:
                 # Opens tile editor
                 library.EDITOR = True
+                game_state.set_state("editor")
             elif library.SETTINGS is True and main_menu_buttons["back"].is_pressed(pygame.mouse.get_pos(), (51, 613),
                                                                                    library.KEY_PRESSED["mouse"]):
                 # Checks to see if you're in settings before going back to the main menu
@@ -572,24 +590,69 @@ def set_menu_states(state):
     state.set_state("main menu")
 
 
-def menu_audio(is_playing, stop):
-    # todo test again once the state machine has been fully implemented
-    if not stop and not is_playing:
+def menu_audio(is_playing, play):
+
+    if play and not is_playing:
         pygame.mixer.music.play(-1)
         return True
 
-    elif stop and is_playing:
+    elif not play and is_playing:
         pygame.mixer.music.stop()
         return False
-
-    print(is_playing)
 
     return is_playing
 
 
+def draw_dungeon():
+
+    # Todo this can be optimized so it only draws the rooms we can see.
+    for i in range(len(dunGen.DungeonGenerator.levels) - 1, -1, -1):
+        screen.blit(dunGen.DungeonGenerator.levels[i],
+                    (dunGen.DungeonGenerator.x +
+                     dunGen.DungeonGenerator.starting_point_x[i] -
+                     dunGen.DungeonGenerator.offsetX, dunGen.DungeonGenerator.y +
+                     dunGen.DungeonGenerator.starting_point_y[i] -
+                     dunGen.DungeonGenerator.offsetY))
+
+
+def debug():
+    if library.debug_mode:
+        # display some stats to screen
+        debug_header_surface = debug_header_font_face.render(
+            "DEBUG MODE",
+            True,
+            library.WHITE
+        )
+        debug_room_count_surface = debug_font_face.render(
+            "Level Room count: " + str(dunGen.DungeonGenerator.levelCount),
+            True,
+            library.WHITE
+        )
+
+        for room in range(len(dunGen.DungeonGenerator.starting_point_x)):
+            room_numb = room + 1
+            room_numb_surface = debug_font_face.render(
+                str(room_numb),
+                True,
+                library.WHITE
+            )
+            display_position = dunGen.DungeonGenerator.get_position_with_offset(
+                dunGen.DungeonGenerator.starting_point_x[room] +
+                (dunGen.TILE_SIZE // 2),
+                dunGen.DungeonGenerator.starting_point_y[room] +
+                (dunGen.TILE_SIZE // 2)
+            )
+            screen.blit(room_numb_surface, display_position)
+
+        screen.blit(debug_header_surface, (0, 0))
+        screen.blit(debug_room_count_surface, (0, 33))
+
+
 def main():
     """Main game loop."""
-    player_object.get_world_position_funct = dunGen.DungeonGenerator.get_position_with_offset
+
+    player_object.get_world_position_funct = \
+        dunGen.DungeonGenerator.get_position_with_offset
     dunGen.DungeonGenerator.create_dungeon(dunGen.DungeonGenerator)
 
     # players current direction
@@ -610,180 +673,96 @@ def main():
 
     # main game loop
     while True:
-        movement_speed = 0
 
         time.update_time(pygame.time.get_ticks()/1000.0)
 
         # amount of time that passed since the last frame in seconds
         delta_time = time.delta_time
+        movement_speed = 75 * delta_time
 
-        if library.EDITOR:
-            Editor.display()
-            continue
-
-        # Get inputs
         event_inputs()
 
-        display_pause_menu = False
-
-        if not library.PAUSED and library.HAS_STARTED:
-            # multiply the movement by delta_time to ensure constant speed
-            # no matter the FPS
-            movement_speed = 75 * delta_time
-
-        # prevent the player from moving if the game has not finished resetting
-        if library.RESET or library.PAUSED or library.GAME_OVER or not library.HAS_STARTED:
-            movement_speed = 0
-
-        if not library.RESET:
-            if not library.PAUSED:
-                colDetect.CollisionDetector.detect_collision(colDetect.CollisionDetector)
-                # Key press actions
-                if library.KEY_PRESSED["forwards"] and \
-                        not library.KEY_PRESSED["backwards"]:
-                    dunGen.DungeonGenerator.bottom_col = False
-                    if not dunGen.DungeonGenerator.top_col:
-                        # move the player and assign prediction values
-                        dunGen.DungeonGenerator.previousY = dunGen.DungeonGenerator.y
-                        dunGen.DungeonGenerator.y += movement_speed
-
-                        dunGen.DungeonGenerator.prediction_Y = -10
-                        if not library.KEY_PRESSED["right"] and \
-                                not library.KEY_PRESSED["left"]:
-                            dunGen.DungeonGenerator.prediction_X = 0
-                            dunGen.DungeonGenerator.secondary_prediction_X = 0
-
-                        if not dunGen.DungeonGenerator.left_col and \
-                                not dunGen.DungeonGenerator.right_col:
-                            dunGen.DungeonGenerator.secondary_prediction_Y = -10
-                    else:
-                        # block the player movement
-                        dunGen.DungeonGenerator.prediction_Y = 0
-                        if not dunGen.DungeonGenerator.previousY == dunGen.DungeonGenerator.y:
-                            dunGen.DungeonGenerator.y -= movement_speed
-                            dunGen.DungeonGenerator.previousY = dunGen.DungeonGenerator.y
-
-                if library.KEY_PRESSED["backwards"] and \
-                        not library.KEY_PRESSED["forwards"]:
-                    dunGen.DungeonGenerator.top_col = False
-                    if not dunGen.DungeonGenerator.bottom_col:
-                        # move the player and assign prediction values
-                        dunGen.DungeonGenerator.previousY = dunGen.DungeonGenerator.y
-                        dunGen.DungeonGenerator.y -= movement_speed
-
-                        dunGen.DungeonGenerator.prediction_Y = 10
-                        if not library.KEY_PRESSED["right"] and \
-                                not library.KEY_PRESSED["left"]:
-                            dunGen.DungeonGenerator.prediction_X = 0
-                            dunGen.DungeonGenerator.secondary_prediction_X = 0
-
-                        if not dunGen.DungeonGenerator.left_col and \
-                                not dunGen.DungeonGenerator.right_col:
-                            dunGen.DungeonGenerator.secondary_prediction_Y = 10
-                    else:
-                        # block the player movement
-                        dunGen.DungeonGenerator.prediction_Y = 0
-                        if not dunGen.DungeonGenerator.previousY == dunGen.DungeonGenerator.y:
-                            dunGen.DungeonGenerator.y += movement_speed
-                            dunGen.DungeonGenerator.previousY = dunGen.DungeonGenerator.y
-
-                if library.KEY_PRESSED["left"] and \
-                        not library.KEY_PRESSED["right"]:
-                    dunGen.DungeonGenerator.right_col = False
-                    if not dunGen.DungeonGenerator.left_col:
-                        # move the player and assign prediction values
-                        dunGen.DungeonGenerator.previousX = dunGen.DungeonGenerator.x
-                        dunGen.DungeonGenerator.x += movement_speed
-
-                        dunGen.DungeonGenerator.prediction_X = -20
-                        if not library.KEY_PRESSED["forwards"] and \
-                                not library.KEY_PRESSED["backwards"]:
-                            dunGen.DungeonGenerator.prediction_Y = 0
-                            dunGen.DungeonGenerator.secondary_prediction_Y = 0
-
-                        if not dunGen.DungeonGenerator.bottom_col and \
-                                not dunGen.DungeonGenerator.top_col:
-                            dunGen.DungeonGenerator.secondary_prediction_X = -20
-                    else:
-                        # block the player movement
-                        dunGen.DungeonGenerator.prediction_X = 0
-                        if not dunGen.DungeonGenerator.previousX == dunGen.DungeonGenerator.x:
-                            dunGen.DungeonGenerator.x -= movement_speed
-                            dunGen.DungeonGenerator.previousX = dunGen.DungeonGenerator.x
-
-                if library.KEY_PRESSED["right"] and \
-                        not library.KEY_PRESSED["left"]:
-                    dunGen.DungeonGenerator.left_col = False
-                    if not dunGen.DungeonGenerator.right_col:
-                        # move the player and assign prediction values
-                        dunGen.DungeonGenerator.previousX = dunGen.DungeonGenerator.x
-                        dunGen.DungeonGenerator.x -= movement_speed
-
-                        dunGen.DungeonGenerator.prediction_X = 15
-                        if not library.KEY_PRESSED["forwards"] and \
-                                not library.KEY_PRESSED["backwards"]:
-                            dunGen.DungeonGenerator.prediction_Y = 0
-                            dunGen.DungeonGenerator.secondary_prediction_Y = 0
-
-                        if not dunGen.DungeonGenerator.bottom_col and \
-                                not dunGen.DungeonGenerator.top_col:
-                            dunGen.DungeonGenerator.secondary_prediction_X = 15
-                    else:
-                        # block the player movement
-                        dunGen.DungeonGenerator.prediction_X = 0
-                        if not dunGen.DungeonGenerator.previousX == dunGen.DungeonGenerator.x:
-                            dunGen.DungeonGenerator.x += movement_speed
-                            dunGen.DungeonGenerator.previousX = dunGen.DungeonGenerator.x
-
-                # update animation times
-                if not library.GAME_OVER and library.HAS_STARTED:
-                    fuel_meter.update_fuel_timer(delta_time)
-            else:
-                display_pause_menu = True
-
-
-            # Display main menu if the game has not started
-            if not library.HAS_STARTED:
-                main_menu()
-            elif library.GAME_OVER:
-                game_over()
-            # display the pause menu if the game paused
-            elif display_pause_menu is True:
-                pause_menu()
-            else:
-                # fill the background
-                screen.fill(library.BLACK)
-                # render the level on screen
-                for i in range(len(dunGen.DungeonGenerator.levels) - 1, -1, -1):
-                    screen.blit(dunGen.DungeonGenerator.levels[i],
-                                (dunGen.DungeonGenerator.x +
-                                 dunGen.DungeonGenerator.starting_point_x[i] -
-                                 dunGen.DungeonGenerator.offsetX, dunGen.DungeonGenerator.y +
-                                 dunGen.DungeonGenerator.starting_point_y[i] -
-                                 dunGen.DungeonGenerator.offsetY))
-
-                # update player's position
-                player_x_pos, player_y_pos = dunGen.DungeonGenerator.\
-                    get_position_with_offset(player_object.position[0],
-                                             player_object.position[1])
-
-                dunGen.DungeonGenerator.draw_chest(dunGen.DungeonGenerator)
-
-                aiAnimationPaths.update_animations(delta_time, screen)
-
-                if aiAnimationPaths.ghost_in_position(player_x_pos, player_y_pos, screen):
-                    library.GAME_OVER = True
+        # fill the background
+        screen.fill(library.BLACK)
 
         # NEW MAIN CODE
-        if game_state.get_state() == "loading":
+        if game_state.get_state() == "loading":  # treat this as RESET.
 
             menu_audio_is_playing = menu_audio(menu_audio_is_playing, True)
         elif game_state.get_state() == "game":
+            # Audio
             sound_effects.play_footprint()
+            menu_audio_is_playing = menu_audio(menu_audio_is_playing, False)
+
+            # Dungeon
+            colDetect.CollisionDetector.detect_collision(
+                colDetect.CollisionDetector
+            )
+
+            dunGen.DungeonGenerator. update_dungeon(
+                dunGen.DungeonGenerator,
+                "forwards",
+                "backwards",
+                movement_speed,
+                -10,
+                "right",
+                "left"
+            )
+            dunGen.DungeonGenerator. update_dungeon(
+                dunGen.DungeonGenerator,
+                "backwards",
+                "forwards",
+                -movement_speed,
+                10,
+                "right",
+                "left"
+            )
+            dunGen.DungeonGenerator. update_dungeon(
+                dunGen.DungeonGenerator,
+                "left",
+                "right",
+                movement_speed,
+                -20,
+                "forwards",
+                "backwards"
+            )
+            dunGen.DungeonGenerator. update_dungeon(
+                dunGen.DungeonGenerator,
+                "right",
+                "left",
+                -movement_speed,
+                15,
+                "forwards",
+                "backwards"
+            )
+
+            draw_dungeon()
+            dunGen.DungeonGenerator.draw_chest(dunGen.DungeonGenerator)
+
+            # Ghost Animation
+            aiAnimationPaths.update_animations(delta_time, screen)
+
             # Player
-            player_object.block_move_direction(dunGen.DungeonGenerator.top_col, dunGen.DungeonGenerator.right_col, dunGen.DungeonGenerator.bottom_col, dunGen.DungeonGenerator.left_col)
+            player_object.block_move_direction(
+                dunGen.DungeonGenerator.top_col,
+                dunGen.DungeonGenerator.right_col,
+                dunGen.DungeonGenerator.bottom_col,
+                dunGen.DungeonGenerator.left_col
+            )
             player_object.update(library.KEY_PRESSED)
             player_object.draw(dunGen.TILE_SIZE, screen)
+
+            player_x_pos, player_y_pos = dunGen.DungeonGenerator.\
+                get_position_with_offset(player_object.position[0],
+                                         player_object.position[1])
+
+            if not library.debug_mode and aiAnimationPaths.ghost_in_position(
+                    player_x_pos,
+                    player_y_pos,
+                    screen
+            ):
+                game_state.set_state("game over")
+
             # Light
             playerLight.update_light(fuel_meter.get_fuel_percentage())
             playerLight.initialise_lightning(dunGen.TILE_SIZE)
@@ -791,12 +770,13 @@ def main():
             playerLight.overlay(screen)
 
             # Fuel Meta (UI)
+            if not library.debug_mode:
+                fuel_meter.update_fuel_timer(delta_time)
+
             fuel_meter.display_fuel_meter(screen, (630, 50))
 
             if fuel_meter.torch_time == 0:
                 game_state.set_state("game over")
-                # todo remove when ui is sorted
-                library.GAME_OVER = True
 
             if dunGen.DungeonGenerator.reset_fuel:
                 fuel_meter.reset_fuel()
@@ -805,22 +785,33 @@ def main():
                 fuel_meter.add_fuel()
                 dunGen.DungeonGenerator.add_fuel = False
 
-                menu_audio_is_playing = menu_audio(menu_audio_is_playing, True)
-
         elif game_state.get_state() == "game over":
+            # todo. nuffing is working on the game over screen!!
+            game_over()
+
             menu_audio_is_playing = menu_audio(menu_audio_is_playing, True)
         elif game_state.get_state() == "main menu":
             # New ui code!
-            menus.draw_buttons(screen, pygame.mouse.get_pos(), library.KEY_PRESSED["mouse"])
-            menus.is_button_pressed(pygame.mouse.get_pos(), library.KEY_PRESSED["mouse"])
+            menus.draw_buttons(
+                screen,
+                pygame.mouse.get_pos(),
+                library.KEY_PRESSED["mouse"]
+            )
+            menus.is_button_pressed(
+                pygame.mouse.get_pos(),
+                library.KEY_PRESSED["mouse"]
+            )
 
-            menu_audio_is_playing = menu_audio(menu_audio_is_playing, False)
+            menu_audio_is_playing = menu_audio(menu_audio_is_playing, True)
             if menu_state.get_state() == "Controls":
                 ui_controls()
         elif game_state.get_state() == "paused":
-            menu_audio_is_playing = menu_audio(menu_audio_is_playing, False)
+            menu_audio_is_playing = menu_audio(menu_audio_is_playing, True)
+            pause_menu()
         elif game_state.get_state() == "editor":
-            pass
+            Editor.display()
+
+        debug()
 
         # update the display.
         fps_clock.tick(FPS)
@@ -829,11 +820,15 @@ def main():
 
 if __name__ == "__main__":
 
+    # set games state in the tile editor so we can return.
+    Editor.EditorStore.game_state = game_state
+
+    # set shared functions with the menu system
     menu.set_functions_by_name("exit", exit_game)
     menu.set_functions_by_name("menu_state", menu_state)
     menu.set_functions_by_name("game state", game_state)
 
     menus = menu.initialize_menu()
-
     colorBlindFilter.initialization()
+
     main()
