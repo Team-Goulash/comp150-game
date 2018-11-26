@@ -812,7 +812,15 @@ def main():
                 ui_controls()
         elif game_state.get_state() == "paused":
             menu_audio_is_playing = menu_audio(menu_audio_is_playing, True)
-            pause_menu()
+            menus.draw_buttons(
+                screen,
+                pygame.mouse.get_pos(),
+                library.KEY_PRESSED["mouse"]
+            )
+            menus.is_button_pressed(
+                pygame.mouse.get_pos(),
+                library.KEY_PRESSED["mouse"]
+            )
         elif game_state.get_state() == "editor":
             Editor.display()
 

@@ -27,6 +27,12 @@ class Menu:
         self.menu_state.set_state("main menu")
         self.menu_ui.set_current_menu("Main Menu")
 
+    def resume_game_action(self):
+        self.game_state("game")
+
+    def pause_game_action(self):
+        pass
+
     def start_game_action(self):
         if library.HAD_FIRST_RUN:
             dunGen.DungeonGenerator.reset(dunGen.DungeonGenerator, True)
@@ -53,6 +59,13 @@ class Menu:
         menu_ui.add_button("Game Over", "default", "Restart", (690, 220), self.start_game_action)
         menu_ui.add_button("Game Over", "default", "Exit To Menu", (690, 370), self.return_to_menu_action)
         menu_ui.add_button("Game Over", "default", "Quit", (690, 520), self.exit_funct)
+
+        menu_ui.add_menu("Paused")
+        menu_ui.add_button("Paused", "default", "Resume", (460, 208), self.resume_game_action)
+        menu_ui.add_button("Paused", "default", "Restart", (460, 308), self.start_game_action)
+        menu_ui.add_button("Paused", "default", "Controls", (460, 408), self.controls_action)
+        menu_ui.add_button("Paused", "default", "Exit To Menu", (460, 508), self.return_to_menu_action)
+        menu_ui.add_button("Paused", "default", "Quit", (460, 608), self.exit_funct)
 
 
         menu_ui.add_menu("Main Menu")
