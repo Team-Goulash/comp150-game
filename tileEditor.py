@@ -8,7 +8,6 @@ import pygame
 import sys
 import library
 import UI
-# import pathlib
 import loadSave
 import os
 import image_effects
@@ -21,6 +20,7 @@ class EditorStore:
 
     # has the editor been initialized
     initialized = False
+    game_state = None
     update_image_directory = False
     current_directory = "./Well Escape tiles"
     # stores the tile paths from the current directory
@@ -776,7 +776,7 @@ def button_action(action_type, button_data=None):
             if standalone_mode:
                 quit()
             # un-set the editor
-            library.EDITOR = False
+            EditorStore.game_state.set_state("main menu")
             # Set buttons back to start menu so
             # if we return to editor its good to go.
             EditorStore.current_menu_buttons = start_menu_button_data
@@ -890,7 +890,7 @@ def run_effect(effect_id):
 
     image_effects.run_effect(
         effect_id, EditorStore.edit_tile, effect_inputs,
-        (loading_bar, screen, (0, 0, WINDOW_WIDTH, 50)
+        (library.loading_bar, screen, (0, 0, WINDOW_WIDTH, 50)
          )
     )
 
@@ -917,26 +917,6 @@ def resize_preview_image(preview_image):
                         int(image_size[1] * multiplier)
                         )
     )
-
-
-def loading_bar(surface, rect, percent):
-    """
-    Displays a loading bar on surface and updates display.
-
-    :param surface: surface to display loading bar on.
-    :param rect:    the position and size of the loading bar
-    (x, y, width, height).
-    :param percent: the loading percentage.
-    :return:        None.
-    """
-    text_surface = text_fontface.render("Loading", True, library.BLACK)
-    pygame.draw.rect(surface, library.GREY, rect)
-    pygame.draw.rect(
-        surface, library.WHITE,
-        (rect[0] + 5, rect[1] + 5, (rect[2] - 10) * percent, rect[3] - 8)
-    )
-    surface.blit(text_surface, (50, 10))
-    pygame.display.flip()
 
 
 def set_directory(directory):

@@ -82,7 +82,7 @@ class MusicGenerator:
     sample_rate = 44100
     songRate = sample_rate * multiplier
 
-    volume = 0      # TODO: change back to 0.5
+    volume = 0.1      # TODO: change back to 0.5
 
     song_point = 0.1
 
@@ -102,8 +102,6 @@ class MusicGenerator:
                 self.current_chord += 2
             else:
                 self.current_chord = 1
-
-        print(self.song_point)
 
     def snare(self):
         """
@@ -220,8 +218,6 @@ class MusicGenerator:
             sample_value4 = self.create_value(self, i, self.hi_hat_frequency,
                                               self.volume / 4)
 
-            print(sample_value + sample_value2 +
-                  sample_value3 + sample_value4)
 
             # pack all of the values together
             packed_value = struct.pack('i', int(sample_value
@@ -259,9 +255,6 @@ def main():
                 if event.key == K_SPACE:
                     # Generate and play the track
                     MusicGenerator.generate_track(MusicGenerator)
-                    print(str(MusicGenerator.filename
-                              + str(MusicGenerator.current_track)
-                              + MusicGenerator.filetype))
                     pygame.mixer.music.load(str(MusicGenerator.filename
                                             + str(MusicGenerator.current_track)
                                             + MusicGenerator.filetype))
