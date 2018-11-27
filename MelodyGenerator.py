@@ -78,11 +78,11 @@ class MusicGenerator:
     currentNote = 2
     currentNote2 = 1
 
-    multiplier = 2
+    multiplier = 6
     sample_rate = 44100
     songRate = sample_rate * multiplier
 
-    volume = 0.1      # TODO: change back to 0.5
+    volume = 0.1
 
     song_point = 0.1
 
@@ -216,7 +216,7 @@ class MusicGenerator:
             self.hi_hat(self)
             self.melody(self)
 
-            number_of_values = 6
+            number_of_values = 5
 
             # create the sine wave values for each sound
             sample_value = self.create_value(self, i, self.melody_frequency_1,
@@ -227,6 +227,7 @@ class MusicGenerator:
                                               self.volume / number_of_values)
             sample_value4 = self.create_value(self, i, self.hi_hat_frequency,
                                               self.volume / number_of_values)
+
             square_wave_sample_value = sample_value * 2 * self.square_wave(
                 sample_value) * 0.5
 
