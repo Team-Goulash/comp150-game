@@ -82,7 +82,7 @@ class MusicGenerator:
     sample_rate = 44100
     songRate = sample_rate * multiplier
 
-    volume = 0.5
+    volume = 0.1      # TODO: change back to 0.5
 
     song_point = 0.1
 
@@ -226,9 +226,14 @@ class MusicGenerator:
             sample_value3 = self.create_value(self, i, self.snare_frequency,
                                               self.volume / number_of_values)
             sample_value4 = self.create_value(self, i, self.hi_hat_frequency,
+<<<<<<< HEAD
                                               self.volume / number_of_values)
             square_wave_sample_value = sample_value * 2 * self.square_wave(
                 sample_value) * 0.5
+=======
+                                              self.volume / 4)
+
+>>>>>>> 52faf1b9641a60a35bfa3f7b57aab6b73fc13385
 
             # pack all of the values together
             packed_value = struct.pack('i', int(sample_value
