@@ -15,11 +15,12 @@ class UiMenu:
     menus = {}
     buttons = {}
 
-    HEADER_Y_POSITION = 0
+    HEADER_Y_POSITION = -40
+    HEADER_X_OFFSET = -237
     HEADER_SIZE = (1100, 300)
 
     def __init__(self):
-        self.header_fontface = pygame.font.Font("UI/AMS hand writing.ttf", 185)
+        self.header_fontface = pygame.font.Font("UI/AMS hand writing.ttf", 105)
         self.button_fontface = pygame.font.Font("UI/AMS hand writing.ttf", 50)
 
     def set_font_face(self, header_fontface, button_fontface):
@@ -94,12 +95,12 @@ class UiMenu:
         return temp_surface
 
     def get_header(self, label, fontface, label_size,
-                   font_color=(40, 40, 40, 255),
-                   background_color=(200, 200, 200, 255)
+                   font_color=(60, 60, 60, 103),
+                   background_color=(132, 249, 230, 0)
                    ):
         """gets the menu header"""
 
-        temp_surface = pygame.Surface(label_size)
+        temp_surface = pygame.Surface(label_size, pygame.SRCALPHA)
         temp_surface.fill(background_color)
         text_surface = fontface.render(label, True, font_color)
 
@@ -126,6 +127,8 @@ class UiMenu:
                                          self.HEADER_SIZE)
         offset_x, offset_y = self.center_surface(surface.get_size(),
                                                  header_surface.get_size())
+
+        offset_x += self.HEADER_X_OFFSET
 
         surface.blit(header_surface, (offset_x, self.HEADER_Y_POSITION))
 

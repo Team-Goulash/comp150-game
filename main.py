@@ -268,7 +268,6 @@ def main():
     player_object.get_world_position_funct = \
         dunGen.DungeonGenerator.get_position_with_offset
     dunGen.DungeonGenerator.create_dungeon(dunGen.DungeonGenerator)
-
     # players current direction
     current_direction = library.BACKWARDS
 
@@ -297,9 +296,12 @@ def main():
         event_inputs()
 
         # fill the background
-        screen.fill(library.LIGHT_GREY)
+        screen.fill((132, 249, 230, 255))
 
         # NEW MAIN CODE
+        if game_state.get_state() == "main menu" or game_state.get_state() == "game over"\
+                or game_state.get_state() == "paused":
+            screen.blit(library.background, (0, 0))
         if game_state.get_state() == "loading":  # treat this as RESET.
 
             menu_audio_is_playing = menu_audio(menu_audio_is_playing, True)

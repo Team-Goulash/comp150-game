@@ -44,6 +44,9 @@ buttonTwoClick = pygame.transform.scale(pygame.image.load("UI/Button_001_pressed
 buttonOne = pygame.transform.scale(pygame.image.load("UI/Button_000_normal.png"), buttonSize)
 buttonTwo = pygame.transform.scale(pygame.image.load("UI/Button_001_normal.png"), buttonSize)
 
+# Background
+background = pygame.image.load("UI/WellEscape_Background.png")
+
 loading_bar_font_face = None    # gets set in main.
 
 scaleNum = 90
