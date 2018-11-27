@@ -95,7 +95,7 @@ class UiMenu:
         return temp_surface
 
     def get_header(self, label, fontface, label_size,
-                   font_color=(60, 60, 60, 103),
+                   font_color=(140, 140, 140, 103),
                    background_color=(132, 249, 230, 0)
                    ):
         """gets the menu header"""
