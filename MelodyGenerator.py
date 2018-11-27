@@ -226,14 +226,9 @@ class MusicGenerator:
             sample_value3 = self.create_value(self, i, self.snare_frequency,
                                               self.volume / number_of_values)
             sample_value4 = self.create_value(self, i, self.hi_hat_frequency,
-<<<<<<< HEAD
                                               self.volume / number_of_values)
             square_wave_sample_value = sample_value * 2 * self.square_wave(
                 sample_value) * 0.5
-=======
-                                              self.volume / 4)
-
->>>>>>> 52faf1b9641a60a35bfa3f7b57aab6b73fc13385
 
             # pack all of the values together
             packed_value = struct.pack('i', int(sample_value
