@@ -15,12 +15,13 @@ class UiMenu:
     menus = {}
     buttons = {}
 
-    HEADER_Y_POSITION = 75
-    HEADER_SIZE = (500, 100)
+    HEADER_Y_POSITION = -40
+    HEADER_X_OFFSET = -237
+    HEADER_SIZE = (1100, 300)
 
     def __init__(self):
-        self.header_fontface = pygame.font.SysFont("arial", 100)
-        self.button_fontface = pygame.font.SysFont("arial", 50)
+        self.header_fontface = pygame.font.Font("UI/AMS hand writing.ttf", 105)
+        self.button_fontface = pygame.font.Font("UI/AMS hand writing.ttf", 50)
 
     def set_font_face(self, header_fontface, button_fontface):
         """ set the fontface, params are ignored if None """
@@ -94,12 +95,12 @@ class UiMenu:
         return temp_surface
 
     def get_header(self, label, fontface, label_size,
-                   font_color=(0, 0, 0, 255),
-                   background_color=(255, 255, 255, 255)
+                   font_color=(140, 140, 140, 103),
+                   background_color=(132, 249, 230, 0)
                    ):
         """gets the menu header"""
 
-        temp_surface = pygame.Surface(label_size)
+        temp_surface = pygame.Surface(label_size, pygame.SRCALPHA)
         temp_surface.fill(background_color)
         text_surface = fontface.render(label, True, font_color)
 
@@ -110,14 +111,14 @@ class UiMenu:
 
         return temp_surface
 
-    def draw_buttons(self, surface, mouse_pos, key_pressed, menu_tile=None, menu_name=None):
+    def draw_buttons(self, surface, mouse_pos, key_pressed, menu_title=None, menu_name=None):
         """Draws all the buttons and menu header to the surface"""
         # note to self: button_type, button_label, position_rect, action_funct
 
         if menu_name is None:
             menu_name = self.current_menu
 
-        if menu_tile is None:
+        if menu_title is None:
             menu_title = menu_name
 
         # display the header in the hoz center of the screen
@@ -126,6 +127,8 @@ class UiMenu:
                                          self.HEADER_SIZE)
         offset_x, offset_y = self.center_surface(surface.get_size(),
                                                  header_surface.get_size())
+
+        offset_x += self.HEADER_X_OFFSET
 
         surface.blit(header_surface, (offset_x, self.HEADER_Y_POSITION))
 

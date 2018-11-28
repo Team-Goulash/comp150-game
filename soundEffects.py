@@ -128,7 +128,7 @@ class SoundFX:
         if not self.playing and (library.KEY_PRESSED["backwards"] or library.KEY_PRESSED["forwards"] or
                                  library.KEY_PRESSED["right"]
                                  or library.KEY_PRESSED["left"]):
-            self.footstep_sound.play(0)
+            self.footstep_sound.play(-1)
             self.footstep_sound.set_volume(self.volume)
             self.playing = True
         elif self.playing and not (library.KEY_PRESSED["backwards"] or library.KEY_PRESSED["forwards"] or

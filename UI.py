@@ -33,13 +33,13 @@ class UIButtons:
         """
         self.button_size = size
         self.button_hover = self.set_button_image(
-            button_hover_src, size, library.GREY
+            button_hover_src, size, library.LIGHT_GREY
         )
         self.button_normal = self.set_button_image(
-            button_normal_src, size, library.WHITE
+            button_normal_src, size, library.GREY
         )
         self.button_pressed = self.set_button_image(
-            button_pressed_src, size, library.LIGHT_GREY
+            button_pressed_src, size, library.DARK_GREY
         )
 
     def set_button_image(self, image_src, size, color):

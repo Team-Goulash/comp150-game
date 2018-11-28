@@ -16,18 +16,8 @@ KEY_PRESSED = {"left": False, "right": False, "forwards": False,
                "backwards": False, "mouse": False, "space": False}
 
 HAD_FIRST_RUN = False
-HAS_STARTED = False
 RESET = False
 
-# Todo Remove States
-MAIN_MENU = False
-OPTIONS = False
-PAUSE_MENU = False
-GAME_OVER = False
-CONTROLS = False
-SETTINGS = False
-MAIN_MENU_CONTROLS = False
-PAUSED = False
 
 # set Colors (r, g, b, a)
 BLUE = (0, 0, 255, 255)
@@ -53,6 +43,9 @@ buttonOneClick = pygame.transform.scale(pygame.image.load("UI/Button_000_pressed
 buttonTwoClick = pygame.transform.scale(pygame.image.load("UI/Button_001_pressed.png"), buttonSize)
 buttonOne = pygame.transform.scale(pygame.image.load("UI/Button_000_normal.png"), buttonSize)
 buttonTwo = pygame.transform.scale(pygame.image.load("UI/Button_001_normal.png"), buttonSize)
+
+# Background
+background = pygame.image.load("UI/WellEscape_Background.png")
 
 loading_bar_font_face = None    # gets set in main.
 
