@@ -56,6 +56,7 @@ playerImg = pygame.transform.scale(pygame.image.load("Characters/Player.png"),
 
 debug_mode = False
 
+SOUND_HAS_INITIALIZED = None
 
 def clamp(min, max, value):
     """
