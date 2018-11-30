@@ -220,6 +220,7 @@ def menu_audio(is_playing, play):
 def draw_dungeon():
 
     # Todo this can be optimized so it only draws the rooms we can see.
+    screen.fill(Color("black"))
     for i in range(len(dunGen.DungeonGenerator.levels) - 1, -1, -1):
         screen.blit(dunGen.DungeonGenerator.levels[i],
                     (dunGen.DungeonGenerator.x +
