@@ -208,6 +208,10 @@ def set_menu_states(state):
 
 def menu_audio(is_playing, play):
     """Play or stop the menu audio."""
+
+    if library.SOUND_HAS_INITIALIZED is None:
+        return
+
     if play and not is_playing:
         pygame.mixer.music.play(-1)
         return True
@@ -281,10 +285,13 @@ def main():
 
     dunGen.DungeonGenerator.player = player_object
 
-    melGen.MusicGenerator.generate_track(melGen.MusicGenerator)
-    pygame.mixer.music.load(str(melGen.MusicGenerator.filename
-                                + str(melGen.MusicGenerator.current_track)
-                                + melGen.MusicGenerator.filetype))
+    # prevent the menu audio generating if the audio has not initialized
+    if library.SOUND_HAS_INITIALIZED is not None:
+        print("Audio has not been initialized")
+        melGen.MusicGenerator.generate_track(melGen.MusicGenerator)
+        pygame.mixer.music.load(str(melGen.MusicGenerator.filename
+                                    + str(melGen.MusicGenerator.current_track)
+                                    + melGen.MusicGenerator.filetype))
 
     menu_audio_is_playing = False
 
@@ -486,5 +493,7 @@ if __name__ == "__main__":
 
     menus = menu.initialize_menu()
     colorBlindFilter.initialization()
+
+    library.SOUND_HAS_INITIALIZED = pygame.mixer.get_init()
 
     main()

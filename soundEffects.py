@@ -20,6 +20,10 @@ class SoundFX:
 
     def __init__(self, vol=0.7):
         """Initialize."""
+        
+        if library.SOUND_HAS_INITIALIZED is None:
+            return
+
         self.playing = False
         self.echo_footprint_sound = pygame.mixer.Sound(
             'Game Sounds/Foot Steps Echo.wav')
@@ -139,6 +143,9 @@ class SoundFX:
         Check if the keys are no longer being pressed and stop the sound.
         :return:
         """
+        if library.SOUND_HAS_INITIALIZED is None:
+            return
+
         if not self.playing and (library.KEY_PRESSED["backwards"]
                                  or library.KEY_PRESSED["forwards"]
                                  or library.KEY_PRESSED["right"]
