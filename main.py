@@ -61,7 +61,7 @@ menu_state = StateController()
 time = timeManager.TimeManager(pygame.time.get_ticks() / 1000.0)
 player_object = Player(75, (0.9, 0.9), time)
 
-sound_effects = soundEffects.SoundFX()
+
 
 if not os.path.exists("Well Escape tiles/varieties"):
     os.makedirs("Well Escape tiles/varieties")
@@ -367,6 +367,8 @@ def main():
             draw_dungeon()
             dunGen.DungeonGenerator.draw_chest(dunGen.DungeonGenerator)
 
+            print(dunGen.DungeonGenerator.x, dunGen.DungeonGenerator.y)
+
             # Ghost Animation
             aiAnimationPaths.update_animations(delta_time, screen)
 
@@ -495,5 +497,6 @@ if __name__ == "__main__":
     colorBlindFilter.initialization()
 
     library.SOUND_HAS_INITIALIZED = pygame.mixer.get_init()
+    sound_effects = soundEffects.SoundFX()
 
     main()
