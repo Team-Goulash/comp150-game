@@ -33,15 +33,14 @@ WINDOW_WIDTH = 1334
 # create the window
 screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
 
-import tileEditor as Editor
-
 # set the load bar font here so we know pygame has initialized
 library.loading_bar_font_face = pygame.font.Font("UI/AMS hand writing.ttf", 18)
 debug_header_font_face = pygame.font.Font("UI/AMS hand writing.ttf", 36)
 debug_font_face = pygame.font.Font("UI/AMS hand writing.ttf", 22)
 
 menu = mainMenu.Menu()
-menus = None            # this is set just befor main is called at the end of the script
+# this is set just before main is called at the end of the script
+menus = None
 
 # set the window caption
 pygame.display.set_caption("Well Escape")
@@ -128,7 +127,8 @@ def event_inputs():
         elif event.type == MOUSEBUTTONDOWN:
             library.KEY_PRESSED["mouse"] = True
 
-        elif event.type == MOUSEBUTTONUP:                       # has a mouse button just been released?
+        # has a mouse button just been released?
+        elif event.type == MOUSEBUTTONUP:
             library.KEY_PRESSED["mouse"] = False
 
 
@@ -169,19 +169,21 @@ def start():
     # variables for offsetting everything
     # so the starting tile is always at the center
     dunGen.DungeonGenerator.offsetX = -level_rect.centerx + \
-                                      dunGen.DungeonGenerator.playerSpawnPoint[0]
+        dunGen.DungeonGenerator.playerSpawnPoint[0]
     dunGen.DungeonGenerator.offsetY = -level_rect.centery + \
-                                      dunGen.DungeonGenerator.playerSpawnPoint[1]
+        dunGen.DungeonGenerator.playerSpawnPoint[1]
     library.RESET = False
 
 
-#UI functions
+# UI functions
 def ui_controls():
-    screen.blit(pygame.transform.scale(pygame.image.load("UI/Controls.png"), (800, 600)), (200, 200))
+    """Draw the controls image on screen."""
+    screen.blit(pygame.transform.scale(pygame.image.load("UI/Controls.png"),
+                                       (800, 600)), (200, 200))
 
 
 def set_game_states(state):
-
+    """Create the game states and set the default state."""
     state.add_state("main menu", "main menu")
     state.add_state("loading", "loading")
     state.add_state("game", "game")
@@ -194,7 +196,7 @@ def set_game_states(state):
 
 
 def set_menu_states(state):
-
+    """Create the menu states and set the default state."""
     state.add_state("main menu", "main menu")
     state.add_state("options", "Options")
     state.add_state("paused", "paused")
@@ -205,7 +207,7 @@ def set_menu_states(state):
 
 
 def menu_audio(is_playing, play):
-
+    """Play or stop the menu audio."""
     if play and not is_playing:
         pygame.mixer.music.play(-1)
         return True
@@ -218,18 +220,21 @@ def menu_audio(is_playing, play):
 
 
 def draw_dungeon():
-
+    """Draw the dungeon on screen."""
     # Todo this can be optimized so it only draws the rooms we can see.
+    screen.fill(Color("black"))
     for i in range(len(dunGen.DungeonGenerator.levels) - 1, -1, -1):
         screen.blit(dunGen.DungeonGenerator.levels[i],
                     (dunGen.DungeonGenerator.x +
                      dunGen.DungeonGenerator.starting_point_x[i] -
-                     dunGen.DungeonGenerator.offsetX, dunGen.DungeonGenerator.y +
+                     dunGen.DungeonGenerator.offsetX,
+                     dunGen.DungeonGenerator.y +
                      dunGen.DungeonGenerator.starting_point_y[i] -
                      dunGen.DungeonGenerator.offsetY))
 
 
 def debug():
+    """Switch the game to debug mode."""
     if library.debug_mode:
         # display some stats to screen
         debug_header_surface = debug_header_font_face.render(
@@ -250,12 +255,12 @@ def debug():
                 True,
                 library.WHITE
             )
-            display_position = dunGen.DungeonGenerator.get_position_with_offset(
-                dunGen.DungeonGenerator.starting_point_x[room] +
-                (dunGen.TILE_SIZE // 2),
-                dunGen.DungeonGenerator.starting_point_y[room] +
-                (dunGen.TILE_SIZE // 2)
-            )
+            display_position = dunGen.DungeonGenerator.\
+                get_position_with_offset(
+                    dunGen.DungeonGenerator.starting_point_x[room] +
+                    (dunGen.TILE_SIZE // 2),
+                    dunGen.DungeonGenerator.starting_point_y[room] +
+                    (dunGen.TILE_SIZE // 2))
             screen.blit(room_numb_surface, display_position)
 
         screen.blit(debug_header_surface, (0, 0))
@@ -264,7 +269,6 @@ def debug():
 
 def main():
     """Main game loop."""
-
     player_object.get_world_position_funct = \
         dunGen.DungeonGenerator.get_position_with_offset
     dunGen.DungeonGenerator.create_dungeon(dunGen.DungeonGenerator)
@@ -299,7 +303,8 @@ def main():
         screen.fill((132, 249, 230, 255))
 
         # NEW MAIN CODE
-        if game_state.get_state() == "main menu" or game_state.get_state() == "game over"\
+        if game_state.get_state() == "main menu"\
+                or game_state.get_state() == "game over"\
                 or game_state.get_state() == "paused":
             screen.blit(library.background, (0, 0))
         if game_state.get_state() == "loading":  # treat this as RESET.
@@ -470,7 +475,7 @@ def main():
 
 
 if __name__ == "__main__":
-
+    import tileEditor as Editor
     # set games state in the tile editor so we can return.
     Editor.EditorStore.game_state = game_state
 
