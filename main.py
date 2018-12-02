@@ -367,8 +367,6 @@ def main():
             draw_dungeon()
             dunGen.DungeonGenerator.draw_chest(dunGen.DungeonGenerator)
 
-            print(dunGen.DungeonGenerator.x, dunGen.DungeonGenerator.y)
-
             # Ghost Animation
             aiAnimationPaths.update_animations(delta_time, screen)
 
