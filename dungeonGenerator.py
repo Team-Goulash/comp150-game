@@ -125,7 +125,8 @@ class DungeonGenerator:
                 # set the starting point for the next room
                 self.starting_point_x[i] = \
                     self.starting_point_x[i - 1] + \
-                    self.end_x[i-1] * TILE_SIZE - (self.start_x[i-1] * TILE_SIZE)
+                    self.end_x[i-1] * TILE_SIZE - \
+                    (self.start_x[i-1] * TILE_SIZE)
 
                 self.starting_point_y[i] = \
                     self.starting_point_y[i - 1] + \
@@ -476,13 +477,15 @@ class DungeonGenerator:
 
         return weights
 
-    def get_edge_name_from_move_direction(self, move_direction):
-        """Get the related edge name for move direction
+    @staticmethod
+    def get_edge_name_from_move_direction(move_direction):
+        """
+        Get the related edge name for move direction.
+
         Driver: Ashley
         :param move_direction: name of move direction
         :return:               name of edge corresponding to the move direction
         """
-
         if move_direction == "forwards":
             return "top"
         elif move_direction == "right":
@@ -499,12 +502,13 @@ class DungeonGenerator:
             )
 
     def get_collider_edge(self, edge_name):
-        """Get players collider edges value
+        """
+        Get players collider edges value.
+
         Driver: Ashley
         :param edge_name:   Name of edge to reset
         :return:            Value of the player collider edges
         """
-
         if edge_name == "top":
             return self.top_col
         elif edge_name == "right":
@@ -521,12 +525,13 @@ class DungeonGenerator:
             )
 
     def reset_collider_edge(self, edge_name):
-        """Reset collider edge
+        """
+        Reset collider edge.
+
         Driver: Ashley
         :param edge_name:   Name of edge to reset
         :return:            None
         """
-
         if edge_name == "top":
             self.top_col = False
         elif edge_name == "right":
@@ -547,14 +552,15 @@ class DungeonGenerator:
                         move_amount,
                         previous_position=None
                         ):
-        """Update dungeon position
+        """
+        Update dungeon position.
+
         Driver: Ashley
         :param move_direction:      name of direction to move in
         :param move_amount:         amount to move
         :param previous_position:   if None its set to position
         :return:                    None
         """
-
         if move_direction == "forwards" or move_direction == "backwards":
             if previous_position is None:
                 self.previousY = self.y
@@ -572,24 +578,26 @@ class DungeonGenerator:
             self.x += move_amount
 
     def get_axis_position_from_move_direction(self, move_direction):
-        """Get position of an axis corresponding to the move direction
+        """
+        Get position of an axis corresponding to the move direction.
+
         Driver: Ashley
         :param move_direction:  name of direction to get the position of
         :return:                position of the corresponding axis
         """
-
         if move_direction == "forwards" or move_direction == "backwards":
             return self.y
         else:
             return self.x
 
     def get_axis_previous_position_from_move_direction(self, move_direction):
-        """Get previous position of an axis corresponding to the move direction
+        """
+        Get previous position of an axis corresponding to the move direction.
+
         Driver: Ashley
         :param move_direction:  name of direction to get the position of
         :return:                previous position of the corresponding axis
         """
-
         if move_direction == "forwards" or move_direction == "backwards":
             return self.previousY
         else:
@@ -597,10 +605,12 @@ class DungeonGenerator:
 
     def set_prediction(self,
                        move_direction,
-                       main_value = None,
-                       secondary_value = None
+                       main_value=None,
+                       secondary_value=None
                        ):
-        """ Set main and secondary values corresponding to move direction
+        """
+        Set main and secondary values corresponding to move direction.
+
         Driver: Ashley
         :param move_direction:
         :param main_value:          value to set main prediction
@@ -609,7 +619,6 @@ class DungeonGenerator:
                                     (ignored if None)
         :return:                    None
         """
-
         if move_direction == "forwards" or move_direction == "backwards":
             if main_value is not None:
                 self.prediction_Y = main_value
@@ -632,9 +641,10 @@ class DungeonGenerator:
                        other_direction_1,
                        other_direction_2
                        ):
-        """Update the dungeon position
-        Drive: Ashley
+        """
+        Update the dungeon position.
 
+        Driver: Ashley
         :param move_direction:              Direction to test if moving
         :param opposite_move_direction:     Opposite direction of move test
         :param move_amount:                 Amount to move
@@ -643,31 +653,26 @@ class DungeonGenerator:
         :param other_direction_2:           The other, other direction.
         :return:                            None
         """
-
         if (library.KEY_PRESSED[move_direction] and
                 not library.KEY_PRESSED[opposite_move_direction]):
             # Get names of all the edges so its orientated correctly
             move_direction_edge_name = \
                 self.get_edge_name_from_move_direction(
-                    self,
                     move_direction
                     )
 
             opposite_move_direction_edge_name = \
                 self.get_edge_name_from_move_direction(
-                    self,
                     opposite_move_direction
                     )
 
             other_direction_1_edge_name = \
                 self.get_edge_name_from_move_direction(
-                    self,
                     other_direction_1
                     )
 
             other_direction_2_edge_name = \
                 self.get_edge_name_from_move_direction(
-                    self,
                     other_direction_2
                     )
 
@@ -732,4 +737,3 @@ class DungeonGenerator:
 
                 if current_pos != prv_pos:
                     self.update_position(self, move_direction, 0)
-
