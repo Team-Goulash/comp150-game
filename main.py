@@ -428,7 +428,7 @@ def main():
             # Audio
             if next_background_audio_time <= 0:
                 game_background_audio()
-                next_background_audio_time += random.uniform(
+                next_background_audio_time = random.uniform(
                     float(bg_audio_interval["min"]),
                     float(bg_audio_interval["max"])
                 )
