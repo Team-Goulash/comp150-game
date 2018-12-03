@@ -442,15 +442,14 @@ def main():
 
             fuel_meter.display_fuel_meter(screen, (630, 50))
 
-            if fuel_meter.torch_time == 0:
-                game_state.set_state("game over")
-
             if dunGen.DungeonGenerator.reset_fuel:
                 fuel_meter.reset_fuel()
                 dunGen.DungeonGenerator.reset_fuel = False
             elif dunGen.DungeonGenerator.add_fuel:
                 fuel_meter.add_fuel()
                 dunGen.DungeonGenerator.add_fuel = False
+            elif fuel_meter.torch_time == 0:
+                game_state.set_state("game over")
 
         elif game_state.get_state() == "game over":
 
