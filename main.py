@@ -61,7 +61,9 @@ menu_state = StateController()
 time = timeManager.TimeManager(pygame.time.get_ticks() / 1000.0)
 player_object = Player(75, (0.9, 0.9), time)
 
-
+background_audio_paths = ["audio/bg_1.wav", "audio/bg_0.wav"]
+bg_audio_interval = {"min": 3, "max": 6}
+bg_audio_players = []
 
 if not os.path.exists("Well Escape tiles/varieties"):
     os.makedirs("Well Escape tiles/varieties")
@@ -222,6 +224,30 @@ def menu_audio(is_playing, play):
 
     return is_playing
 
+def game_background_audio():
+    """play in game background audio."""
+
+    if library.SOUND_HAS_INITIALIZED is None:
+        return
+
+    random_bg_sound_id = random.randint(0, len(background_audio_paths)-1)
+    audio = pygame.mixer.Sound(background_audio_paths[random_bg_sound_id])
+    audio.set_volume(0.5)
+    audio.play()
+
+def stop_audio():
+    """Stop all audio.
+
+    :return:    0 so it can reset any timers
+    """
+
+    if library.SOUND_HAS_INITIALIZED is None:
+        return
+
+    pygame.mixer.stop()
+
+    return 0
+
 
 def draw_dungeon():
     """Draw the dungeon on screen."""
@@ -295,6 +321,8 @@ def main():
 
     menu_audio_is_playing = False
 
+    next_background_audio_time = 0
+
     # main game loop
     while True:
 
@@ -314,6 +342,7 @@ def main():
                 or game_state.get_state() == "game over"\
                 or game_state.get_state() == "paused":
             screen.blit(library.background, (0, 0))
+
         if game_state.get_state() == "loading":  # treat this as RESET.
 
             menu_audio_is_playing = menu_audio(menu_audio_is_playing, True)
@@ -397,6 +426,16 @@ def main():
             playerLight.draw_light(screen, dunGen)
             playerLight.overlay(screen)
 
+            # Audio
+            if next_background_audio_time <= 0:
+                game_background_audio()
+                next_background_audio_time += random.uniform(
+                    float(bg_audio_interval["min"]),
+                    float(bg_audio_interval["max"])
+                )
+
+            next_background_audio_time -= delta_time
+
             # Fuel Meta (UI)
             if not library.debug_mode:
                 fuel_meter.update_fuel_timer(delta_time)
@@ -414,6 +453,7 @@ def main():
                 dunGen.DungeonGenerator.add_fuel = False
 
         elif game_state.get_state() == "game over":
+
             menus.draw_buttons(
                 screen, pygame.mouse.get_pos(),
                 library.KEY_PRESSED["mouse"], "Game Over", "Game Over")
@@ -422,8 +462,14 @@ def main():
                 library.KEY_PRESSED["mouse"], "Game Over")
 
             menu_audio_is_playing = menu_audio(menu_audio_is_playing, True)
+
         elif game_state.get_state() == "main menu":
+
+            if not menu_audio_is_playing:
+                next_background_audio_time = stop_audio()
+
             menu_audio_is_playing = menu_audio(menu_audio_is_playing, True)
+
             if menu_state.get_state() == "Controls":
                 ui_controls()
                 menus.draw_buttons(
@@ -448,7 +494,12 @@ def main():
                 )
 
         elif game_state.get_state() == "paused":
+
+            if not menu_audio_is_playing:
+                next_background_audio_time = stop_audio()
+
             menu_audio_is_playing = menu_audio(menu_audio_is_playing, True)
+
             if menu_state.get_state() == "Controls":
                 ui_controls()
                 menus.draw_buttons(
