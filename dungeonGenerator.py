@@ -144,7 +144,10 @@ class DungeonGenerator:
 
             self.current_loaded += 1
             loading_x_position = (main.WINDOW_WIDTH/2) - 200;
-            library.loading_bar(main.screen, (loading_x_position, 300, 400, 250), self.current_loaded / self.load_count)
+            library.loading_bar(main.screen,
+                                (loading_x_position, 300, 400, 250),
+                                self.current_loaded / self.load_count
+                                )
 
             self.initialize_level(self, i)
             self.gen_chest_map(self, i)
@@ -180,7 +183,8 @@ class DungeonGenerator:
             main.screen.blit(tile_class.tileTypes[3][0], (x_pos,
                                                           y_pos,
                                                           TILE_SIZE,
-                                                          TILE_SIZE))
+                                                          TILE_SIZE)
+                             )
 
     def gen_rand_map_tiles(self, instance):
         """
@@ -259,11 +263,14 @@ class DungeonGenerator:
                 # horizontal row of materials
                 mat_row.append(material)
 
-                #update loaded coun
+                #update loaded count
                 self.current_loaded += 1
 
             loading_x_position = (main.WINDOW_WIDTH/2) - 200
-            library.loading_bar(main.screen, (loading_x_position, 300, 400, 250), self.current_loaded / self.load_count)
+            library.loading_bar(main.screen,
+                                (loading_x_position, 300, 400, 250),
+                                self.current_loaded / self.load_count
+                                )
 
             # vertical column of horizontal tile rows
             tiles.append(tile_row)
@@ -352,11 +359,14 @@ class DungeonGenerator:
             (DungeonGenerator.MAP_WIDTH * TILE_SIZE,
              DungeonGenerator.MAP_HEIGHT * TILE_SIZE))
 
-        self.load_count += len(tile_class.tileTypes[1]) * DungeonGenerator.mud_variations
-        self.load_count += len(tile_class.tileTypes[1]) * DungeonGenerator.moss_variations
+        self.load_count += len(tile_class.tileTypes[1]) * \
+                           DungeonGenerator.mud_variations
+        self.load_count += len(tile_class.tileTypes[1]) * \
+                           DungeonGenerator.moss_variations
 
         # generate material variations
-        while DungeonGenerator.mud_variations > 0 or DungeonGenerator.moss_variations > 0:
+        while DungeonGenerator.mud_variations > 0 or \
+                DungeonGenerator.moss_variations > 0:
 
 
 
@@ -375,9 +385,14 @@ class DungeonGenerator:
                 DungeonGenerator.moss_variations -= 1
 
             loading_x_position = (main.WINDOW_WIDTH / 2) - 200
-            library.loading_bar(main.screen, (loading_x_position, 300, 400, 250), self.current_loaded / self.load_count)
+            library.loading_bar(main.screen,
+                                (loading_x_position, 300, 400, 250),
+                                self.current_loaded / self.load_count
+                                )
 
-        self.load_count += (DungeonGenerator.MAP_HEIGHT * DungeonGenerator.MAP_WIDTH)
+        self.load_count += (DungeonGenerator.MAP_HEIGHT *
+                            DungeonGenerator.MAP_WIDTH
+                            )
 
         # draw the tiles to the level surface
         for column in range(DungeonGenerator.MAP_HEIGHT):
