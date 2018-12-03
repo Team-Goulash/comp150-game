@@ -135,6 +135,8 @@ class DungeonGenerator:
                 # create the room
                 self.gen_rand_map_tiles(self, i)
 
+            library.loading_bar(main.screen, (0, 0, main.WINDOW_WIDTH, 250), i / len(self.levels))
+
             self.initialize_level(self, i)
             self.gen_chest_map(self, i)
 
