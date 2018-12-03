@@ -71,6 +71,9 @@ class DungeonGenerator:
     reset_fuel = False
     add_fuel = False
 
+    load_count = 1
+    current_loaded = 0
+
     for num in range(levelCount):
         levels.append(pygame.Surface)
         starting_point_x.append(0)
@@ -116,7 +119,11 @@ class DungeonGenerator:
 
     def create_dungeon(self):
         """Generate the dungeon."""
+
         # reset all lists
+        self.load_count = len(self.levels)
+        self.current_loaded = 0
+
         library.RESET = True
         for i in range(len(self.levels)):
             if i > 0:
@@ -134,6 +141,13 @@ class DungeonGenerator:
             else:
                 # create the room
                 self.gen_rand_map_tiles(self, i)
+
+            self.current_loaded += 1
+            loading_x_position = (main.WINDOW_WIDTH/2) - 200;
+            library.loading_bar(main.screen,
+                                (loading_x_position, 300, 400, 250),
+                                self.current_loaded / self.load_count
+                                )
 
             self.initialize_level(self, i)
             self.gen_chest_map(self, i)
@@ -169,7 +183,8 @@ class DungeonGenerator:
             main.screen.blit(tile_class.tileTypes[3][0], (x_pos,
                                                           y_pos,
                                                           TILE_SIZE,
-                                                          TILE_SIZE))
+                                                          TILE_SIZE)
+                             )
 
     def gen_rand_map_tiles(self, instance):
         """
@@ -200,6 +215,8 @@ class DungeonGenerator:
         tiles.clear()
         tileTypes.clear()
         tileMats.clear()
+
+        self.load_count += (self.MAP_WIDTH * self.MAP_HEIGHT)
 
         # Scroll through each pixel in a map and assign according tiles
         # depending on the pixel brightness.
@@ -245,6 +262,15 @@ class DungeonGenerator:
                 material = choices(material_types, material_weights)[0]
                 # horizontal row of materials
                 mat_row.append(material)
+
+                #update loaded count
+                self.current_loaded += 1
+
+            loading_x_position = (main.WINDOW_WIDTH/2) - 200
+            library.loading_bar(main.screen,
+                                (loading_x_position, 300, 400, 250),
+                                self.current_loaded / self.load_count
+                                )
 
             # vertical column of horizontal tile rows
             tiles.append(tile_row)
@@ -333,18 +359,40 @@ class DungeonGenerator:
             (DungeonGenerator.MAP_WIDTH * TILE_SIZE,
              DungeonGenerator.MAP_HEIGHT * TILE_SIZE))
 
-        # generate material variations
-        while DungeonGenerator.mud_variations > 0:
-            for i in range(len(tile_class.tileTypes[1])):
-                tile_class.generate_material(1, i, 1, DungeonGenerator.
-                                             mud_variations)
-            DungeonGenerator.mud_variations -= 1
+        self.load_count += len(tile_class.tileTypes[1]) * \
+                           DungeonGenerator.mud_variations
+        self.load_count += len(tile_class.tileTypes[1]) * \
+                           DungeonGenerator.moss_variations
 
-        while DungeonGenerator.moss_variations > 0:
-            for i in range(len(tile_class.tileTypes[1])):
-                tile_class.generate_material(1, i, 2, DungeonGenerator.
-                                             moss_variations)
-            DungeonGenerator.moss_variations -= 1
+        # generate material variations
+        while DungeonGenerator.mud_variations > 0 or \
+                DungeonGenerator.moss_variations > 0:
+
+
+
+            if self.mud_variations > 0:
+                for i in range(len(tile_class.tileTypes[1])):
+                    tile_class.generate_material(1, i, 1, DungeonGenerator.
+                                                 mud_variations)
+                    self.current_loaded += 1
+                DungeonGenerator.mud_variations -= 1
+
+            if self.moss_variations > 0:
+                for i in range(len(tile_class.tileTypes[1])):
+                    tile_class.generate_material(1, i, 2, DungeonGenerator.
+                                                 moss_variations)
+                    self.current_loaded += 1
+                DungeonGenerator.moss_variations -= 1
+
+            loading_x_position = (main.WINDOW_WIDTH / 2) - 200
+            library.loading_bar(main.screen,
+                                (loading_x_position, 300, 400, 250),
+                                self.current_loaded / self.load_count
+                                )
+
+        self.load_count += (DungeonGenerator.MAP_HEIGHT *
+                            DungeonGenerator.MAP_WIDTH
+                            )
 
         # draw the tiles to the level surface
         for column in range(DungeonGenerator.MAP_HEIGHT):
