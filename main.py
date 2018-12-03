@@ -426,7 +426,7 @@ def main():
             playerLight.overlay(screen)
 
             # Audio
-            if next_background_audio_time <= 0:
+            if next_background_audio_time is None or next_background_audio_time <= 0:
                 game_background_audio()
                 next_background_audio_time = random.uniform(
                     float(bg_audio_interval["min"]),
