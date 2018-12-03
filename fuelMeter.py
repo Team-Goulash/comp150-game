@@ -37,10 +37,14 @@ class Torch:
         if self.torch_time <= 0:
             self.torch_time = 0
         surface.blit(self.bar_holder, position)
+        position = list(position)
+        # apply an offset to position the inner fuel bar
+        position[0] += 17
+        position[1] += 1
         bar_width, bar_height = self.fuel_bar.get_size()
         temp_bar = pygame.transform.scale(
             self.fuel_bar,
-            (int(bar_width * self.get_fuel_percentage()), bar_height))
+            (int((bar_width-17) * self.get_fuel_percentage()), bar_height))
         surface.blit(temp_bar, position)
 
     def get_fuel_percentage(self):
