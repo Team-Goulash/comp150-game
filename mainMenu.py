@@ -41,7 +41,7 @@ class Menu:
     def start_game_action(self):
         """Start the game."""
         if library.HAD_FIRST_RUN:
-            dunGen.DungeonGenerator.reset(dunGen.DungeonGenerator, True)
+            dunGen.DungeonGenerator.reset(dunGen.DungeonGenerator, True, True)
 
         library.HAD_FIRST_RUN = True
         self.game_state.set_state("game")
