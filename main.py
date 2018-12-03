@@ -252,7 +252,6 @@ def stop_audio():
 def draw_dungeon():
     """Draw the dungeon on screen."""
     # Todo this can be optimized so it only draws the rooms we can see.
-    screen.fill(Color("black"))
     for i in range(len(dunGen.DungeonGenerator.levels) - 1, -1, -1):
         screen.blit(dunGen.DungeonGenerator.levels[i],
                     (dunGen.DungeonGenerator.x +
@@ -335,7 +334,7 @@ def main():
         event_inputs()
 
         # fill the background
-        screen.fill((132, 249, 230, 255))
+        screen.fill(library.BLACK)
 
         # NEW MAIN CODE
         if game_state.get_state() == "main menu"\
