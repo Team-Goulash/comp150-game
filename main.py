@@ -414,7 +414,6 @@ def main():
                 dunGen.DungeonGenerator.add_fuel = False
 
         elif game_state.get_state() == "game over":
-            # todo. nuffing is working on the game over screen!!
             menus.draw_buttons(
                 screen, pygame.mouse.get_pos(),
                 library.KEY_PRESSED["mouse"], "Game Over", "Game Over")
