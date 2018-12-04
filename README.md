@@ -25,7 +25,7 @@ Also while in debug mode you can change the amount of rooms that are loaded by p
 '+' to increase the room count and '-' to decrease the room amount. For the new room count to take 
 place you must go through an 'Exit' door.
 
-####GitHubs  
+#### GitHubs  
 Team-goulash: https://github.com/Team-Goulash/comp150-game
 
 Ashley: https://github.com/gizzmo123456/comp150-game  
